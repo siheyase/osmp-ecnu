@@ -1,12 +1,3 @@
-<!--
- * @Author: lyt
- * @Date: 2024-11-18 17:35:01
- * @LastEditTime: 2024-12-13 17:18:37
- * @LastEditors: lyt
- * @Description: 堆叠条形图
- * @FilePath: /osmp-demo/src/components/Charts/src/DirectChart.vue
- *  
--->
 <template>
   <div ref="chartRef" :style="{ height, width }"></div>
 </template>
@@ -17,11 +8,6 @@
   import { DataType } from '/@/components/Charts/src/types/chart';
 
   const props = defineProps({
-    // 图表标题
-    title: {
-      type: String as PropType<string>,
-      default: '',
-    },
     // 数据类型
     dataType: {
       type: String as PropType<DataType>,

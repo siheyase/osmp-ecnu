@@ -1,12 +1,3 @@
-<!--
- * @Author: lyt
- * @Date: 2024-11-21 13:42:33
- * @LastEditTime: 2024-12-13 17:25:35
- * @LastEditors: lyt
- * @Description: 环形图（基于饼图改造）
- * @FilePath: /osmp-demo/src/components/Charts/src/RingChart.vue
- *  
--->
 <template>
   <div ref="chartRef" :style="{ height, width }"></div>
 </template>
@@ -18,11 +9,6 @@
   import { DataType } from '/@/components/Charts/src/types/chart';
 
   const props = defineProps({
-    // 图表标题
-    title: {
-      type: String as PropType<string>,
-      default: '',
-    },
     // 数据类型
     dataType: {
       type: String as PropType<DataType>,

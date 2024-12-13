@@ -1,12 +1,3 @@
-<!--
- * @Author: lyt
- * @Date: 2024-11-19 13:32:58
- * @LastEditTime: 2024-12-13 17:17:56
- * @LastEditors: lyt
- * @Description: 折线图
- * @FilePath: /osmp-demo/src/components/Charts/src/LineChart.vue
- *  
--->
 <template>
   <div ref="chartRef" :style="{ height, width }"></div>
 </template>
@@ -17,11 +8,6 @@
   import { DataType } from '/@/components/Charts/src/types/chart';
 
   const props = defineProps({
-    // 图表标题
-    title: {
-      type: String as PropType<string>,
-      default: '',
-    },
     // 数据类型
     dataType: {
       type: String as PropType<DataType>,

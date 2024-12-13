@@ -1,12 +1,3 @@
-<!--
- * @Author: lyt
- * @Date: 2024-11-11 13:42:04
- * @LastEditTime: 2024-12-13 17:18:34
- * @LastEditors: lyt
- * @Description: 柱状图-多列
- * @FilePath: /osmp-demo/src/components/Charts/src/BarMulti.vue
- *  
--->
 <template>
   <div ref="chartRef" :style="{ height, width }"></div>
 </template>
@@ -18,11 +9,6 @@
   import { DataType } from '/@/components/Charts/src/types/chart';
 
   const props = defineProps({
-    // 图表标题
-    title: {
-      type: String as PropType<string>,
-      default: '',
-    },
     // 数据类型
     dataType: {
       type: String as PropType<DataType>,
