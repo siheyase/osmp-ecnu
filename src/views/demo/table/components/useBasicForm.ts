@@ -1,10 +1,10 @@
 /*
  * @Author: lyt
  * @Date: 2024-12-11 16:13:34
- * @LastEditTime: 2024-12-12 16:19:33
+ * @LastEditTime: 2024-12-13 15:50:30
  * @LastEditors: lyt
  * @Description: lyt
- * @FilePath: /osmp-demo/jeecgboot-vue3/src/views/demo/table/components/useBasicForm.ts
+ * @FilePath: /osmp-demo/src/views/demo/table/components/useBasicForm.ts
  *
  */
 import { useTable } from '/@/components/Table';
@@ -17,7 +17,9 @@ export const useBasicForm = () => {
 
   // 任务表格配置
   const [nodeTable, { reload }] = useTable({
+    // 直接请求接口获取数据
     api: getNodeTableDataApi,
+    // 自定义表格数据
     // dataSource: getNodeTableData(),
     columns: getNodeColumns(),
     fetchSetting: {

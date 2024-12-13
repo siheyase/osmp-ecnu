@@ -1,10 +1,10 @@
 <!--
  * @Author: lyt
  * @Date: 2024-11-08 10:55:12
- * @LastEditTime: 2024-12-12 10:19:15
+ * @LastEditTime: 2024-12-13 16:47:07
  * @LastEditors: lyt
  * @Description: 雷达图
- * @FilePath: /osmp-demo/jeecgboot-vue3/src/components/chart/RadarChart.vue
+ * @FilePath: /osmp-demo/src/components/Charts/RadarChart.vue
  *  
 -->
 <template>

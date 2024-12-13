@@ -1,10 +1,10 @@
 /*
  * @Author: lyt
  * @Date: 2024-11-18 15:06:42
- * @LastEditTime: 2024-12-12 17:25:11
+ * @LastEditTime: 2024-12-13 15:27:51
  * @LastEditors: lyt
  * @Description: demo模块路由
- * @FilePath: /osmp-demo/jeecgboot-vue3/src/router/routes/demo.ts
+ * @FilePath: /osmp-demo/src/router/routes/demo.ts
  *
  */
 import type { AppRouteRecordRaw } from '/@/router/types';
@@ -13,20 +13,12 @@ export const DemoRoute: AppRouteRecordRaw = {
   path: '/demo',
   name: 'Demo',
   component: () => import('/@/views/demo/home/index.vue'),
+  // 重定向, 访问/demo时重定向到/demo/charts
+  redirect: '/demo/charts',
   meta: {
     title: 'Demo示例',
   },
   children: [
-    {
-      path: '',
-      name: 'Home',
-      redirect: '/demo/charts',
-      component: () => import('/@/views/demo/home/index.vue'),
-      meta: {
-        title: 'Demo-首页',
-        currentActiveMenu: '/demo/charts',
-      },
-    },
     {
       path: 'charts',
       name: 'Charts',
@@ -59,13 +51,13 @@ export const DemoRoute: AppRouteRecordRaw = {
         title: 'Demo-弹窗',
       },
     },
-    {
-      path: 'sys/finDataSynthSecurity/dataOnChain',
-      name: 'Sys-FinDataSynthSecurity-DataOnChain',
-      component: () => import('/@/views/demo/sys/finDataSynthSecurity/DataOnChain.vue'),
-      meta: {
-        title: 'Demo-数据合成安全',
-      },
-    },
+    // {
+    //   path: 'sys/finDataSynthSecurity/dataOnChain',
+    //   name: 'Sys-FinDataSynthSecurity-DataOnChain',
+    //   component: () => import('/@/views/demo/sys/finDataSynthSecurity/DataOnChain.vue'),
+    //   meta: {
+    //     title: 'Demo-数据合成安全',
+    //   },
+    // },
   ],
 };

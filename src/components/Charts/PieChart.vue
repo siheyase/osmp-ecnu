@@ -1,10 +1,10 @@
 <!--
  * @Author: lyt
- * @Date: 2024-11-21 13:42:33
- * @LastEditTime: 2024-12-12 10:19:19
+ * @Date: 2024-11-08 10:55:03
+ * @LastEditTime: 2024-12-13 16:47:04
  * @LastEditors: lyt
- * @Description: 环形图（基于饼图改造）
- * @FilePath: /osmp-demo/jeecgboot-vue3/src/components/chart/RingChart.vue
+ * @Description: 饼图
+ * @FilePath: /osmp-demo/src/components/Charts/PieChart.vue
  *  
 -->
 <template>
@@ -54,11 +54,6 @@
       type: String as PropType<string>,
       default: '50vh',
     },
-    // 图表颜色
-    seriesColor: {
-      type: Array as PropType<{ type: string; color: string }[]>,
-      default: () => ['#1D7DE9', '#E8E8E8', '#02B578', '#FEAC00', '#FF4849'],
-    },
   });
 
   const emit = defineEmits(['click']);
@@ -83,13 +78,13 @@
     series: [
       {
         type: 'pie',
-        radius: ['40%', '70%'],
-        center: ['50%', '50%'],
-        data: [],
+        radius: '50%',
+        color: ['#1D7DE9', '#E8E8E8', '#02B578', '#FEAC00', '#FF4849'],
         label: {
           show: true,
           formatter: '{b} {c}',
         },
+        data: [],
       },
     ],
   });

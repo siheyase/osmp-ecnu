@@ -1,10 +1,10 @@
 <!--
  * @Author: lyt
- * @Date: 2024-11-21 14:59:19
- * @LastEditTime: 2024-12-12 10:19:25
+ * @Date: 2024-11-08 10:54:06
+ * @LastEditTime: 2024-12-13 16:46:50
  * @LastEditors: lyt
- * @Description: 极坐标图（基于柱状图改造）
- * @FilePath: /osmp-demo/jeecgboot-vue3/src/components/chart/TangPolarChart.vue
+ * @Description: 柱状图-单列
+ * @FilePath: /osmp-demo/src/components/Charts/BarChart.vue
  *  
 -->
 <template>
@@ -67,36 +67,27 @@
         type: 'shadow',
         label: {
           show: true,
-          backgroundColor: '#1D7DE9',
+          backgroundColor: '#333',
         },
       },
     },
-    polar: {
-      radius: [30, '80%'],
-    },
-    angleAxis: {
-      max: 100,
-      startAngle: 75,
-    },
-    radiusAxis: {
+    xAxis: {
       type: 'category',
-      axisLabel: {
-        // 添加或修改以下属性以调整标签显示
-        interval: 0, // 显示所有标签
-        rotate: 0, // 根据需要调整标签的旋转角度
-      },
       data: [],
     },
-    series: {
-      type: 'bar',
-      coordinateSystem: 'polar',
-      color: ['#2578F2'],
+    yAxis: {
+      type: 'value',
+      axisLabel: {
+        align: 'center',
+      },
     },
-    label: {
-      // show: true,
-      position: 'middle',
-      formatter: '{b}: {c}',
-    },
+    series: [
+      {
+        type: 'bar',
+        data: [],
+        color: ['#1D7DE9'],
+      },
+    ],
   });
 
   watchEffect(() => {
@@ -110,19 +101,9 @@
     // option配置（不含series）
     if (props.optionConfig) {
       Object.assign(option, cloneDeep(props.optionConfig));
-      if (!option.radiusAxis.type) {
-        option.radiusAxis.type = 'category';
-      }
-      if (!option?.radiusAxis?.axisLabel) {
-        option.radiusAxis.axisLabel = {
-          // 添加或修改以下属性以调整标签显示
-          interval: 0, // 显示所有标签
-          rotate: 0, // 根据需要调整标签的旋转角度
-        };
-      }
     }
     let seriesData: any = [];
-    let radiusAxis: any = [];
+    let xAxisData: any = [];
     if (props.dataType === 'origVal') {
       // ------原始数据------
       seriesData = cloneDeep(props.chartData);
@@ -130,16 +111,16 @@
       // ------组装数据------
       props.chartData.forEach((item) => {
         seriesData.push(item.value);
-        radiusAxis.push(item.name);
+        xAxisData.push(item.name);
       });
-      option.radiusAxis.data = radiusAxis;
+      option.xAxis.data = xAxisData;
     }
     // option-series配置
     if (props.seriesConfig) {
-      Object.assign(option.series, cloneDeep(props.seriesConfig));
+      Object.assign(option.series[0], cloneDeep(props.seriesConfig));
     }
-    option.series = {
-      ...option.series,
+    option.series[0] = {
+      ...option.series[0],
       data: seriesData,
     };
     try {

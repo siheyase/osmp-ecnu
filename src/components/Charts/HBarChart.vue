@@ -1,18 +1,17 @@
 <!--
  * @Author: lyt
- * @Date: 2024-11-08 10:55:03
- * @LastEditTime: 2024-12-12 10:19:10
+ * @Date: 2024-11-08 17:26:21
+ * @LastEditTime: 2024-12-13 16:46:58
  * @LastEditors: lyt
- * @Description: 饼图
- * @FilePath: /osmp-demo/jeecgboot-vue3/src/components/chart/PieChart.vue
+ * @Description: 柱状图-横向
+ * @FilePath: /osmp-demo/src/components/Charts/HBarChart.vue
  *  
 -->
 <template>
   <div ref="chartRef" :style="{ height, width }"></div>
 </template>
-
-<script setup lang="ts">
-  import { ref, watchEffect, watch, reactive, onBeforeUnmount, Ref } from 'vue';
+<script lang="ts" setup>
+  import { ref, watchEffect, PropType, reactive, Ref, onBeforeUnmount } from 'vue';
   import { useECharts } from '/@/hooks/web/useECharts';
   import { cloneDeep } from 'lodash-es';
   import { DataType } from '/@/api/demo/model/monDashboardModel';
@@ -39,7 +38,7 @@
       type: Object as PropType<Record<string, any>>,
       default: () => ({}),
     },
-    // 图表配置(echarts-series)
+    // 图表系列配置(echarts-series)
     seriesConfig: {
       type: Object as PropType<Record<string, any>>,
       default: () => ({}),
@@ -59,32 +58,31 @@
   const emit = defineEmits(['click']);
 
   const chartRef = ref<HTMLDivElement | null>(null);
-  const { setOptions, getInstance, resize } = useECharts(chartRef as Ref<HTMLDivElement>);
+  const { setOptions, getInstance } = useECharts(chartRef as Ref<HTMLDivElement>);
 
   const option = reactive<any>({
-    title: {
-      text: props.title,
-      bottom: 0,
-      left: 'center',
-    },
-    legend: {
-      bottom: 10,
-      left: 'center',
-      show: false,
-    },
     tooltip: {
-      trigger: 'item',
+      trigger: 'axis',
+      axisPointer: {
+        type: 'shadow',
+        label: {
+          show: true,
+          backgroundColor: '#333',
+        },
+      },
+    },
+    xAxis: {
+      type: 'value',
+    },
+    yAxis: {
+      type: 'category',
+      data: [],
     },
     series: [
       {
-        type: 'pie',
-        radius: '50%',
-        color: ['#1D7DE9', '#E8E8E8', '#02B578', '#FEAC00', '#FF4849'],
-        label: {
-          show: true,
-          formatter: '{b} {c}',
-        },
+        type: 'bar',
         data: [],
+        color: ['#1D7DE9'],
       },
     ],
   });
@@ -92,14 +90,6 @@
   watchEffect(() => {
     initCharts();
   });
-
-  watch(
-    () => props.size,
-    () => {
-      resize();
-    },
-    { immediate: true }
-  );
 
   function initCharts() {
     if (!props.chartData || props.chartData.length === 0) {
@@ -109,34 +99,47 @@
     if (props.optionConfig) {
       Object.assign(option, cloneDeep(props.optionConfig));
     }
+    let seriesData: any = [];
+    let yAxisData: any = [];
+    if (props.dataType === 'origVal') {
+      // ------原始数据------
+      seriesData = cloneDeep(props.chartData);
+    } else {
+      // ------组装数据------
+      props.chartData.forEach((item) => {
+        seriesData.push(item.value);
+        yAxisData.push(item.name);
+      });
+      option.yAxis.data = yAxisData;
+    }
     // option-series配置
     if (props.seriesConfig) {
       Object.assign(option.series[0], cloneDeep(props.seriesConfig));
     }
-    option.series[0].data = props.chartData as any;
+    option.series[0] = {
+      ...option.series[0],
+      data: seriesData,
+    };
     try {
       setOptions(option);
     } catch (error) {
       console.error('Error setting options:', error);
     }
-    resize();
-    const instance = getInstance();
-    if (instance) {
-      instance.off('click', onClick);
-      instance.on('click', onClick);
-    }
+    getInstance()?.off('click', onClick);
+    getInstance()?.on('click', onClick);
   }
 
   function onClick(params: any) {
     emit('click', params);
   }
 
-  // 清理事件监听
+  const instance = getInstance();
   onBeforeUnmount(() => {
-    const instance = getInstance();
-    if (instance) {
-      instance.off('click', onClick);
-    }
+    instance?.off('click', onClick);
   });
 </script>
-<style lang="less" scoped></style>
+<style lang="less" scoped>
+  .container {
+    width: 100%;
+  }
+</style>

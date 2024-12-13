@@ -1,14 +1,14 @@
 <!--
  * @Author: lyt
  * @Date: 2024-12-12 10:32:41
- * @LastEditTime: 2024-12-12 12:30:16
+ * @LastEditTime: 2024-12-13 16:49:09
  * @LastEditors: lyt
  * @Description: 数据合成安全
- * @FilePath: /osmp-demo/jeecgboot-vue3/src/views/demo/sys/finDataSynthSecurity/DataOnChain.vue
+ * @FilePath: /osmp-demo/src/views/demo/sys/finDataSynthSecurity/DataOnChain.vue
  *  
 -->
 <template>
-  <div>
+  <PageWrapper>
     <h3>数据合成安全</h3>
     <div class="chart">
       <!-- title="节点合成数据" -->
@@ -69,11 +69,12 @@
         </template>
       </BasicTable>
     </div>
-  </div>
+  </PageWrapper>
 </template>
 <script lang="ts" setup>
-  import BarChart from '/@/components/chart/BarChart.vue';
-  import PieChart from '/@/components/chart/PieChart.vue';
+  import { PageWrapper } from '/@/components/Page';
+  import BarChart from '/@/components/Charts/BarChart.vue';
+  import PieChart from '/@/components/Charts/PieChart.vue';
   import { BasicTable } from '/@/components/Table';
   import { useBasicForm } from '/@/views/demo/table/components/useBasicForm';
   import { useDataOnChain } from './useDataOnChain';

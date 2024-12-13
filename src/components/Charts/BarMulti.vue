@@ -1,10 +1,10 @@
 <!--
  * @Author: lyt
  * @Date: 2024-11-11 13:42:04
- * @LastEditTime: 2024-12-12 10:18:47
+ * @LastEditTime: 2024-12-13 16:46:53
  * @LastEditors: lyt
  * @Description: 柱状图-多列
- * @FilePath: /osmp-demo/jeecgboot-vue3/src/components/chart/BarMulti.vue
+ * @FilePath: /osmp-demo/src/components/Charts/BarMulti.vue
  *  
 -->
 <template>

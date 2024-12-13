@@ -1,10 +1,10 @@
 <!--
  * @Author: lyt
- * @Date: 2024-11-19 13:32:58
- * @LastEditTime: 2024-12-12 10:19:06
+ * @Date: 2024-11-18 17:35:01
+ * @LastEditTime: 2024-12-13 16:46:55
  * @LastEditors: lyt
- * @Description: 折线图
- * @FilePath: /osmp-demo/jeecgboot-vue3/src/components/chart/LineChart.vue
+ * @Description: 堆叠条形图
+ * @FilePath: /osmp-demo/src/components/Charts/DirectChart.vue
  *  
 -->
 <template>
@@ -14,8 +14,7 @@
   import { PropType, ref, Ref, reactive, watchEffect } from 'vue';
   import { useECharts } from '/@/hooks/web/useECharts';
   import { cloneDeep } from 'lodash-es';
-
-  type DataType = 'origVal' | 'modVal';
+  import { DataType } from '/@/api/demo/model/monDashboardModel';
 
   const props = defineProps({
     // 图表标题
@@ -62,22 +61,42 @@
   const { setOptions, getInstance } = useECharts(chartRef as Ref<HTMLDivElement>);
 
   const option = reactive<any>({
+    color: ['#5087EC', '#68BBC4', '##58A55D'],
     tooltip: {
       trigger: 'axis',
       axisPointer: {
         type: 'shadow',
+        label: {
+          show: true,
+          backgroundColor: '#333',
+        },
       },
     },
+    legend: {
+      top: '0%',
+    },
     xAxis: {
-      type: 'category',
+      type: 'value',
+      // 自定义X轴Label显示内容
+      axisLabel: {
+        align: 'center',
+      },
     },
     yAxis: {
-      type: 'value',
+      type: 'category',
+      data: [],
     },
     series: [
       {
-        type: 'line',
-        color: ['#2578F2'],
+        name: 'Direct',
+        type: 'bar',
+        stack: 'total',
+        label: {
+          show: true,
+        },
+        emphasis: {
+          focus: 'series',
+        },
         data: [],
       },
     ],
@@ -87,41 +106,55 @@
     initCharts();
   });
 
+  function createSeriesItem(item: any, index: number, isOrigVal: boolean) {
+    let obj: any = { type: 'bar', stack: 'total' };
+    if (props.seriesConfig) {
+      Object.assign(obj, cloneDeep(props.seriesConfig));
+      if (props.seriesConfig?.color && props.seriesConfig?.color?.length) {
+        obj.color = [props.seriesConfig?.color[index]];
+      } else {
+        let defaultColor = ['#2578F2', '#68BBC4', '#02B578'];
+        obj.color = defaultColor[index];
+      }
+    }
+    if (isOrigVal) {
+      obj = { ...obj, name: item.name, data: item.value };
+    } else {
+      obj = { ...obj, name: item.type };
+      let data: any = [];
+      option.yAxis.data.forEach((x) => {
+        let dataArr = props.chartData.filter((chartItem) => item.type === chartItem.type && chartItem.name === x);
+        data.push(dataArr.length > 0 ? dataArr[0].value : null);
+      });
+      obj.data = data;
+    }
+    return obj;
+  }
+
   function initCharts() {
     if (!props.chartData || props.chartData.length === 0) {
       return;
     }
-    // option配置（不含series）
     if (props.optionConfig) {
       Object.assign(option, cloneDeep(props.optionConfig));
     }
-    let seriesData: any = [];
-    // option-series配置
-    if (props.seriesConfig) {
-      Object.assign(option.series[0], cloneDeep(props.seriesConfig));
-    }
+    let seriesData: any[] = [];
     if (props.dataType === 'origVal') {
       // ------原始数据------
-      seriesData = cloneDeep(props.chartData);
+      props.chartData.forEach((item, i) => {
+        seriesData.push(createSeriesItem(item, i, true));
+      });
     } else {
       // ------组装数据------
-      // 图例类型
-      let xAxisData: any = [];
-      props.chartData.forEach((item) => {
-        seriesData.push(item.value);
-        xAxisData.push(item.name);
+      let typeArr = Array.from(new Set(props.chartData.map((item) => item.type)));
+      let yAxisData = Array.from(new Set(props.chartData.map((item) => item.name)));
+      option.yAxis.data = yAxisData;
+      typeArr.forEach((type, i) => {
+        seriesData.push(createSeriesItem({ type }, i, false));
       });
-      option.xAxis.data = xAxisData;
     }
-    option.series[0] = {
-      ...option.series[0],
-      data: seriesData,
-    };
-    try {
-      setOptions(option);
-    } catch (error) {
-      console.error('Error setting options:', error);
-    }
+    option.series = seriesData;
+    setOptions(option);
     getInstance()?.off('click', onClick);
     getInstance()?.on('click', onClick);
   }

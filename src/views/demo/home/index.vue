@@ -1,10 +1,10 @@
 <!--
  * @Author: lyt
  * @Date: 2024-11-18 16:20:29
- * @LastEditTime: 2024-12-12 17:36:29
+ * @LastEditTime: 2024-12-13 15:06:03
  * @LastEditors: lyt
  * @Description: demo-首页
- * @FilePath: /osmp-demo/jeecgboot-vue3/src/views/demo/home/index.vue
+ * @FilePath: /osmp-demo/src/views/demo/home/index.vue
  *  
 -->
 <template>
@@ -14,7 +14,7 @@
       <a-button color="error" @click="goRoute('form')">表单示例</a-button>
       <a-button color="warning" @click="goRoute('table')">表格示例</a-button>
       <a-button :style="{ 'background-color': '#6CC8E1', color: '#fff' }" @click="goRoute('model')">弹窗示例</a-button>
-      <a-button @click="goRoute('sys/finDataSynthSecurity/dataOnChain')">具体示例</a-button>
+      <a-button @click="goRoute('dataOnChain')">具体示例</a-button>
     </div>
     <div>
       <router-view />
@@ -27,7 +27,11 @@
 
   const { replace } = useRouter();
   const goRoute = (type) => {
-    replace({ path: `/demo/${type}` });
+    if (type === 'dataOnChain') {
+      replace({ path: `/finDataSynthSecurity/dataOnChain` });
+    } else {
+      replace({ path: `/demo/${type}` });
+    }
   };
 </script>
 <style lang="scss" scoped>
