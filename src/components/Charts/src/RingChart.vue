@@ -1,10 +1,10 @@
 <!--
  * @Author: lyt
  * @Date: 2024-11-21 13:42:33
- * @LastEditTime: 2024-12-13 16:47:10
+ * @LastEditTime: 2024-12-13 17:25:35
  * @LastEditors: lyt
  * @Description: 环形图（基于饼图改造）
- * @FilePath: /osmp-demo/src/components/Charts/RingChart.vue
+ * @FilePath: /osmp-demo/src/components/Charts/src/RingChart.vue
  *  
 -->
 <template>
@@ -15,7 +15,7 @@
   import { ref, watchEffect, watch, reactive, onBeforeUnmount, Ref } from 'vue';
   import { useECharts } from '/@/hooks/web/useECharts';
   import { cloneDeep } from 'lodash-es';
-  import { DataType } from '/@/api/demo/model/monDashboardModel';
+  import { DataType } from '/@/components/Charts/src/types/chart';
 
   const props = defineProps({
     // 图表标题

@@ -1,20 +1,21 @@
 <!--
  * @Author: lyt
- * @Date: 2024-11-08 17:26:21
- * @LastEditTime: 2024-12-13 16:46:58
+ * @Date: 2024-11-11 13:42:04
+ * @LastEditTime: 2024-12-13 17:18:34
  * @LastEditors: lyt
- * @Description: 柱状图-横向
- * @FilePath: /osmp-demo/src/components/Charts/HBarChart.vue
+ * @Description: 柱状图-多列
+ * @FilePath: /osmp-demo/src/components/Charts/src/BarMulti.vue
  *  
 -->
 <template>
   <div ref="chartRef" :style="{ height, width }"></div>
 </template>
-<script lang="ts" setup>
+
+<script setup lang="ts">
   import { ref, watchEffect, PropType, reactive, Ref, onBeforeUnmount } from 'vue';
   import { useECharts } from '/@/hooks/web/useECharts';
   import { cloneDeep } from 'lodash-es';
-  import { DataType } from '/@/api/demo/model/monDashboardModel';
+  import { DataType } from '/@/components/Charts/src/types/chart';
 
   const props = defineProps({
     // 图表标题
@@ -71,25 +72,50 @@
         },
       },
     },
-    xAxis: {
-      type: 'value',
+    legend: {
+      top: 30,
     },
-    yAxis: {
+    grid: {
+      top: 60,
+    },
+    xAxis: {
       type: 'category',
       data: [],
     },
-    series: [
-      {
-        type: 'bar',
-        data: [],
-        color: ['#1D7DE9'],
-      },
-    ],
+    yAxis: {
+      type: 'value',
+    },
+    series: [],
   });
 
   watchEffect(() => {
     initCharts();
   });
+
+  function createSeriesItem(item: any, index: number, isOrigVal: boolean) {
+    let obj: any = { type: 'bar' };
+    if (props.seriesConfig) {
+      Object.assign(obj, cloneDeep(props.seriesConfig));
+      if (props.seriesConfig?.color && props.seriesConfig?.color?.length) {
+        obj.color = [props.seriesConfig?.color[index]];
+      } else {
+        let defaultColor = ['#2578F2', '#68BBC4', '#02B578'];
+        obj.color = defaultColor[index];
+      }
+    }
+    if (isOrigVal) {
+      obj = { ...obj, name: item.name, data: item.value };
+    } else {
+      obj = { ...obj, name: item.type };
+      let data: any = [];
+      option.xAxis.data.forEach((x) => {
+        let dataArr = props.chartData.filter((chartItem) => item.type === chartItem.type && chartItem.name === x);
+        data.push(dataArr.length > 0 ? dataArr[0].value : null);
+      });
+      obj.data = data;
+    }
+    return obj;
+  }
 
   function initCharts() {
     if (!props.chartData || props.chartData.length === 0) {
@@ -99,34 +125,32 @@
     if (props.optionConfig) {
       Object.assign(option, cloneDeep(props.optionConfig));
     }
-    let seriesData: any = [];
-    let yAxisData: any = [];
+    let seriesData: any[] = [];
     if (props.dataType === 'origVal') {
       // ------原始数据------
-      seriesData = cloneDeep(props.chartData);
+      props.chartData.forEach((item, i) => {
+        seriesData.push(createSeriesItem(item, i, true));
+      });
     } else {
       // ------组装数据------
-      props.chartData.forEach((item) => {
-        seriesData.push(item.value);
-        yAxisData.push(item.name);
+      let typeArr = Array.from(new Set(props.chartData.map((item) => item.type)));
+      let xAxisData = Array.from(new Set(props.chartData.map((item) => item.name)));
+      option.xAxis.data = xAxisData;
+      typeArr.forEach((type, i) => {
+        seriesData.push(createSeriesItem({ type }, i, false));
       });
-      option.yAxis.data = yAxisData;
     }
-    // option-series配置
-    if (props.seriesConfig) {
-      Object.assign(option.series[0], cloneDeep(props.seriesConfig));
-    }
-    option.series[0] = {
-      ...option.series[0],
-      data: seriesData,
-    };
+    option.series = seriesData;
     try {
       setOptions(option);
     } catch (error) {
       console.error('Error setting options:', error);
     }
-    getInstance()?.off('click', onClick);
-    getInstance()?.on('click', onClick);
+    const instance = getInstance();
+    if (instance) {
+      instance.off('click', onClick);
+      instance.on('click', onClick);
+    }
   }
 
   function onClick(params: any) {
@@ -138,8 +162,3 @@
     instance?.off('click', onClick);
   });
 </script>
-<style lang="less" scoped>
-  .container {
-    width: 100%;
-  }
-</style>

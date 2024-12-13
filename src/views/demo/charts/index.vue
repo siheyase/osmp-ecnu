@@ -1,7 +1,7 @@
 <!--
  * @Author: lyt
  * @Date: 2024-11-18 16:09:59
- * @LastEditTime: 2024-12-13 16:48:46
+ * @LastEditTime: 2024-12-13 17:32:07
  * @LastEditors: lyt
  * @Description: demo-图表系列
  * @FilePath: /osmp-demo/src/views/demo/charts/index.vue
@@ -31,16 +31,7 @@
   </div>
 </template>
 <script name="demo-monDashboard" lang="ts" setup>
-  import BarChart from '/@/components/Charts/BarChart.vue';
-  import BarMulti from '/@/components/Charts/BarMulti.vue';
-  import HBarChart from '/@/components/Charts/HBarChart.vue';
-  import RadarChart from '/@/components/Charts/RadarChart.vue';
-  import PieChart from '/@/components/Charts/PieChart.vue';
-  import DirectChart from '/@/components/Charts/DirectChart.vue';
-  import LineChart from '/@/components/Charts/LineChart.vue';
-  import RingChart from '/@/components/Charts/RingChart.vue';
-  import TangPolarChart from '/@/components/Charts/TangPolarChart.vue';
-
+  import { BarChart, BarMulti, HBarChart, RadarChart, PieChart, DirectChart, LineChart, RingChart, TangPolarChart } from '/@/components/Charts';
   import { useCharts } from './useCharts';
 
   const { dashboardData } = useCharts();

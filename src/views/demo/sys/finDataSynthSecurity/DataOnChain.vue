@@ -1,7 +1,7 @@
 <!--
  * @Author: lyt
  * @Date: 2024-12-12 10:32:41
- * @LastEditTime: 2024-12-13 16:49:09
+ * @LastEditTime: 2024-12-13 17:33:27
  * @LastEditors: lyt
  * @Description: 数据合成安全
  * @FilePath: /osmp-demo/src/views/demo/sys/finDataSynthSecurity/DataOnChain.vue
@@ -73,8 +73,7 @@
 </template>
 <script lang="ts" setup>
   import { PageWrapper } from '/@/components/Page';
-  import BarChart from '/@/components/Charts/BarChart.vue';
-  import PieChart from '/@/components/Charts/PieChart.vue';
+  import { BarChart, PieChart } from '/@/components/Charts';
   import { BasicTable } from '/@/components/Table';
   import { useBasicForm } from '/@/views/demo/table/components/useBasicForm';
   import { useDataOnChain } from './useDataOnChain';

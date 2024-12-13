@@ -1,10 +1,10 @@
 <!--
  * @Author: lyt
  * @Date: 2024-11-08 10:55:12
- * @LastEditTime: 2024-12-13 16:47:07
+ * @LastEditTime: 2024-12-13 17:25:31
  * @LastEditors: lyt
  * @Description: 雷达图
- * @FilePath: /osmp-demo/src/components/Charts/RadarChart.vue
+ * @FilePath: /osmp-demo/src/components/Charts/src/RadarChart.vue
  *  
 -->
 <template>
@@ -15,6 +15,7 @@
   import { ref, watchEffect, PropType, reactive, Ref } from 'vue';
   import { useECharts } from '/@/hooks/web/useECharts';
   import { cloneDeep } from 'lodash-es';
+  import { DataType } from '/@/components/Charts/src/types/chart';
 
   const props = defineProps({
     // 图表标题

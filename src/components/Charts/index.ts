@@ -1,0 +1,9 @@
+export { default as BarChart } from '/@/components/Charts/src/BarChart.vue';
+export { default as BarMulti } from '/@/components/Charts/src/BarMulti.vue';
+export { default as DirectChart } from '/@/components/Charts/src/DirectChart.vue';
+export { default as HBarChart } from '/@/components/Charts/src/HBarChart.vue';
+export { default as LineChart } from '/@/components/Charts/src/LineChart.vue';
+export { default as PieChart } from '/@/components/Charts/src/PieChart.vue';
+export { default as RadarChart } from '/@/components/Charts/src/RadarChart.vue';
+export { default as RingChart } from '/@/components/Charts/src/RingChart.vue';
+export { default as TangPolarChart } from '/@/components/Charts/src/TangPolarChart.vue';
