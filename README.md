@@ -19,9 +19,11 @@
 
 #### 使用说明
 
-1.  进入项目：cd jeecgboot-vue3
-2.  安装依赖：pnpm install
-3.  启动项目：
+参考文档：[【腾讯文档】一站式平台-demo示例文档](https://docs.qq.com/doc/DWXZ5ZWFZSWJLQ1JC)
+在线演示：[demo项目在线演示](http://140.207.154.218:42218/)
+
+1.  安装依赖：pnpm install
+2.  启动项目：
     方式1 pnpm dev
     方式2 npm run dev
 
