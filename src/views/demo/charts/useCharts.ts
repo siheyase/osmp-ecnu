@@ -1,26 +1,28 @@
 /*
  * @Author: lyt
  * @Date: 2024-11-18 16:18:18
- * @LastEditTime: 2024-11-25 16:07:21
+ * @LastEditTime: 2024-12-16 17:53:01
  * @LastEditors: lyt
  * @Description: demo-图表系列
- * @FilePath: /osmp-demo/jeecgboot-vue3/src/views/demo/charts/useCharts.ts
+ * @FilePath: /osmp-demo/src/views/demo/charts/useCharts.ts
  *
  */
-import { getMonDashboardApi } from '/@/api/demo/monDashboardApi';
-import { DashboardInfo } from '/@/api/demo/model/monDashboardModel';
+import { getChartsDataApi } from '../../../api/demo/chartsApi';
+import { ChartsInfo } from '../../../api/demo/model/chartsModel';
 import { onMounted, ref } from 'vue';
 import { cloneDeep } from 'lodash-es';
 
 export const useCharts = () => {
-  const dashboardData = ref<DashboardInfo[]>();
+  // 图表demo数据
+  const chartsListData = ref<ChartsInfo[]>();
+  // 弹窗数据
+  const modelData = ref();
 
   const setChartOption = (data) => {
     const newData = cloneDeep(data) as any;
     if (newData && newData.length > 0) {
       newData.forEach((modelItem) => {
         modelItem.chartList.forEach((chartItem, chartIndex) => {
-          // '#1D7DE9
           if (modelItem.type === 'bar') {
             chartItem.chartConfig = {
               ...chartItem.chartConfig,
@@ -28,6 +30,18 @@ export const useCharts = () => {
                 axisLabel: {
                   formatter: '{value}T',
                 },
+              },
+            };
+          }
+          if (modelItem.type === 'hbar') {
+            chartItem.chartConfig = {
+              ...chartItem.chartConfig,
+              // 直角坐标系内绘图区域的配置
+              grid: {
+                left: '3%',
+                right: '3%',
+                bottom: '3%',
+                containLabel: true,
               },
             };
           }
@@ -113,45 +127,49 @@ export const useCharts = () => {
             };
           }
           if (modelItem.type === 'ring') {
-            chartItem.seriesConfig = {
-              // 设置图表每块/列/行的颜色（非必填，为空时默认使用系统设定的颜色）
-              color: ['#2578F2', '#FEAC00'],
-              // 起始角度，支持范围[0, 360]。
-              startAngle: 180,
-              // 结束角度，默认值是 'auto'，支持范围[0, 360]
-              endAngle: 360,
-              label: {
-                show: true,
-                formatter: '{b}{c}',
-              },
-            };
-            // chartItem.chartConfig = {
-            //   legend: {
-            //     orient: 'vertical',
-            //   },
-            //   ...chartItem.chartConfig,
-            // };
+            switch (chartIndex) {
+              case 0:
+                chartItem.seriesConfig = {
+                  // 设置图表每块/列/行的颜色（非必填，为空时默认使用系统设定的颜色）
+                  color: ['#2578F2', '#FEAC00'],
+                  // 起始角度，支持范围[0, 360]。
+                  startAngle: 180,
+                  // 结束角度，默认值是 'auto'，支持范围[0, 360]
+                  endAngle: 360,
+                  label: {
+                    show: true,
+                    formatter: '{b}{c}',
+                  },
+                };
+                break;
+              case 1:
+                chartItem.seriesConfig = {
+                  // 设置图表每块/列/行的颜色（非必填，为空时默认使用系统设定的颜色）
+                  color: ['#2578F2', '#FEAC00'],
+                };
+                break;
+              default:
+                break;
+            }
           }
         });
       });
     }
-
-    console.log('newData', newData);
-
+    console.log('ChartsData', newData);
     return newData;
   };
-  const getDashboardData = async () => {
+  const getchartsListData = async () => {
     try {
-      const res = await getMonDashboardApi({ type: 'pie' });
-      dashboardData.value = res ? setChartOption(res) : [];
+      const res = await getChartsDataApi();
+      chartsListData.value = res ? setChartOption(res) : [];
     } catch (error) {
       console.error('Error:', error);
     }
   };
 
   onMounted(() => {
-    getDashboardData();
+    getchartsListData();
   });
 
-  return { dashboardData };
+  return { chartsListData, modelData };
 };

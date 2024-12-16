@@ -1,3 +1,13 @@
+/*
+ * @Author: lyt
+ * @Date: 2024-12-12 11:43:30
+ * @LastEditTime: 2024-12-16 17:56:58
+ * @LastEditors: lyt
+ * @Description: 表格demo-mock数据
+ * @FilePath: /osmp-demo/mock/demo/tableDemo.ts
+ *
+ */
+
 import { MockMethod } from 'vite-plugin-mock';
 import { resultPageSuccess, baseUrl } from '../_util';
 const getNodeTableData = () => {

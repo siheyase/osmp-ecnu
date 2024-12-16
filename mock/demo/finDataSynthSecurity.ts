@@ -3,7 +3,7 @@
  * @Date: 2024-12-12 10:43:30
  * @LastEditTime: 2024-12-12 10:56:23
  * @LastEditors: lyt
- * @Description: 数据合成安全
+ * @Description: 数据合成安全-mock数据
  * @FilePath: /osmp-demo/jeecgboot-vue3/mock/demo/finDataSynthSecurity.ts
  *
  */

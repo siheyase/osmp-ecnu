@@ -1,41 +1,71 @@
 <!--
  * @Author: lyt
  * @Date: 2024-11-18 16:09:59
- * @LastEditTime: 2024-12-13 17:32:07
+ * @LastEditTime: 2024-12-16 16:09:14
  * @LastEditors: lyt
  * @Description: demo-图表系列
  * @FilePath: /osmp-demo/src/views/demo/charts/index.vue
  *  
 -->
 <template>
-  <div>
-    <a-card :bordered="false" v-if="dashboardData && dashboardData.length > 0">
-      <div class="container">
-        <a-card :bordered="false" :title="board?.title" v-for="(board, boardI) in dashboardData" :key="board?.id">
-          <div class="container-charts" :class="{ 'single-chart': board?.chartList && board?.chartList.length === 1 }">
-            <div class="charts" v-for="(chart, i) in board?.chartList" :key="chart?.id">
-              <h4 v-show="boardI < 3">{{ i / 2 === 0 ? '原始数据' : '组装数据' }}</h4>
-              <component
-                :is="getChartComponent(board.type)"
-                :dataType="i / 2 === 0 ? 'origVal' : 'modVal'"
-                :title="chart?.name"
-                :chartData="chart?.chartData"
-                :optionConfig="chart?.chartConfig"
-                :seriesConfig="chart?.seriesConfig"
-              />
-            </div>
+  <div class="demo-charts">
+    <a-card :bordered="false" v-if="chartsListData && chartsListData.length > 0">
+      <CollapseContainer :title="board?.title" v-for="board in chartsListData" :key="board?.id">
+        <div class="charts-row">
+          <div class="charts-row-item" v-for="(chart, i) in board?.chartList" :key="chart?.id">
+            <a-button class="btn-data" type="link" @click="seeData(chart)"
+              >{{ board.type !== 'pie' && board.type !== 'ring' ? (i / 2 === 0 ? '原始' : '组装') : '通用' }}数据格式
+            </a-button>
+            <component
+              :is="getChartComponent(board.type)"
+              :dataType="i / 2 === 0 ? 'origVal' : 'modVal'"
+              :title="chart?.name"
+              :chartData="chart?.chartData"
+              :optionConfig="chart?.chartConfig"
+              :seriesConfig="chart?.seriesConfig"
+            />
           </div>
-        </a-card>
-      </div>
+        </div>
+      </CollapseContainer>
     </a-card>
+    <BasicModal v-bind="$attrs" @register="registerModal" title="数据" @ok="closeModal()" :showCancelBtn="false" width="900px" destroyOnClose>
+      <div class="model">
+        <div>
+          <h4>数据格式</h4>
+          <pre>
+            <code>{{ modelData.chartData }}</code>
+          </pre>
+        </div>
+        <div>
+          <h4>图表通用配置项-chartConfig</h4>
+          <pre>
+            <code>{{ modelData?.chartConfig}}</code>
+          </pre>
+        </div>
+        <div>
+          <h4> 图表系列配置项-seriesConfig</h4>
+          <pre>
+            <code>{{ modelData?.seriesConfig}}</code>
+          </pre>
+        </div>
+      </div>
+    </BasicModal>
   </div>
 </template>
 <script name="demo-monDashboard" lang="ts" setup>
+  import { CollapseContainer } from '/@/components/Container';
   import { BarChart, BarMulti, HBarChart, RadarChart, PieChart, DirectChart, LineChart, RingChart, TangPolarChart } from '/@/components/Charts';
+  import { BasicModal } from '/@/components/Modal';
   import { useCharts } from './useCharts';
+  import { useModal } from '/@/components/Modal';
 
-  const { dashboardData } = useCharts();
+  const [registerModal, { openModal, closeModal }] = useModal();
+  const { chartsListData, modelData } = useCharts();
 
+  const seeData = (record: any) => {
+    modelData.value = record;
+    openModal();
+  };
   const getChartComponent = (type: string | undefined) => {
     if (!type) {
       return null;
@@ -59,76 +89,37 @@
         return RingChart;
       case 'tangPolar':
         return TangPolarChart;
+      case 'tangPolar':
+        return TangPolarChart;
       default:
         return null;
     }
   };
 </script>
 <style lang="less" scoped>
-  .container {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-
-    /deep/ .ant-card {
+  .demo-charts {
+    .charts-row {
       width: 100%;
-    }
-
-    /deep/ .ant-card-head {
-      border-bottom: none;
-      border-top: 1px solid #f0f0f0;
-    }
-
-    .container-charts {
-      width: 100%;
-      display: flex;
-      flex-direction: row;
-      justify-content: space-around;
-      align-items: center;
-      flex-wrap: wrap;
-
-      &.single-chart {
-        .charts {
-          width: 100%;
-          margin: 0;
-        }
-      }
-
-      .charts {
-        flex: 1 0 48%;
-        min-width: 500px;
-        margin: 1%;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      .charts-row-item {
+        padding: 8px;
         display: flex;
-        flex-direction: row;
-        flex-wrap: wrap;
-        justify-content: space-around;
         align-items: center;
-
-        & > * {
-          flex: 1 0 48%;
-          min-width: 500px;
-          margin: 1%;
-        }
+        flex-direction: column;
       }
     }
   }
+  .model {
+    padding: 16px;
 
-  // 768px
-  @media screen and (max-width: @screen-md) {
-    .container-charts {
-      flex-direction: column;
-
-      .charts {
-        width: 100%;
-        margin: 1%;
-        flex-direction: column;
-
-        & > * {
-          width: 100%;
-          margin: 1%;
-        }
-      }
+    pre {
+      padding: 16px;
+      overflow: auto;
+      line-height: 1.45;
+      background-color: #f7f7f7;
+      border: 0;
+      border-radius: 4px;
     }
   }
 </style>

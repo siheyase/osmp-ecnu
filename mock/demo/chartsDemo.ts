@@ -1,12 +1,13 @@
 /*
  * @Author: lyt
- * @Date: 2024-11-08 13:26:03
- * @LastEditTime: 2024-12-12 16:34:41
+ * @Date: 2024-12-12 11:43:30
+ * @LastEditTime: 2024-12-16 17:58:36
  * @LastEditors: lyt
- * @Description: lyt
- * @FilePath: /osmp-demo/jeecgboot-vue3/mock/demo/monDashboard.ts
+ * @Description: 图表demo-mock数据
+ * @FilePath: /osmp-demo/mock/demo/chartsDemo.ts
  *
  */
+
 import { MockMethod } from 'vite-plugin-mock';
 import { resultSuccess, baseUrl } from '../_util';
 
@@ -82,7 +83,7 @@ const newValData = [
     ],
   },
   {
-    id: '005',
+    id: '003',
     title: '柱状图（多列）',
     type: 'barMulti',
     chartList: [
@@ -157,7 +158,7 @@ const newValData = [
     ],
   },
   {
-    id: '006',
+    id: '004',
     title: '堆叠图',
     type: 'direct',
     chartList: [
@@ -267,7 +268,7 @@ const newValData = [
     ],
   },
   {
-    id: '001',
+    id: '005',
     title: '极坐标图',
     type: 'tangPolar',
     chartList: [
@@ -300,7 +301,7 @@ const newValData = [
     ],
   },
   {
-    id: '004',
+    id: '006',
     title: '饼图',
     type: 'pie',
     chartList: [
@@ -322,9 +323,9 @@ const newValData = [
     ],
   },
   {
-    id: '004',
+    id: '007',
     title: '环形图',
-    type: '',
+    type: 'ring',
     chartList: [
       {
         chartData: [
@@ -341,7 +342,7 @@ const newValData = [
     ],
   },
   {
-    id: '007',
+    id: '008',
     title: '折线图',
     type: 'line',
     chartList: [
@@ -390,91 +391,134 @@ const newValData = [
     ],
   },
   {
-    id: '007',
-    title: 'K线图',
-    type: 'kLine',
+    id: '009',
+    title: '雷达图',
+    type: 'radar',
     chartList: [
       {
         chartConfig: {
-          xAxis: { data: ['9月26日', '9月27日', '9月28日', '9月29日', '9月30日', '10月1日', '10月2日', '10月3日'] },
+          radar: {
+            indicator: [
+              { name: '鲁棒性', max: 6500 },
+              { name: '隐私性', max: 16000 },
+              { name: '概念漂移', max: 30000 },
+              { name: '责任性', max: 38000 },
+              { name: '保真度', max: 52000 },
+            ],
+          },
         },
-        chartData: [13000, 14000, 18000, 19000, 17000, 18500, 16000, 13000],
+        chartData: [
+          {
+            value: [4200, 3000, 20000, 35000, 50000],
+            name: '分类模型',
+          },
+          {
+            value: [5000, 14000, 28000, 26000, 42000],
+            name: '回归模型',
+          },
+          {
+            value: [3000, 12000, 22000, 20000, 32000],
+            name: '波动率曲面',
+          },
+        ],
       },
-      // {
-      //   chartData: [
-      //     {
-      //       name: '9月26日',
-      //       value: 13000,
-      //     },
-      //     {
-      //       name: '9月27日',
-      //       value: 14000,
-      //     },
-      //     {
-      //       name: '9月28日',
-      //       value: 18000,
-      //     },
-      //     {
-      //       name: '9月29日',
-      //       value: 19000,
-      //     },
-      //     {
-      //       name: '9月30日',
-      //       value: 17000,
-      //     },
-      //     {
-      //       name: '10月1日',
-      //       value: 18500,
-      //     },
-      //     {
-      //       name: '10月2日',
-      //       value: 16000,
-      //     },
-      //     {
-      //       name: '10月3日',
-      //       value: 13000,
-      //     },
-      //   ],
-      // },
+      {
+        chartConfig: {
+          radar: {
+            indicator: [
+              { name: '鲁棒性', max: 6500 },
+              { name: '隐私性', max: 16000 },
+              { name: '概念漂移', max: 30000 },
+              { name: '责任性', max: 38000 },
+              { name: '保真度', max: 52000 },
+            ],
+          },
+        },
+        chartData: [
+          {
+            name: '鲁棒性',
+            value: 4200,
+            type: '分类模型',
+          },
+          {
+            name: '隐私性',
+            value: 3000,
+            type: '分类模型',
+          },
+          {
+            name: '概念漂移',
+            value: 20000,
+            type: '分类模型',
+          },
+          {
+            name: '责任性',
+            value: 35000,
+            type: '分类模型',
+          },
+          {
+            name: '保真度',
+            value: 50000,
+            type: '分类模型',
+          },
+          {
+            name: '鲁棒性',
+            value: 5000,
+            type: '回归模型',
+          },
+          {
+            name: '隐私性',
+            value: 14000,
+            type: '回归模型',
+          },
+          {
+            name: '概念漂移',
+            value: 28000,
+            type: '回归模型',
+          },
+          {
+            name: '责任性',
+            value: 26000,
+            type: '回归模型',
+          },
+          {
+            name: '保真度',
+            value: 42000,
+            type: '回归模型',
+          },
+          {
+            name: '鲁棒性',
+            value: 3000,
+            type: '波动率曲面',
+          },
+          {
+            name: '隐私性',
+            value: 12000,
+            type: '波动率曲面',
+          },
+          {
+            name: '概念漂移',
+            value: 22000,
+            type: '波动率曲面',
+          },
+          {
+            name: '责任性',
+            value: 20000,
+            type: '波动率曲面',
+          },
+          {
+            name: '保真度',
+            value: 32000,
+            type: '波动率曲面',
+          },
+        ],
+      },
     ],
   },
-  // {
-  //   id: '007',
-  //   title: '折线图',
-  //   type: 'line',
-  //   chartList: [
-  //     {
-  //       id: '005-01',
-  //       chartData: [
-  //         {
-  //           name: '0',
-  //           value: [
-  //             0.21, 0.15, 0.18, 0.14, 0.17, 0.175, 0.165, 0.14, 0.145, 0.147, 0.148, 0.22, 0.19, 0.16, 0.13, 0.18, 0.15, 0.12, 0.16, 0.14, 0.15,
-  //           ],
-  //           type: 'dgraph',
-  //         },
-  //         {
-  //           value: [0.5, 0.35, 0.23, 0.32, 0.29, 0.25, 0.21, 0.38, 0.26, 0.37, 0.44, 0.33, 0.29, 0.25, 0.22, 0.28, 0.26, 0.17, 0.19, 0.19, 0.24],
-  //           type: 'elliptic',
-  //         },
-  //         {
-  //           // name: 'tfinance',
-  //           value: [0.9, 0.58, 0.34, 0.46, 0.39, 0.45, 0.52, 0.68, 0.46, 0.47, 0.44, 0.43, 0.39, 0.35, 0.42, 0.48, 0.46, 0.57, 0.24, 0.35, 0.44],
-  //           type: 'tfinance',
-  //         },
-  //       ],
-  //     },
-  //     {
-  //       id: '005-01',
-  //       chartData: [720, 832, 901, 740, 780, 520, 750, 740],
-  //     },
-  //   ],
-  // },
 ];
 
 export default [
   {
-    url: `${baseUrl}/select_dashboardData`,
+    url: `${baseUrl}/demo/charts/chartsDemoData`,
     method: 'get',
     response: ({ query }) => {
       return resultSuccess(newValData);
