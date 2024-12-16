@@ -6,14 +6,8 @@
   import { ref, watchEffect, watch, reactive, onBeforeUnmount, Ref } from 'vue';
   import { useECharts } from '/@/hooks/web/useECharts';
   import { cloneDeep } from 'lodash-es';
-  import { DataType } from '/@/components/Charts/src/types/chart';
 
   const props = defineProps({
-    // 数据类型
-    dataType: {
-      type: String as PropType<DataType>,
-      default: 'modVal',
-    },
     // 图表数据
     chartData: {
       type: Array as PropType<Record<string, any>>,
@@ -38,7 +32,11 @@
     // 图表高度
     height: {
       type: String as PropType<string>,
-      default: '50vh',
+      default: 'calc(50vh - 40px)',
+    },
+    size: {
+      type: Object,
+      default: () => {},
     },
     // 图表颜色
     seriesColor: {
@@ -53,11 +51,6 @@
   const { setOptions, getInstance, resize } = useECharts(chartRef as Ref<HTMLDivElement>);
 
   const option = reactive<any>({
-    title: {
-      text: props.title,
-      bottom: 0,
-      left: 'center',
-    },
     legend: {
       bottom: 10,
       left: 'center',
