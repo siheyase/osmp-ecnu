@@ -15,6 +15,10 @@
       <a-button color="warning" @click="goRoute('table')">表格示例</a-button>
       <a-button :style="{ 'background-color': '#6CC8E1', color: '#fff' }" @click="goRoute('model')">弹窗示例</a-button>
       <a-button @click="goRoute('dataOnChain')">具体示例</a-button>
+      <a-button @click="goRoute('dataSynthMonitor')">页面1.1</a-button>
+      <a-button @click="goRoute('dataSynthTask')">页面1.2</a-button>
+      <a-button @click="goRoute('blockChainMonitor')">页面2.1</a-button>
+      <a-button @click="goRoute('evidencePreserve')">页面2.2</a-button>
     </div>
     <div>
       <router-view />
@@ -29,6 +33,14 @@
   const goRoute = (type) => {
     if (type === 'dataOnChain') {
       replace({ path: `/finDataSynthSecurity/dataOnChain` });
+    } else if (type === 'dataSynthMonitor') {
+      replace({ path: `/finDataSynthSecurity/dataSynthMonitor` });
+    } else if (type === 'dataSynthTask') {
+      replace({ path: `/finDataSynthSecurity/dataSynthTask` });
+    } else if (type === 'blockChainMonitor') {
+      replace({ path: `/finDataSynthSecurity/blockChainMonitor` });
+    } else if (type === 'evidencePreserve') {
+      replace({ path: `/finDataSynthSecurity/evidencePreserve` });
     } else {
       replace({ path: `/demo/${type}` });
     }

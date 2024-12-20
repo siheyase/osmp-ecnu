@@ -22,3 +22,42 @@ export const DataOnChainRoute: AppRouteRecordRaw = {
     title: '数据合成安全',
   },
 };
+
+// 路由1.1: 数据合成模块-数据合成监控 页面
+export const DataSynthMonitorRoute: AppRouteRecordRaw = {
+  path: '/finDataSynthSecurity/dataSynthMonitor',
+  name: 'FinDataSynthSecurity-DataSynthMonitor',
+  component: () => import('/@/views/demo/sys/finDataSynthSecurity/DataSynthMonitor.vue'),
+  meta: {
+    title: '数据合成监控',
+  },
+}
+// 路由1.2: 数据合成模块-数据合成任务页面
+export const DataSynthTaskRoute: AppRouteRecordRaw = {
+  path: '/finDataSynthSecurity/dataSynthTask',
+  name: 'FinDataSynthSecurity-DataSynthTask',
+  component: () => import('/@/views/demo/sys/finDataSynthSecurity/DataSynthTask.vue'),
+  meta: {
+    title: '数据合成任务',
+  },
+}
+// 路由2.1: 可信溯源模块-区块链监控页面
+export const BlockChainMonitorRoute: AppRouteRecordRaw = 
+{
+  path: '/finDataSynthSecurity/blockChainMonitor',
+  name: 'FinDataSynthSecurity-BlockChainMonitor',
+  component: () => import('/@/views/demo/sys/finDataSynthSecurity/BlockChainMonitor.vue'),
+  meta: {
+    title: '区块链监控',
+  },
+}
+// 路由2.2: 可信溯源模块-存证溯源页面
+export const EvidencePreserveRoute: AppRouteRecordRaw = 
+{
+  path: '/finDataSynthSecurity/evidencePreserve',
+  name: 'FinDataSynthSecurity-EvidencePreserve',
+  component: () => import('/@/views/demo/sys/finDataSynthSecurity/EvidencePreserve.vue'),
+  meta: {
+    title: '存证溯源',
+  },
+}

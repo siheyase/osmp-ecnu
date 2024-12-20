@@ -27,4 +27,13 @@
     方式1 pnpm dev
     方式2 npm run dev
 
+若运行失败 可能是没安装sass  
+安装命令：`pnpm add -D sass`
+
+
+#### 前端公网地址
+http://140.207.154.218:42217/
+
+#### 前端使用的开源项目JeecgBoot文档
+https://help.jeecg.com/
 
