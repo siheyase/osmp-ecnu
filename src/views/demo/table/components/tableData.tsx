@@ -205,3 +205,20 @@ export const histCompTaskFormSchema: FormSchema[] = [
     },
   },
 ];
+
+export function getBlockColumns(): BasicColumn[] {
+  return [
+    { title: '区块信息', dataIndex: 'blockNumber', key: 'blockNumber', },
+    { title: '节点', dataIndex: 'node', key: 'node', },
+    { title: '上链时间', dataIndex: 'time', key: 'time', },
+    { title: '交易数量', dataIndex: 'transactions', key: 'transactions' },
+  ];
+}
+export function getTransactionColumns(): BasicColumn[] {
+  return [
+    { title: "交易哈希", dataIndex: 'hash', key: 'hash' },
+    { title: "交易数据存储起点", dataIndex: 'from', key: 'from' },
+    { title: "交易数据存储终点", dataIndex: 'to', key: 'to' },
+    { title: "交易上链时间", dataIndex: 'time', key: 'time' },
+  ];
+}

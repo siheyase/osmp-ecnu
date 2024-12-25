@@ -8,6 +8,7 @@
  *
  */
 import { getChartsDataApi } from '../../../api/demo/chartsApi';
+import { getUpChainTPSDataApi } from '../../../api/demo/finDataSynthSecurityApi';
 import { ChartsInfo } from '../../../api/demo/model/chartsModel';
 import { onMounted, ref } from 'vue';
 import { cloneDeep } from 'lodash-es';
@@ -172,4 +173,51 @@ export const useCharts = () => {
   });
 
   return { chartsListData, modelData };
+};
+
+export const useUpChainTPSChart = () => {
+  // 
+  const chartsListData = ref<ChartsInfo[]>();
+
+  const setChartOption = (data) => {
+    const newData = cloneDeep(data) as any;
+    if (newData && newData.length > 0) {
+      newData.forEach((modelItem) => {
+        modelItem.chartList.forEach((chartItem, chartIndex) => {
+          if (modelItem.type === 'line') {
+            chartItem.chartConfig = {
+              ...chartItem.chartConfig,
+              yAxis: {
+                axisLabel: {
+                  formatter: '{value}TPS',
+                },
+              },
+            };
+            chartItem.seriesConfig = {
+              ...chartItem.seriesConfig,
+              // 平滑曲线
+              smooth: true,
+              color: ['#13AEFF'],
+            };
+          }
+        });
+      });
+    }
+    console.log('ChartsData', newData);
+    return newData;
+  };
+  const getUpChainTPSData = async () => {
+    try {
+      const res = await getUpChainTPSDataApi();
+      chartsListData.value = res ? setChartOption(res) : [];
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+  onMounted(() => {
+    getUpChainTPSData();
+  });
+
+  return { chartsListData};
 };

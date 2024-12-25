@@ -10,6 +10,7 @@
 
 import { MockMethod } from 'vite-plugin-mock';
 import { resultPageSuccess, baseUrl } from '../_util';
+import { time } from 'console';
 const getNodeTableData = () => {
   const synthesisStatusArr = ['已完成', '未完成'];
   const nodeStatusArr = ['负载', '空闲', '关机'];
@@ -57,6 +58,58 @@ const getHisCompTaskData = () => {
   return data;
 };
 
+const getBlockTableData = () => {
+  const now = new Date();
+
+  const y = now.getFullYear();
+  const m = String(now.getMonth() + 1).padStart(2, '0');
+  const d = String(now.getDate()).padStart(2, '0');
+  const h = String(now.getHours()).padStart(2, '0');
+  const min = String(now.getMinutes()).padStart(2, '0');
+  const s = String(now.getSeconds()).padStart(2, '0');
+
+  const data: any = (() => {
+    const arr: any = [];
+    for (let index = 0; index < 40; index++) {
+      arr.push({
+        id: `${index}`,
+        blockNumber: Math.floor(Math.random() * 9999999),
+        node: `节点${Math.floor(Math.random() * 9) + 1}`,
+        time: `${y}-${m}-${d} ${h}:${min}:${s}`,
+        transactions: `${Math.floor(Math.random() * 1000)} 笔交易`,
+      });
+    }
+    return arr;
+  })();
+  return data;
+};
+
+const getTransactionTableData = () => {
+  const now = new Date();
+
+  const y = now.getFullYear();
+  const m = String(now.getMonth() + 1).padStart(2, '0');
+  const d = String(now.getDate()).padStart(2, '0');
+  const h = String(now.getHours()).padStart(2, '0');
+  const min = String(now.getMinutes()).padStart(2, '0');
+  const s = String(now.getSeconds()).padStart(2, '0');
+
+  const data: any = (() => {
+    const arr: any = [];
+    for (let index = 0; index < 40; index++) {
+      arr.push({
+        id: `${index}`,
+        hash: `0x${Math.floor(Math.random() * 9999999999)}`,
+        from: `0x${Math.floor(Math.random() * 9999999999)}`,
+        to: `0x${Math.floor(Math.random() * 9999999999)}`,
+        time: `${y}-${m}-${d} ${h}:${min}:${s}`,
+      });
+    }
+    return arr;
+  })();
+  return data;
+};
+
 export default [
   {
     url: `${baseUrl}/demo/table/getNodeTableData`,
@@ -76,6 +129,26 @@ export default [
       const { page = 1, pageSize = 20 } = query;
       const pageNo = +(query.pageNo ?? page);
       return resultPageSuccess(pageNo, +pageSize, getHisCompTaskData());
+    },
+  },
+  {
+    url: `${baseUrl}/demo/table/getBlockData`,
+    timeout: 1000,
+    method: 'get',
+    response: ({ query }) => {
+      const { page = 1, pageSize = 10 } = query;
+      const pageNo = +(query.pageNo ?? page);
+      return resultPageSuccess(pageNo, +pageSize, getBlockTableData());
+    },
+  },
+  {
+    url: `${baseUrl}/demo/table/getTransactionData`,
+    timeout: 1000,
+    method: 'get',
+    response: ({ query }) => {
+      const { page = 1, pageSize = 10 } = query;
+      const pageNo = +(query.pageNo ?? page);
+      return resultPageSuccess(pageNo, +pageSize, getTransactionTableData());
     },
   },
 ] as MockMethod[];
