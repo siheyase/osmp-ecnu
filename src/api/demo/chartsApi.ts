@@ -10,6 +10,7 @@
 import { defHttp } from '/@/utils/http/axios';
 import { ChartsInfo } from './model/chartsModel';
 
+// todo @YZM 这里是填url的
 enum Api {
   SELECT_CHARTS_DATA = '/mock/demo/charts/chartsDemoData',
 }

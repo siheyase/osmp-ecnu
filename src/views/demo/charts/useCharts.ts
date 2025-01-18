@@ -189,7 +189,7 @@ export const useUpChainTPSChart = () => {
               ...chartItem.chartConfig,
               yAxis: {
                 axisLabel: {
-                  formatter: '{value}TPS',
+                  formatter: '{value}',
                 },
               },
             };

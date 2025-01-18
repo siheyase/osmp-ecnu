@@ -47,18 +47,18 @@
               <!-- FISCO BCOS -->
               <a-col :span="8">
                   <a-card :style="cardStyles.purple">
-                  <p class="title">FISCOBCOS</p>
-                  <h2 class="value">3.0</h2>
-                  <p class="subtitle">版本</p>
+                  <p class="title">历史纪元数</p>
+                  <h2 class="value">15</h2>
+                  <p class="subtitle">Epoch</p>
                   </a-card>
               </a-col>
 
               <!-- 总TPS -->
               <a-col :span="8">
                   <a-card :style="cardStyles.lightBlue">
-                  <p class="title">总TPS</p>
-                  <h2 class="value">16700</h2>
-                  <p class="subtitle">当前节点平均TPS</p>
+                  <p class="title">提交单元数</p>
+                  <h2 class="value">167</h2>
+                  <p class="subtitle">Slots</p>
                   </a-card>
               </a-col>
               </a-row>
@@ -74,11 +74,65 @@
               <a-col :span="4">
                   <a-button type="primary" @click="queryBlockInfo">查询区块信息</a-button>
               </a-col>
-              <a-col :span="4">
+              <!-- <a-col :span="4">
                   <a-button @click="resetBlockHash">重置</a-button>
-              </a-col>
-              </a-row>
+              </a-col> -->
+            <!--
+              NOTE: add by zhmye
+              这里点击查询区块信息后要跳出一个弹窗，展示区块内容
+              下面的交易同理  
+            -->
+            <a-modal
+                v-model:open="blockModalVisable"
+                title="区块详情"
+                centered
+                @ok="blockModalVisable = false"
 
+              >
+              <template #footer>
+                <a-button key="back" @click="blockModalVisable = false">返回</a-button>
+              </template>
+                <a-list
+                  bordered
+                  size="large"
+                >
+                  <a-list-item>
+                    <span><strong>区块哈希:</strong> <a-tag color="pink">{{ blockItem.blockHash }}</a-tag></span>
+                  </a-list-item>
+                  <a-list-item>
+                    <span><strong>父区块哈希:</strong> <a-tag color="orange">{{ blockItem.parentHash }}</a-tag></span>
+                  </a-list-item>
+                  <a-list-item>
+                    <span><strong>Merkle Root:</strong> <a-tag color="cyan">{{ blockItem.merkleRoot }}</a-tag></span>
+                  </a-list-item>
+                  <a-list-item>
+                    <span><strong>区块高度:</strong> <a-tag color="green">{{ blockItem.blockHeight }}</a-tag></span>
+                  </a-list-item>
+                  <a-list-item>
+                    <span><strong>交易数量:</strong> <a-tag color="blue">{{ blockItem.nbTransactions }}</a-tag></span>
+                  </a-list-item>
+
+                  <!-- <a-list-item>
+                    这边加这个有点麻烦，先不加了
+                    <span><strong>交易哈希:</strong></span>
+                    <a-list
+                      bordered
+                      size="small"
+                      v-if="blockItem.txHashs && blockItem.txHashs.length > 0"
+                    >
+                      <a-list-item
+                        v-for="(hash, index) in blockItem.txHashs"
+                        :key="index"
+                      >
+                        {{ hash }}
+                      </a-list-item>
+                    </a-list>
+                    <span v-else>暂无交易</span>
+                  </a-list-item> -->
+                </a-list>
+              </a-modal>
+
+              </a-row>
               <!-- 交易哈希查询 -->
               <a-row :gutter="16" align="middle" style="margin-top: 5px;">
               <a-col :span="16">
@@ -89,14 +143,14 @@
               <a-col :span="4">
                   <a-button type="primary" @click="queryTransactionInfo">查询交易信息</a-button>
               </a-col>
-              <a-col :span="4">
+              <!-- <a-col :span="4">
                   <a-button @click="resetTransactionHash">重置</a-button>
-              </a-col>
+              </a-col> -->
               </a-row>
           </a-form>
           </div>
           <div class="charts-row-item" v-for="(chart, i) in board?.chartList" >
-              <h3 class="chart-title" style="margin-top: 20px;">上链TPS</h3>
+              <h3 class="chart-title" style="margin-top: 20px;">上链交易数</h3>
               <component
               :is="getChartComponent(board.type)"
               :dataType="'origVal'"
@@ -107,13 +161,13 @@
             />
           </div>
           <div class="realtime-monitor">
-            <h3 class="title">最新区块信息</h3>
+            <h3 class="title">最新纪元信息</h3>
             <a-divider />
-            <BasicTable @register="chainTable">
+            <BasicTable @register="epochTable">
             </BasicTable>
           </div>
           <div class="realtime-monitor">
-            <h3 class="title">最新区块信息</h3>
+            <h3 class="title">最新交易信息</h3>
             <a-divider />
             <BasicTable @register="transactionTable">
             </BasicTable>
@@ -127,11 +181,13 @@
   import { reactive } from 'vue';
   import { LineChart } from '/@/components/Charts';
   import { useUpChainTPSChart } from '@/views/demo/charts/useCharts';
-  import { useBasicForm } from './useDataOnChain';
+  import { queryEpochAndTransactionTableData } from './useDataOnChain';
   import { BasicTable } from '/@/components/Table';
-
+  import { ref } from 'vue';
+  import { getBlockInfoApi } from '../../../../api/demo/finDataSynthSecurityApi';
+import { cloneDeep } from 'lodash-es';
   const { chartsListData } = useUpChainTPSChart();
-  const { chainTable, transactionTable } = useBasicForm();
+  const { epochTable, transactionTable } = queryEpochAndTransactionTableData(); // modify by zhmye 这里用来获取这个页面里面的两个表格数据
 
   const getChartComponent = (type: string | undefined) => {
     if (!type) {
@@ -144,14 +200,54 @@
         return null;
     }
   };
+
+  // add by zhmye
+  // 这里定义的是两个弹窗是否可见
+  const blockModalVisable = ref<boolean>(false);
+  const txModalVisable = ref<boolean>(false); 
+  
   // 搜索表单数据
   const searchForm = reactive({
   blockHash: '',
   transactionHash: '',
   });
+  // 弹窗中显示的区块
+  let blockItem = reactive({
+    blockHash: '',
+    parentHash: '',
+    blockHeight: -1,
+    merkleRoot: '',
+    nbTransactions: -1,
+    txHashs: [] as string[],
+  })
+  const getBlockInfoQuery = async () => {
+    const res = await getBlockInfoApi();
+    if (res) {
+        blockItem.blockHash = res.blockHash;
+        blockItem.parentHash = res.parentHash;
+        blockItem.blockHeight = res.blockHeight;
+        blockItem.merkleRoot = res.merkleRoot;
+        blockItem.nbTransactions = res.nbTransactions;
 
+        // 修改数组内容时需要先清空再添加元素，保证响应性
+        blockItem.txHashs.length = 0; // 清空数组
+        blockItem.txHashs.push(...res.txHashs); // 添加新数据
+    }
+    console.log(res, blockItem)
+  }
   const queryBlockInfo = () => {
   console.log('查询区块信息:', searchForm.blockHash);
+  // add by zhmye 
+  // 这里打开一个弹窗，里面显示区块信息 具体要看fisco-bcos能给出什么样的数据，至少
+  // 1. 区块哈希
+  // 2. parent hash
+  // 3. 区块高度
+  // 4. merkle root
+  // 5. 交易数据量
+  // 6. 交易哈希数组(折叠)
+  // 7. ...
+    getBlockInfoQuery(); // todo 这里要把blockHash传过去,post
+    blockModalVisable.value = true;
   };
 
   const queryTransactionInfo = () => {

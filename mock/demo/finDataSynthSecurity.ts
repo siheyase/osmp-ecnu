@@ -186,6 +186,33 @@ const columnsException = [
   { title: '错误描述', dataIndex: 'errorMessage', key: 'errorMessage' },
 ];
 
+
+
+/*** 
+  NOTE: add by zhmye 这里是一些要和后端交互的新的接口
+***/
+// add by zhmye 这里要和后端真实交互
+const getBlockInfo = () => {
+    let nbTransactons = Math.floor(Math.random() * 100)
+    let mockData = {
+      blockHash: `0x${Math.floor(Math.random() * 9999999999)}`,
+      parentHash: `0x${Math.floor(Math.random() * 9999999999)}`,
+      blockHeight: `${Math.floor(Math.random() * 100)}`,
+      merkleRoot: `0x${Math.floor(Math.random() * 9999999999)}`,
+      nbTransactions: `${nbTransactons}`,
+      txHashs: () => {
+        let arr: any = [];
+        for (let index = 0; index < nbTransactons; index++) {
+          arr.push(`0x${Math.floor(Math.random() * 9999999999)}`)
+        }
+        return arr;
+      },
+    };
+    return mockData
+};
+
+
+
 export default [
   {
     url: `${baseUrl}/demo/finDataSynthSecurity/nodeSynData`,
@@ -306,4 +333,12 @@ export default [
       return resultSuccess(columnsException);
     },
   },
+  // add by zhmye
+  {
+    url: `${baseUrl}/demo/finDataSynthSecurity/getBlockInfo`,
+    method: 'get', // todo 这里应该是post，要根据输入的blockHash，目前还没看post是怎么写的
+    response: () => {
+      return resultSuccess(getBlockInfo())
+    }
+  }
 ] as MockMethod[];

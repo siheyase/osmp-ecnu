@@ -206,19 +206,25 @@ export const histCompTaskFormSchema: FormSchema[] = [
   },
 ];
 
-export function getBlockColumns(): BasicColumn[] {
+/***
+  NOTE: zhmye
+  这里是修改区块链数据监控页面的下面两个表格的column的
+***/
+export function getEpochColumns(): BasicColumn[] {
   return [
-    { title: '区块信息', dataIndex: 'blockNumber', key: 'blockNumber', },
-    { title: '节点', dataIndex: 'node', key: 'node', },
-    { title: '上链时间', dataIndex: 'time', key: 'time', },
-    { title: '交易数量', dataIndex: 'transactions', key: 'transactions' },
+    { title: '纪元编号', dataIndex: 'EpochID', key: 'EpochID', },
+    { title: '提交单元数', dataIndex: 'nbCommitSlot', key: 'nbCommitSlot', },
+    { title: '确认单元数', dataIndex: 'nbFinalizedSlot', key: 'nbFinalizedSlot', },
+    { title: '异常单元数', dataIndex: 'nbInvalidSlot', key: 'nbInvalidSlot' },
+    { title: '交易哈希', dataIndex: 'txHash', key: 'txHash'},
   ];
 }
 export function getTransactionColumns(): BasicColumn[] {
   return [
     { title: "交易哈希", dataIndex: 'hash', key: 'hash' },
-    { title: "交易数据存储起点", dataIndex: 'from', key: 'from' },
-    { title: "交易数据存储终点", dataIndex: 'to', key: 'to' },
+    { title: "交易数据类型", dataIndex: 'txType', key: 'txType' },
+    { title: "区块哈希", dataIndex: 'blockHash', key: 'blockHash'},
+    { title: "合约地址", dataIndex: 'contractAddress', key: 'contractAddress'},
     { title: "交易上链时间", dataIndex: 'time', key: 'time' },
   ];
 }

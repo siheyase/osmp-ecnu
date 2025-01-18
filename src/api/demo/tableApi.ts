@@ -5,6 +5,7 @@ enum Api {
   HIS_COMP_TASK_LIST = '/mock/demo/table/getHisCompTaskData',
   BLOCK_LIST = '/mock/demo/table/getBlockData',
   TRANSACTION_LIST ='/mock/demo/table/getTransactionData',
+  EPOCH_LIST = '/mock/demo/table/getEpochData', // add by zhmye，获取epoch信息
 }
 
 export const getNodeTableDataApi = async (params) => {
@@ -30,3 +31,9 @@ export const getTransactionDataApi = async (params) => {
   console.log('查询最新交易信息列表接口返回数据', res);
   return res;
 };
+
+export const getEpochDataApi = async (params) => {
+  const res = await defHttp.get<any[]>({ url: Api.EPOCH_LIST, params });
+  console.log('查询最新epoch信息列表接口返回数据', res);
+  return res
+}

@@ -28,8 +28,8 @@ import {
 } from '/@/api/demo/finDataSynthSecurityApi';
 import { cloneDeep } from 'lodash-es';
 import { useTable } from '/@/components/Table';
-import { getBlockColumns, getTransactionColumns } from '@/views/demo/table/components/tableData';
-import { getBlockDataApi, getTransactionDataApi } from '../../../../api/demo/tableApi';
+import { getEpochColumns, getTransactionColumns } from '@/views/demo/table/components/tableData';
+import { getEpochDataApi, getTransactionDataApi } from '../../../../api/demo/tableApi';
 
 interface ChartInfo {
   chartData?: any[];
@@ -246,11 +246,14 @@ export const useEvidenceOnChain = () => {
     taskException,
   };
 }
-
-export const useBasicForm = () => {
-  const [chainTable, { reload }] = useTable({
-    api: getBlockDataApi,
-    columns: getBlockColumns(),
+/*** 
+  NOTE: zhmye
+  这里是区块链数据页面两个表格的请求地方，api是网址 
+ ***/
+export const queryEpochAndTransactionTableData = () => {
+  const [epochTable, { reload }] = useTable({
+    api: getEpochDataApi,
+    columns: getEpochColumns(),
     // 是否开启搜索
     useSearchForm: false,
     // 是否显示序号
@@ -268,5 +271,13 @@ export const useBasicForm = () => {
     // 是否显示边框
     bordered: true,
   });
-  return {chainTable, transactionTable};
+  return {epochTable, transactionTable};
+}
+
+/*** 
+  NOTE: add by zhmye
+  这里是区块链数据页面搜索一个区块的请求地方，api是网址
+* ***/
+export const queryBlockInfo = () => {
+  
 }

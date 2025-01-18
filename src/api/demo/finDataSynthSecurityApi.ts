@@ -28,6 +28,7 @@ enum Api {
   LATEST_TRANSACTIONS_DATA = '/mock/demo/finDataSynthSecurity/latestTransactions',
   LATEST_BLOCKS_COLUMN = '/mock/demo/finDataSynthSecurity/columnsBlock',
   LATEST_TRANSACTIONS_COLUMN = '/mock/demo/finDataSynthSecurity/columnsTransaction',
+  CERTAIN_BLOCK_DATA = '/mock/demo/finDataSynthSecurity/getBlockInfo',
 }
 
 export const getFDSynthNodeSynDataApi = async () => {
@@ -144,3 +145,17 @@ export const getFDSynthColumnExceptionApi = async () => {
   console.log('数据合成安全-获取异常列配置-接口返回数据', res);
   return res;
 };
+interface BlockInfo {
+  blockHash: string;
+  parentHash: string;
+  blockHeight: number;
+  merkleRoot: string;
+  nbTransactions: number;
+  txHashs: string[];
+}
+// 数据合成安全 - 获取区块信息 add by zhmye
+export const getBlockInfoApi: () => Promise<BlockInfo> = async () => {
+  const res = await defHttp.get({ url: Api.CERTAIN_BLOCK_DATA});
+  console.log('数据合成安全-获取区块信息-接口返回数据', res);
+  return res;
+} 
