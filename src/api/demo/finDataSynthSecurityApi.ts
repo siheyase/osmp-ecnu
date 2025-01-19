@@ -12,8 +12,11 @@ import { ChartsInfo } from './model/chartsModel';
 
 enum Api {
   FINDATASYNTHSECURITY_NODE_SYN_DATA = '/mock/demo/finDataSynthSecurity/nodeSynData',
+  FINDATASYNTHSECURITY_NODE_SYN_TASK = '/mock/demo/finDataSynthSecurity/nodeSynTask', // add by zhmye
   FINDATASYNTHSECURITY_NODE_STORAGE = '/mock/demo/finDataSynthSecurity/nodeStorage',
   FINDATASYNTHSECURITY_NODE_STATUS = '/mock/demo/finDataSynthSecurity/nodeStatus',
+  FINDATASYNTHSECURITY_TASK_STATUS = '/mock/demo/finDataSynthSecurity/taskStatus',
+  FINDATASYNTHSECURITY_DATASET_STATUS = '/mock/demo/finDataSynthSecurity/datasetStatus',
   FINDATASYNTHSECURITY_TASK_QUERY_RESULT = '/mock/demo/finDataSynthSecurity/taskQueryResult',
   FINDATASYNTHSECURITY_TASK_PROCESS_DATA = '/mock/demo/finDataSynthSecurity/taskProcessData',
   FINDATASYNTHSECURITY_TASK_VALIDATION_DATA = '/mock/demo/finDataSynthSecurity/taskValidationData',
@@ -36,6 +39,12 @@ export const getFDSynthNodeSynDataApi = async () => {
   console.log('数据合成安全-节点合成数据-接口返回数据', res);
   return res;
 };
+// add by zhmye
+export const getFDSynthNodeSynTaskApi = async () => {
+  const res = await defHttp.get<any[]>({ url: Api.FINDATASYNTHSECURITY_NODE_SYN_TASK });
+  console.log('数据合成安全-节点合成数据-接口返回数据', res);
+  return res;
+};
 export const getFDSynthNodeStorageApi = async () => {
   const res = await defHttp.get<any[]>({ url: Api.FINDATASYNTHSECURITY_NODE_STORAGE });
   console.log('数据合成安全-节点存储情况-接口返回数据', res);
@@ -47,7 +56,16 @@ export const getFDSynthNodeStatusApi = async () => {
   console.log('数据合成安全-节点运行情况-接口返回数据', res);
   return res;
 };
-
+export const getDFSynthNodeTaskDataApi = async () => {
+  const res = await defHttp.get<any[]>( {url: Api.FINDATASYNTHSECURITY_TASK_STATUS});
+  console.log('数据合成安全-合成任务状态-接口返回数据',res);
+  return res;
+}
+export const getFDSysthDatasetDataApi = async () => {
+  const res = await defHttp.get<any[]>( {url: Api.FINDATASYNTHSECURITY_DATASET_STATUS});
+  console.log('数据合成安全-合成数据集-接口返回数据',res);
+  return res;
+}
 // 上链TPS折线图数据
 export const getUpChainTPSDataApi = () => {
   const res = defHttp.get<ChartsInfo[]>({ url: Api.UPCHAIN_TPS_DATA });

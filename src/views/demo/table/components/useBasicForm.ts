@@ -26,20 +26,20 @@ export const useBasicForm = () => {
       pageField: 'pageNum',
     },
     // 选择列配置
-    rowSelection: {
-      type: 'checkbox',
-      columnWidth: 20,
-      // 全选事件
-      // onSelectAll: (selected, selectedRows, changeRows) => {
-      //   console.log('全选', selected, selectedRows, changeRows);
-      // },
-      // 选择改变事件
-      onChange: (selectedRowKeys: (string | number)[], selectRow) => {
-        // selectedRowKeys-选择行key结合，selectRow-选中行数据集合
-        console.log('onChange', selectedRowKeys);
-        checkedKeys.value = selectedRowKeys;
-      },
-    },
+    // rowSelection: {
+    //   type: 'checkbox',
+    //   columnWidth: 20,
+    //   // 全选事件
+    //   // onSelectAll: (selected, selectedRows, changeRows) => {
+    //   //   console.log('全选', selected, selectedRows, changeRows);
+    //   // },
+    //   // 选择改变事件
+    //   onChange: (selectedRowKeys: (string | number)[], selectRow) => {
+    //     // selectedRowKeys-选择行key结合，selectRow-选中行数据集合
+    //     console.log('onChange', selectedRowKeys);
+    //     checkedKeys.value = selectedRowKeys;
+    //   },
+    // },
     // 是否显示表格设置
     // showTableSetting: true,
     // 是否开启搜索

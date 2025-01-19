@@ -9,29 +9,112 @@
 -->
 <template>
     <PageWrapper>
-      <h3>数据合成实时监控</h3>
       <div class="chart">
         <!-- title="节点合成数据" -->
-        <BarChart
-          :chartData="nodeSynData?.chartData"
-          :optionConfig="nodeSynData?.chartConfig"
-          :seriesConfig="nodeSynData?.seriesConfig"
-          height="30vh"
-        />
-        <!-- title="节点存储情况" -->
-        <PieChart
-          :chartData="nodeStorage?.chartData"
-          :optionConfig="nodeStorage?.chartConfig"
-          :seriesConfig="nodeStorage?.seriesConfig"
-          height="30vh"
-        />
-        <!-- title="节点运行情况" -->
-        <PieChart
-          :chartData="nodeStatusData?.chartData"
-          :optionConfig="nodeStatusData?.chartConfig"
-          :seriesConfig="nodeStatusData?.seriesConfig"
-          height="30vh"
-        />
+        <div class="tab-container" style="width: 50%;">
+          <a-tabs v-model:activeKey="activeKey1">
+              <a-tab-pane key="1">
+                <template #tab>
+                  <span>
+                    <DatabaseOutlined />
+                    合成数据总量日分布图
+                  </span>
+                </template>
+                <BarChart
+                  :chartData="nodeSynData?.chartData"
+                  :optionConfig="nodeSynData?.chartConfig"
+                  :seriesConfig="nodeSynData?.seriesConfig"
+                  height="30vh"
+                />
+              </a-tab-pane>
+              <a-tab-pane key="2">
+                <template #tab>
+                  <span>
+                    <CheckOutlined />
+                    合成任务总量日分布图
+                  </span>
+                </template>
+                <BarChart
+                  :chartData="nodeSynTask?.chartData"
+                  :optionConfig="nodeSynTask?.chartConfig"
+                  :seriesConfig="nodeSynTask?.seriesConfig"
+                  height="30vh"
+                />
+              </a-tab-pane>
+            </a-tabs>
+        </div>
+        <div class="tab-container" style="width: 24%">
+          <div style="width: 95%; margin: 0 auto;">
+            <a-tabs v-model:activeKey="activeKey2">
+              <a-tab-pane key="1">
+                <template #tab>
+                  <span>
+                    <ShopOutlined />
+                    节点存储空间
+                  </span>
+                </template>
+                <PieChart
+                :chartData="nodeStorage?.chartData"
+                :optionConfig="nodeStorage?.chartConfig"
+                :seriesConfig="nodeStorage?.seriesConfig"
+                height="30vh"
+                width="100%"
+                />
+              </a-tab-pane>
+              <a-tab-pane key="2">
+                <template #tab>
+                  <span>
+                    <MonitorOutlined />
+                    合成节点状态
+                  </span>
+                </template>
+                <PieChart
+                  :chartData="nodeStatusData?.chartData"
+                  :optionConfig="nodeStatusData?.chartConfig"
+                  :seriesConfig="nodeStatusData?.seriesConfig"
+                  height="30vh"
+                  width="100%"
+                />
+              </a-tab-pane>
+            </a-tabs>
+          </div>
+        </div>
+        <div class="tab-container" style="width: 24%">
+          <div style="width: 95%; margin: 0 auto;">
+            <a-tabs v-model:activeKey="activeKey3">
+              <a-tab-pane key="1">
+                <template #tab>
+                  <span>
+                    <ClockCircleOutlined />
+                    合成任务状态
+                  </span>
+                </template>
+                <PieChart
+                :chartData="taskData?.chartData"
+                :optionConfig="taskData?.chartConfig"
+                :seriesConfig="taskData?.seriesConfig"
+                height="30vh"
+                width="100%"
+                />
+              </a-tab-pane>
+              <a-tab-pane key="2">
+                <template #tab>
+                  <span>
+                    <TagOutlined />
+                    合成数据集分布
+                  </span>
+                </template>
+                <PieChart
+                  :chartData="datasetData?.chartData"
+                  :optionConfig="datasetData?.chartConfig"
+                  :seriesConfig="datasetData?.seriesConfig"
+                  height="30vh"
+                  width="100%"
+                />
+              </a-tab-pane>
+            </a-tabs>
+          </div>
+        </div>
       </div>
       <div class="table">
         <BasicTable @register="nodeTable">
@@ -41,16 +124,40 @@
               <a @click="nodeDetail(record)" style="color: #1890ff"> {{ record?.nodeInfo }}</a>
             </div>
           </template>
+          <template #storage="{ record }">
+            <div class="storage-container">
+              <!-- 图标 -->
+              <!-- <div class="storage-icon">
+                <img src="https://img.icons8.com/material-outlined/24/000000/hard-drive.png" alt="Disk Icon" />
+              </div> -->
+              <!-- 信息部分 -->
+              <div class="storage-info">
+                <div class="storage-progress">
+                  <a-progress
+                    :percent="record?.storage.percent"
+                    :show-info="false"
+                    stroke-width="10"
+                    stroke-color="#1890ff"
+                  />
+                </div>
+                <div class="storage-details">
+                  {{ record?.storage.used.toFixed(1) }} TB 可用，共 {{ record?.storage.total.toFixed(1) }} TB
+                </div>
+              </div>
+            </div>
+          </template>
+
           <template #nodeTaskProgress="{ text }">
-            <a-progress :percent="text * 100" size="small" />
+            <!-- <div style="display: flex; justify-content: center; align-items: center; width: 100%;"> -->
+              <a-progress :percent="(text * 100).toFixed(2)" :steps="10" strokeColor="#52c41a" style="display: flex; justify-content: center; align-items: center; width: 100%;"/>
+            <!-- </div> -->
           </template>
+
           <template #action="{ record }">
-            <a-button type="link" @click="statusClick(record)" v-if="record?.synthesisStatus === '已完成'">存储状态</a-button>
-            <a-button type="link" @click="historyClick(record)" v-if="record?.synthesisStatus === '已完成'">历史合成</a-button>
-            <a-button type="link" @click="dataClick(record)" v-if="record?.synthesisStatus !== '已完成'">数据</a-button>
-            <a-button type="link" @click="editClick(record)" v-if="record?.synthesisStatus !== '已完成'">编辑</a-button>
+            <a-button type="link" @click="statusClick(record)">合成详情</a-button>
+            <a-button type="link" @click="dataClick(record)">状态详情</a-button>
           </template>
-          <template #toolbar>
+          <!-- <template #toolbar>
             <a-button type="primary" preIcon="ant-design:plus-outlined" @click="addClick"> 新增</a-button>
             <a-dropdown>
               <template #overlay>
@@ -66,7 +173,7 @@
                 <Icon icon="mdi:chevron-down" />
               </a-button>
             </a-dropdown>
-          </template>
+          </template> -->
         </BasicTable>
       </div>
     </PageWrapper>
@@ -77,9 +184,14 @@
     import { BasicTable } from '/@/components/Table';
     import { useBasicForm } from '/@/views/demo/table/components/useBasicForm';
     import { useDataOnChain } from './useDataOnChain';
-  
-    const { nodeSynData, nodeStorage, nodeStatusData } = useDataOnChain();
+    import { ref } from 'vue';
+    import { MonitorOutlined, ShopOutlined, DatabaseOutlined, TagOutlined, CheckOutlined, ClockCircleOutlined } from '@ant-design/icons-vue';
+import { toFixed } from 'ant-design-vue/es/input-number/src/utils/MiniDecimal';
+    const { nodeSynData, nodeSynTask, nodeStorage, nodeStatusData,taskData, datasetData } = useDataOnChain();
     const { nodeTable, nodeDetail, statusClick, historyClick, dataClick, editClick, addClick, batchDelete } = useBasicForm();
+    const activeKey1 = ref('1');
+    const activeKey2 = ref('1');
+    const activeKey3 = ref('1');
   </script>
   <style scoped lang="less">
     .chart {
@@ -87,6 +199,7 @@
       flex-direction: row;
     }
     .table {
+      margin-top: 20px;
       .nodeInfo {
         display: flex;
         flex-direction: row;
@@ -99,7 +212,15 @@
         }
       }
     }
-  
+    .tab-container {
+      padding: 20px;
+      background-color: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      margin-left: 10px;
+      margin-bottom: 5px;
+      margin-top: 5px;
+    }
     /deep/
       :where(.css-dev-only-do-not-override-1oyve5v).ant-table-wrapper
       .ant-table.ant-table-bordered

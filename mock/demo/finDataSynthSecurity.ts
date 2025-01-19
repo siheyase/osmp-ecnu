@@ -32,7 +32,28 @@ const nodeSynData = [
     value: 100,
   },
 ];
-
+const nodeSynTask = [
+  {
+    name: '9月22日',
+    value: 10,
+  },
+  {
+    name: '9月23日',
+    value: 15,
+  },
+  {
+    name: '9月24日',
+    value: 40,
+  },
+  {
+    name: '9月25日',
+    value: 12,
+  },
+  {
+    name: '9月26日',
+    value: 30,
+  },
+];
 const nodeStorage = [
   { name: '已占用', value: 300 },
   { name: '未占用', value: 500 },
@@ -43,7 +64,17 @@ const nodeStatus = [
   { name: '关机', value: 10 },
   { name: '故障', value: 2 },
 ];
-
+const taskStatus = [
+  { name: '进行中', value: 32 },
+  { name: '已完成', value: 44 },
+  { name: '失败', value: 10 }, 
+];
+const datasetStatus = [
+  { name: 'Dataset1', value: 32 },
+  { name: 'Dataset2', value: 44 },
+  { name: 'Dataset3', value: 10 }, 
+  { name: 'Dataset4', value: 20 }, 
+];
 const upChainTPS = [
 {
   id: '008',
@@ -203,7 +234,14 @@ const getBlockInfo = () => {
       txHashs: () => {
         let arr: any = [];
         for (let index = 0; index < nbTransactons; index++) {
-          arr.push(`0x${Math.floor(Math.random() * 9999999999)}`)
+          arr.push({
+            "hash": `0x${Math.floor(Math.random() * 9999999999)}`,
+            "contract": `0x${Math.floor(Math.random() * 9999999999)}`,
+            "method": (() => {
+              let methods = ["InitTask", "TaskProcess", "EpochRecord"]
+              return methods[Math.floor(Math.random() * 3)]
+            })()
+          })
         }
         return arr;
       },
@@ -222,6 +260,13 @@ export default [
     },
   },
   {
+    url: `${baseUrl}/demo/finDataSynthSecurity/nodeSynTask`,
+    method: 'get',
+    response: () => {
+      return resultSuccess(nodeSynTask);
+    },
+  },
+  {
     url: `${baseUrl}/demo/finDataSynthSecurity/nodeStorage`,
     method: 'get',
     response: () => {
@@ -233,6 +278,20 @@ export default [
     method: 'get',
     response: () => {
       return resultSuccess(nodeStatus);
+    },
+  },
+  {
+    url: `${baseUrl}/demo/finDataSynthSecurity/taskStatus`,
+    method: 'get',
+    response: () => {
+      return resultSuccess(taskStatus);
+    },
+  },
+  {
+    url: `${baseUrl}/demo/finDataSynthSecurity/datasetStatus`,
+    method: 'get',
+    response: () => {
+      return resultSuccess(datasetStatus);
     },
   },
   {

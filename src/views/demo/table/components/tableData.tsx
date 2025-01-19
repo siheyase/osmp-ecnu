@@ -15,44 +15,51 @@ import { render } from '/@/utils/common/renderUtils';
 export function getNodeColumns(): BasicColumn[] {
   return [
     {
-      title: '节点信息',
+      title: '节点名称',
       dataIndex: 'nodeInfo',
-      width: 150,
+      width: 100,
       slots: {
         customRender: 'nodeInfo',
       },
       fixed: 'left',
     },
-    {
-      title: '数据总存储/T',
-      dataIndex: 'totalStorage',
-      width: 80,
-    },
-    {
-      title: '已占用/T',
-      dataIndex: 'usedStorage',
-      width: 80,
-    },
-    {
-      title: '合成状态',
-      dataIndex: 'synthesisStatus',
-      width: 80,
-      // 自定义显示-render例子
-      customRender: ({ value }) => {
-        const color = value === '已完成' ? '#06A94E' : '#F82906';
-        return render.renderTag(value, color);
-      },
-    },
+    // {
+    //   title: '已占用/T',
+    //   dataIndex: 'usedStorage',
+    //   width: 80,
+    // },
     {
       title: '节点状态',
       dataIndex: 'nodeStatus',
       width: 80,
+      // 自定义显示-render例子
+      customRender: ({ value }) => {
+        const color = (() => {
+          if (value === '正常') {
+            return '#06A94E'; // 正常：绿色
+          }
+          if (value === '故障') {
+            return '#F82906'; // 故障：红色
+          }
+          if (value === '关机') {
+            return '#9E9E9E'; // 关机：灰色
+          }
+          return '#9E9E9E'; // 默认无颜色
+        })();
+        return render.renderTag(value, color);
+      },
+      
+    },
+    {
+      title: '负载状态',
+      dataIndex: 'systhStatus',
+      width: 80,
       // 自定义样式
       customCell: (record) => {
         let fontColor;
-        if (record.nodeStatus === '空闲') {
+        if (record.systhStatus === '空闲') {
           fontColor = '#54BCBD';
-        } else if (record.nodeStatus === '负载') {
+        } else if (record.systhStatus === '忙碌') {
           fontColor = '#1D7DEA';
         } else {
           fontColor = '#9A9A9A';
@@ -61,12 +68,39 @@ export function getNodeColumns(): BasicColumn[] {
       },
     },
     {
+      title: '完成任务数量',
+      dataIndex: 'finishTask',
+      width: 80,
+      // 自定义样式
+      slots: {
+        customRender: 'finishTask',
+      },
+    },
+    {
+      title: '合成数据总量',
+      dataIndex: 'systhData',
+      width: 80,
+      // 自定义样式
+      slots: {
+        customRender: 'systhData',
+      },
+    },
+    {
       title: '节点任务进度',
       dataIndex: 'nodeTaskProgress',
-      width: 150,
+      width: 100,
       slots: {
         customRender: 'nodeTaskProgress',
       },
+      align: 'center',
+    },
+    {
+      title: '存储占用',
+      dataIndex: 'storage',
+      slots: {
+        customRender: 'storage',
+      },
+      width: 100,
     },
     {
       title: '操作',
@@ -227,4 +261,13 @@ export function getTransactionColumns(): BasicColumn[] {
     { title: "合约地址", dataIndex: 'contractAddress', key: 'contractAddress'},
     { title: "交易上链时间", dataIndex: 'time', key: 'time' },
   ];
+}
+
+export function getBlockInfoColumns(): BasicColumn[] {
+  return [
+    { title: "交易哈希", dataIndex: 'hash', key: 'hash' },
+    { title: "合约地址", dataIndex: 'contract', key: 'contract'},
+    { title: "调用接口", dataIndex: 'method', key: 'method'},
+
+  ]
 }

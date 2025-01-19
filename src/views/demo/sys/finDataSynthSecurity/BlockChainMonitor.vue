@@ -98,37 +98,30 @@
                 >
                   <a-list-item>
                     <span><strong>区块哈希:</strong> <a-tag color="pink">{{ blockItem.blockHash }}</a-tag></span>
-                  </a-list-item>
-                  <a-list-item>
                     <span><strong>父区块哈希:</strong> <a-tag color="orange">{{ blockItem.parentHash }}</a-tag></span>
                   </a-list-item>
                   <a-list-item>
+                    <span><strong>区块高度:</strong> <a-tag color="green">{{ blockItem.blockHeight }}</a-tag></span>
+                    <span><strong>交易数量:</strong> <a-tag color="blue">{{ blockItem.nbTransactions }}</a-tag></span>
                     <span><strong>Merkle Root:</strong> <a-tag color="cyan">{{ blockItem.merkleRoot }}</a-tag></span>
                   </a-list-item>
-                  <a-list-item>
-                    <span><strong>区块高度:</strong> <a-tag color="green">{{ blockItem.blockHeight }}</a-tag></span>
-                  </a-list-item>
-                  <a-list-item>
-                    <span><strong>交易数量:</strong> <a-tag color="blue">{{ blockItem.nbTransactions }}</a-tag></span>
-                  </a-list-item>
 
-                  <!-- <a-list-item>
-                    这边加这个有点麻烦，先不加了
-                    <span><strong>交易哈希:</strong></span>
-                    <a-list
-                      bordered
-                      size="small"
-                      v-if="blockItem.txHashs && blockItem.txHashs.length > 0"
-                    >
-                      <a-list-item
-                        v-for="(hash, index) in blockItem.txHashs"
-                        :key="index"
-                      >
-                        {{ hash }}
-                      </a-list-item>
-                    </a-list>
-                    <span v-else>暂无交易</span>
-                  </a-list-item> -->
+                  <a-list-item>
+                    <div>
+                      <span><strong>交易哈希:</strong></span>
+                      <a-table
+                        v-if="blockItem.txHashs && blockItem.txHashs.length > 0"
+                        :data-source="blockItem.txHashs"
+                        :columns="blockInfoColumn"
+                        bordered
+                        size="small"
+                        row-key="index"
+                        :scroll="{ y: 'calc(30vh)' }"
+                        :pagination="false"
+                      />
+                      <span v-else>暂无交易</span>
+                    </div>
+                  </a-list-item>
                 </a-list>
               </a-modal>
 
@@ -185,7 +178,7 @@
   import { BasicTable } from '/@/components/Table';
   import { ref } from 'vue';
   import { getBlockInfoApi } from '../../../../api/demo/finDataSynthSecurityApi';
-import { cloneDeep } from 'lodash-es';
+  import { getBlockInfoColumns } from '../../table/components/tableData';
   const { chartsListData } = useUpChainTPSChart();
   const { epochTable, transactionTable } = queryEpochAndTransactionTableData(); // modify by zhmye 这里用来获取这个页面里面的两个表格数据
 
@@ -205,7 +198,7 @@ import { cloneDeep } from 'lodash-es';
   // 这里定义的是两个弹窗是否可见
   const blockModalVisable = ref<boolean>(false);
   const txModalVisable = ref<boolean>(false); 
-  
+  const blockInfoColumn = getBlockInfoColumns();
   // 搜索表单数据
   const searchForm = reactive({
   blockHash: '',
@@ -248,6 +241,7 @@ import { cloneDeep } from 'lodash-es';
   // 7. ...
     getBlockInfoQuery(); // todo 这里要把blockHash传过去,post
     blockModalVisable.value = true;
+    console.log(111, blockItem)
   };
 
   const queryTransactionInfo = () => {

@@ -11,28 +11,65 @@
 import { MockMethod } from 'vite-plugin-mock';
 import { resultPageSuccess, baseUrl } from '../_util';
 import { time } from 'console';
+import { M } from 'vite/dist/node/types.d-aGj9QkWt';
 const getNodeTableData = () => {
-  const synthesisStatusArr = ['已完成', '未完成'];
-  const nodeStatusArr = ['负载', '空闲', '关机'];
+  const synthesisStatusArr = ['空闲', '忙碌', '暂停'];
+  const nodeStatusArr = ['正常', '故障', '关机'];
+  const nodeStatusWeights = [0.8, 0.1, 0.1]; // 正常:80%，故障:10%，关机:10%
+
+  // 根据权重生成随机状态
+  const getWeightedStatus = (statuses: string[], weights: number[]) => {
+    const random = Math.random();
+    let cumulative = 0;
+    for (let i = 0; i < weights.length; i++) {
+      cumulative += weights[i];
+      if (random < cumulative) {
+        return statuses[i];
+      }
+    }
+    return statuses[statuses.length - 1];
+  };
+
   const data: any = (() => {
     const arr: any = [];
     for (let index = 0; index < 40; index++) {
-      const synthesisStatus = synthesisStatusArr[index % 2];
+      // 生成节点状态
+      const nodeStatus = getWeightedStatus(nodeStatusArr, nodeStatusWeights);
+
+      // 生成存储数据
+      const used = Math.random() * 50;
+      const total = used + Math.random() * 50;
+      const percent = Math.ceil((used / total) * 100);
+
+      // 生成合成状态
+      let synthesisStatus = synthesisStatusArr[index % 2]; // 默认生成的合成状态
+      if (nodeStatus === '故障' || nodeStatus === '关机') {
+        synthesisStatus = '暂停'; // 如果前一个是故障或关机，设置为暂停
+      }
+
+
       arr.push({
         id: `${index}`,
         nodeImgUrl: 'https://img.i2soft.net/i2official-web/assets/images/nav/navLogo.png',
         nodeInfo: `节点-${index}-${Math.floor(Math.random() * 99)}`,
-        totalStorage: Math.floor(Math.random() * 999),
-        usedStorage: Math.floor(Math.random() * 999),
-        synthesisStatus: synthesisStatus,
-        nodeStatus: nodeStatusArr[index % 2],
-        nodeTaskProgress: synthesisStatus === '已完成' ? '1' : Math.random().toFixed(2),
+        storage: {
+          total,
+          used,
+          percent,
+        },
+        systhStatus: synthesisStatus,
+        finishTask: Math.floor(Math.random() * 100),
+        systhData: Math.floor(Math.floor(Math.random() * 100)),
+        nodeStatus: nodeStatus,
+        nodeTaskProgress: Math.random().toFixed(2), // 已完成任务数/总任务数
       });
     }
     return arr;
   })();
+
   return data;
 };
+
 
 const getHisCompTaskData = () => {
   const synthesisStatusArr = ['已完成', '未完成'];

@@ -12,6 +12,8 @@ import {
   getFDSynthNodeStatusApi, 
   getFDSynthNodeStorageApi, 
   getFDSynthNodeSynDataApi, 
+  getDFSynthNodeTaskDataApi,
+  getFDSysthDatasetDataApi,
   getFDSynthTaskQueryResultApi, 
   getFDSynthTaskProcessDataApi, 
   getFDSynthTaskValidationDataApi, 
@@ -25,6 +27,7 @@ import {
   getLatestTransactionsDataApi,
   getLatestBlocksColumnApi,
   getLatestTransactionsColumnApi,
+  getFDSynthNodeSynTaskApi,
 } from '/@/api/demo/finDataSynthSecurityApi';
 import { cloneDeep } from 'lodash-es';
 import { useTable } from '/@/components/Table';
@@ -51,6 +54,15 @@ export const useDataOnChain = () => {
       },
     },
   });
+  const nodeSynTask = ref<ChartInfo>({
+    chartConfig: {
+      yAxis: {
+        axisLabel: {
+          formatter: '{value}',
+        },
+      },
+    },
+  });
 
   // 节点存储情况
   const nodeStorage = ref<ChartInfo>({
@@ -67,6 +79,24 @@ export const useDataOnChain = () => {
         formatter: '{c}T',
       },
     },
+    chartConfig: {
+      // 图表全局配置
+      legend: {
+        show: true, // 显示图例
+        orient: 'vertical', // 图例排列方向（可选：'horizontal' 或 'vertical'）
+        left: 'left', // 图例位置，可选值有 'left', 'right', 'center'
+        top: 'center', // 图例垂直位置
+        textStyle: {
+          fontSize: 12, // 图例字体大小
+          color: '#333', // 图例字体颜色
+        },
+      },
+      tooltip: {
+        // 提示框配置
+        trigger: 'item', // 触发类型（'item' 适合饼图）
+        formatter: '{a} <br/>{b}: {c}T ({d}%)', // 提示内容格式
+      },
+    },
   });
 
   // 节点运行情况
@@ -78,8 +108,99 @@ export const useDataOnChain = () => {
         // 设置扇形的圆角半径
         borderRadius: 4,
       },
+      // label: {
+      //   show: true,
+      //   // 标签内容格式器，支持字符串模板和回调函数两种形式
+      //   formatter: '{c}',
+      // },
+    },
+    chartConfig: {
+      // 图表全局配置
+      legend: {
+        show: true, // 显示图例
+        orient: 'vertical', // 图例排列方向（可选：'horizontal' 或 'vertical'）
+        left: 'left', // 图例位置，可选值有 'left', 'right', 'center'
+        top: 'center', // 图例垂直位置
+        textStyle: {
+          fontSize: 12, // 图例字体大小
+          color: '#333', // 图例字体颜色
+        },
+      },
+      tooltip: {
+        // 提示框配置
+        trigger: 'item', // 触发类型（'item' 适合饼图）
+        formatter: '{a} <br/>{b}: {c}T ({d}%)', // 提示内容格式
+      },
     },
   });
+    // 合成任务完成情况
+    const taskData = ref<ChartInfo>({
+      seriesConfig: {
+        // 设置图表每块/列/行的颜色（非必填，为空时默认使用系统设定的颜色）
+        color: ['#2578F2', '#84B7F9', '#9A9A9A', '#DE868F'],
+        itemStyle: {
+          // 设置扇形的圆角半径
+          borderRadius: 4,
+        },
+        // label: {
+        //   show: true,
+        //   // 标签内容格式器，支持字符串模板和回调函数两种形式
+        //   formatter: '{c}',
+        // },
+      },
+      chartConfig: {
+        // 图表全局配置
+        legend: {
+          show: true, // 显示图例
+          orient: 'vertical', // 图例排列方向（可选：'horizontal' 或 'vertical'）
+          left: 'left', // 图例位置，可选值有 'left', 'right', 'center'
+          top: 'center', // 图例垂直位置
+          textStyle: {
+            fontSize: 12, // 图例字体大小
+            color: '#333', // 图例字体颜色
+          },
+        },
+        tooltip: {
+          // 提示框配置
+          trigger: 'item', // 触发类型（'item' 适合饼图）
+          formatter: '<br/>{b}: {c} ({d}%)', // 提示内容格式
+        },
+      },
+    });
+        // 合成数据集分布
+        const datasetData = ref<ChartInfo>({
+          seriesConfig: {
+            // 设置图表每块/列/行的颜色（非必填，为空时默认使用系统设定的颜色）
+            color: ['#2578F2', '#84B7F9', '#9A9A9A', '#DE868F'],
+            itemStyle: {
+              // 设置扇形的圆角半径
+              borderRadius: 4,
+            },
+            label: {
+              show: true,
+              // 标签内容格式器，支持字符串模板和回调函数两种形式
+              formatter: '{c}',
+            },
+          },
+          chartConfig: {
+            // 图表全局配置
+            legend: {
+              show: true, // 显示图例
+              orient: 'vertical', // 图例排列方向（可选：'horizontal' 或 'vertical'）
+              left: 'left', // 图例位置，可选值有 'left', 'right', 'center'
+              top: 'center', // 图例垂直位置
+              textStyle: {
+                fontSize: 12, // 图例字体大小
+                color: '#333', // 图例字体颜色
+              },
+            },
+            tooltip: {
+              // 提示框配置
+              trigger: 'item', // 触发类型（'item' 适合饼图）
+              formatter: '<br/>{b}: {c} ({d}%)', // 提示内容格式
+            },
+          },
+        });
 
   // 最新区块信息
   const latestBlocks = ref<chainDataInfo> ({});
@@ -93,7 +214,13 @@ export const useDataOnChain = () => {
       nodeSynData.value.chartData = cloneDeep(res);
     }
   };
-
+  // 处理节点合成任务
+  const getFDSynthNodeSynTask = async () => {
+    const res = await getFDSynthNodeSynTaskApi();
+    if (res && res.length > 0) {
+      nodeSynTask.value.chartData = cloneDeep(res);
+    }
+  };
   // 处理节点存储情况
   const getFDSynthNodeStorageData = async () => {
     const res = await getFDSynthNodeStorageApi();
@@ -109,6 +236,20 @@ export const useDataOnChain = () => {
       nodeStatusData.value.chartData = cloneDeep(res);
     }
   };
+
+  // add by zhmye
+  const getFDSysthNodeTaskData = async () => {
+    const res = await getDFSynthNodeTaskDataApi();
+    if (res && res.length > 0) {
+      taskData.value.chartData = cloneDeep(res);
+    }
+  }
+  const getFDSysthDatasetData = async () => {
+    const res = await getFDSysthDatasetDataApi();
+    if (res && res.length > 0) {
+      datasetData.value.chartData = cloneDeep(res);
+    }
+  }
 
   // 最新区块信息数据
   const getLatestBlocksData = async () => {
@@ -141,8 +282,11 @@ export const useDataOnChain = () => {
 
   onMounted(() => {
     getFDSynthNodeSynData();
+    getFDSynthNodeSynTask()
     getFDSynthNodeStorageData();
+    getFDSysthNodeTaskData();
     getFDSynthNodeStatusData();
+    getFDSysthDatasetData()
     getLatestBlocksData();
     getLatestBlocksColumn();
     getLatestTransactionsData();
@@ -151,8 +295,11 @@ export const useDataOnChain = () => {
 
   return {
     nodeSynData,
+    nodeSynTask,
     nodeStorage,
     nodeStatusData,
+    taskData,
+    datasetData,
     latestBlocks,
     latestTransactions,
   };
@@ -271,6 +418,9 @@ export const queryEpochAndTransactionTableData = () => {
     // 是否显示边框
     bordered: true,
   });
+  // const [blockInfoTable, ] = useTable({
+  //   api: get
+  // }) 
   return {epochTable, transactionTable};
 }
 
@@ -279,5 +429,5 @@ export const queryEpochAndTransactionTableData = () => {
   这里是区块链数据页面搜索一个区块的请求地方，api是网址
 * ***/
 export const queryBlockInfo = () => {
-  
+
 }
