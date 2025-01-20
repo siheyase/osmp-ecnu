@@ -68,7 +68,8 @@ https://help.jeecg.com/
     - 过程查证：`Epoch`中的`Slot`列表，每个`slot`对应一个`TaskProcess`的交易哈希，另外加上`commit`和`invalid`的列表
     - 异常检测：`Heartbeat`列表+`invalid`列表
     - 没有完整性
-  - 上面两种溯源都提供一个流水线图
+  - 上面两种溯源都提供一个时间轴
+  - 可视化图表
 - 数据合成安全（节点状态）
   - 图表
     - 合成数据日分布图

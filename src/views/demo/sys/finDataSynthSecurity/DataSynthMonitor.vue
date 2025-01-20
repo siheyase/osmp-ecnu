@@ -48,10 +48,7 @@
             <a-tabs v-model:activeKey="activeKey2">
               <a-tab-pane key="1">
                 <template #tab>
-                  <span>
-                    <ShopOutlined />
-                    节点存储空间
-                  </span>
+                  <h3 class="chart-title" style="margin-top: 20px;">上链交易数</h3>
                 </template>
                 <PieChart
                 :chartData="nodeStorage?.chartData"
