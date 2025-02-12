@@ -29,23 +29,23 @@ export const useSearchTable = () => {
       labelWidth: 120,
       autoSubmitOnEnter: true, // 按下回车后自动提交
     },
-    // 选择列配置
-    rowSelection: {
-      type: 'checkbox',
-      columnWidth: 20,
-      // 选择改变事件
-      onChange: (selectedRowKeys: (string | number)[], selectRow) => {
-        // selectedRowKeys-选择行key结合，selectRow-选中行数据集合
-        console.log('onChange', selectedRowKeys);
-        checkedKeys.value = selectedRowKeys;
-      },
-    },
+    // // 选择列配置
+    // rowSelection: {
+    //   type: 'checkbox',
+    //   columnWidth: 20,
+    //   // 选择改变事件
+    //   onChange: (selectedRowKeys: (string | number)[], selectRow) => {
+    //     // selectedRowKeys-选择行key结合，selectRow-选中行数据集合
+    //     console.log('onChange', selectedRowKeys);
+    //     checkedKeys.value = selectedRowKeys;
+    //   },
+    // },
     // 是否显示表格设置
     // showTableSetting: true,
     // 是否开启搜索
-    useSearchForm: true,
+    useSearchForm: false,
     // 是否显示序号
-    showIndexColumn: false,
+    showIndexColumn: true,
     // 是否显示边框
     bordered: true,
   });

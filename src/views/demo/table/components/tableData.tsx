@@ -209,7 +209,7 @@ export const histCompTaskFormSchema: FormSchema[] = [
     component: 'Input',
     componentProps: {},
     colProps: {
-      span: 8,
+      span: 4,
     },
   },
   {
@@ -218,16 +218,23 @@ export const histCompTaskFormSchema: FormSchema[] = [
     component: 'Input',
     componentProps: {},
     colProps: {
-      span: 8,
+      span: 4,
     },
   },
   {
     label: '数据状态',
     field: 'synthesisStatus',
-    component: 'Input',
-    componentProps: {},
+    component: 'Select',
+    componentProps: {
+      options: [
+        { label: '完成', value: 'completed' },
+        { label: '未完成', value: 'pending' }
+      ],
+      placeholder: '请选择数据状态',
+      allowClear: true,  // 允许清空选择
+    },
     colProps: {
-      span: 8,
+      span: 4,
     },
   },
   {
@@ -236,7 +243,7 @@ export const histCompTaskFormSchema: FormSchema[] = [
     label: '合成时间',
     slot: 'taskCompTime',
     colProps: {
-      span: 16,
+      span: 12,
     },
   },
 ];
