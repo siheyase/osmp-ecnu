@@ -13,7 +13,6 @@ import { url } from 'inspector';
 
 
 //这里暂时直接对接go后端，后续可以更改
-const BASE_URL = 'http://127.0.0.1:8080'
 
 enum Api {
   FINDATASYNTHSECURITY_NODE_SYN_DATA = '/mock/demo/finDataSynthSecurity/nodeSynData',
@@ -39,7 +38,8 @@ enum Api {
   CERTAIN_BLOCK_DATA = '/mock/demo/finDataSynthSecurity/getBlockInfo',
 
   //这里是真实的接口接口
-  FINDATASYNTHSECURITY_ORACLE_QUERY = '/oracle'
+  FINDATASYNTHSECURITY_ORACLE_QUERY = '/oracle',
+  FINDATASYNTHSECURITY_DATA_QUERY = '/dataSynth',
 }
 
 export const getFDSynthNodeSynDataApi = async () => {
@@ -180,6 +180,16 @@ export const getQueryDataApi = async (queryData) => {
   })
   console.log('数据合成安全-获取查询数据-接口返回数据', res);
   return res;
+};
+
+// 数据合成安全 - 查询接口
+export const getQueryNodeSysApi = async (queryData) => {
+  const res = await defHttp.get<any>({
+    url: Api.FINDATASYNTHSECURITY_DATA_QUERY,
+    params: queryData
+  })
+  console.log('数据合成安全-获取查询数据-接口返回数据', res);
+  return res.data.nodes;
 };
 
 interface BlockInfo {

@@ -30,18 +30,18 @@ export function getNodeColumns(): BasicColumn[] {
     // },
     {
       title: '节点状态',
-      dataIndex: 'nodeStatus',
+      dataIndex: 'Status',
       width: 80,
       // 自定义显示-render例子
       customRender: ({ value }) => {
         const color = (() => {
-          if (value === '正常') {
+          if (value === 'Normal') {
             return '#06A94E'; // 正常：绿色
           }
-          if (value === '故障') {
+          if (value === 'Down') {
             return '#F82906'; // 故障：红色
           }
-          if (value === '关机') {
+          if (value === 'Close') {
             return '#9E9E9E'; // 关机：灰色
           }
           return '#9E9E9E'; // 默认无颜色
@@ -52,24 +52,25 @@ export function getNodeColumns(): BasicColumn[] {
     },
     {
       title: '负载状态',
-      dataIndex: 'systhStatus',
+      dataIndex: 'Workload',
       width: 80,
       // 自定义样式
-      customCell: (record) => {
-        let fontColor;
-        if (record.systhStatus === '空闲') {
-          fontColor = '#54BCBD';
-        } else if (record.systhStatus === '忙碌') {
-          fontColor = '#1D7DEA';
-        } else {
-          fontColor = '#9A9A9A';
-        }
-        return { style: { color: fontColor } };
+      customRender: ({ value }) => {
+        const color = (() => {
+          if (value === '空闲') {
+            return '#06A94E'; // 正常：绿色
+          }
+          if (value === '忙碌') {
+            return '#F82906'; // 故障：红色
+          }
+          return '#9E9E9E'; // 默认无颜色
+        })();
+        return render.renderTag(value, color);
       },
     },
     {
       title: '完成任务数量',
-      dataIndex: 'finishTask',
+      dataIndex: 'NbFinishedTasks',
       width: 80,
       // 自定义样式
       slots: {
@@ -78,7 +79,7 @@ export function getNodeColumns(): BasicColumn[] {
     },
     {
       title: '合成数据总量',
-      dataIndex: 'systhData',
+      dataIndex: 'SynthData',
       width: 80,
       // 自定义样式
       slots: {
@@ -87,7 +88,7 @@ export function getNodeColumns(): BasicColumn[] {
     },
     {
       title: '节点任务进度',
-      dataIndex: 'nodeTaskProgress',
+      dataIndex: 'progress',
       width: 100,
       slots: {
         customRender: 'nodeTaskProgress',

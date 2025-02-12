@@ -10,7 +10,7 @@
 import { useTable } from '/@/components/Table';
 import { getNodeColumns } from './tableData';
 import { ref } from 'vue';
-import { getNodeTableDataApi } from '../../../../api/demo/tableApi';
+import { getQueryNodeSysApi } from '/@/api/demo/finDataSynthSecurityApi';
 export const useBasicForm = () => {
   // 表格勾选key
   const checkedKeys = ref();
@@ -18,7 +18,11 @@ export const useBasicForm = () => {
   // 任务表格配置
   const [nodeTable, { reload }] = useTable({
     // 直接请求接口获取数据
-    api: getNodeTableDataApi,
+    api: ()=>{
+      return getQueryNodeSysApi({
+        query: "NodesStatusQuery"
+      })
+    },
     // 自定义表格数据
     // dataSource: getNodeTableData(),
     columns: getNodeColumns(),

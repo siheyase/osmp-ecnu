@@ -293,8 +293,7 @@
                     </a-row>
                   </a-list-item>
                 </a-list>
-                <a-table :columns="SchduleSlotTableColumn" :data-source="schedule.tableDatas"
-                  style="margin-top: 1%;">
+                <a-table :columns="SchduleSlotTableColumn" :data-source="schedule.tableDatas" style="margin-top: 1%;">
                   <template #headerCell="{ column }">
                     <!-- <template v-if="column.key === 'name'">
                       <span>
@@ -539,28 +538,30 @@ const onQuery = async () => {
           epochArray.push({ name: `Epoch${res.data.epochs[i]}`, value: res.data.epochProcessData[i] })
         }
         taskBarData.value = epochArray
-        taskPieData.value = [{ name: '处理中', value: res.data.scheduleDistributionData[1] },
+        taskPieData.value = [{ name: '处理中', value: res.data.scheduleDistributionData[2] },
         { name: '已完成', value: res.data.scheduleDistributionData[0] },
-        { name: '失败', value: res.data.scheduleDistributionData[2] }]
+        { name: '失败', value: res.data.scheduleDistributionData[1] }]
         //更新schedule
         let scheduleArray = []
         for (let i = 0; i < res.data.schedules.length; i++) {
           let slotArray = []
-          for (let i = 0; i < res.data.schedules[i].commitNumber; i++) {
+          let item = res.data.schedules[i]
+          let sArr = ["Finished", "Processing", "Failed"]
+          for (let i = 0; i < item.slots.length; i++) {
             slotArray.push({
-              slotHash: `0x${Math.floor(Math.random() * 9999999999999)}`,
-              size: res.data.schedules[i].scheduleSize / res.data.schedules[i].commitNumber,
-              process: res.data.schedules[i].scheduleSize / res.data.schedules[i].commitNumber,
-              status: "Finished"
+              slotHash: item.slots[i].slotHash,
+              size: item.slots[i].scheduleSize,
+              process: item.slots[i].process,
+              status: sArr[item.slots[i].status]
             })
           }
           scheduleArray.push({
             id: `schedule-${i + 1}`,  // 每个 Schedule 的 id 按序生成
-            total: res.data.schedules[i].scheduleSize,
-            process: res.data.schedules[i].process,
-            nbCommit: res.data.schedules[i].commitNumber,
-            nbInvalid: res.data.schedules[i].invalidNumber,
-            nbNodes: res.data.schedules[i].commitNumber,//这里暂时用提交数代替
+            total: item.scheduleSize,
+            process: item.process,
+            nbCommit: item.commitNumber,
+            nbInvalid: item.invalidNumber,
+            nbNodes: item.commitNumber + item.invalidNumber,//这里暂时用提交数代替
             tableDatas: slotArray,
           })
         }
