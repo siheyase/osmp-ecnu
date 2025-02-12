@@ -9,6 +9,11 @@
  */
 import { defHttp } from '/@/utils/http/axios';
 import { ChartsInfo } from './model/chartsModel';
+import { url } from 'inspector';
+
+
+//这里暂时直接对接go后端，后续可以更改
+const BASE_URL = 'http://127.0.0.1:8080'
 
 enum Api {
   FINDATASYNTHSECURITY_NODE_SYN_DATA = '/mock/demo/finDataSynthSecurity/nodeSynData',
@@ -32,6 +37,9 @@ enum Api {
   LATEST_BLOCKS_COLUMN = '/mock/demo/finDataSynthSecurity/columnsBlock',
   LATEST_TRANSACTIONS_COLUMN = '/mock/demo/finDataSynthSecurity/columnsTransaction',
   CERTAIN_BLOCK_DATA = '/mock/demo/finDataSynthSecurity/getBlockInfo',
+
+  //这里是真实的接口接口
+  FINDATASYNTHSECURITY_ORACLE_QUERY = '/oracle'
 }
 
 export const getFDSynthNodeSynDataApi = async () => {
@@ -57,13 +65,13 @@ export const getFDSynthNodeStatusApi = async () => {
   return res;
 };
 export const getDFSynthNodeTaskDataApi = async () => {
-  const res = await defHttp.get<any[]>( {url: Api.FINDATASYNTHSECURITY_TASK_STATUS});
-  console.log('数据合成安全-合成任务状态-接口返回数据',res);
+  const res = await defHttp.get<any[]>({ url: Api.FINDATASYNTHSECURITY_TASK_STATUS });
+  console.log('数据合成安全-合成任务状态-接口返回数据', res);
   return res;
 }
 export const getFDSysthDatasetDataApi = async () => {
-  const res = await defHttp.get<any[]>( {url: Api.FINDATASYNTHSECURITY_DATASET_STATUS});
-  console.log('数据合成安全-合成数据集-接口返回数据',res);
+  const res = await defHttp.get<any[]>({ url: Api.FINDATASYNTHSECURITY_DATASET_STATUS });
+  console.log('数据合成安全-合成数据集-接口返回数据', res);
   return res;
 }
 // 上链TPS折线图数据
@@ -75,28 +83,28 @@ export const getUpChainTPSDataApi = () => {
 
 // 数据合成安全 - 最新区块信息
 export const getLatestBlocksDataApi = async () => {
-  const res = await defHttp.get<any[]>({ url: Api.LATEST_BLOCKS_DATA});
+  const res = await defHttp.get<any[]>({ url: Api.LATEST_BLOCKS_DATA });
   console.log('数据合成安全-最新区块信息-接口返回数据', res);
   return res;
 };
 
 // 数据合成安全 - 最新交易信息
 export const getLatestTransactionsDataApi = async () => {
-  const res = await defHttp.get<any[]>({ url: Api.LATEST_TRANSACTIONS_DATA});
+  const res = await defHttp.get<any[]>({ url: Api.LATEST_TRANSACTIONS_DATA });
   console.log('数据合成安全-最新交易信息-接口返回数据', res);
   return res;
 };
 
 // 数据合成安全 - 最新区块信息列配置
 export const getLatestBlocksColumnApi = async () => {
-  const res = await defHttp.get<any[]>({ url: Api.LATEST_BLOCKS_COLUMN});
+  const res = await defHttp.get<any[]>({ url: Api.LATEST_BLOCKS_COLUMN });
   console.log('数据合成安全-最新区块信息列配置-接口返回数据', res);
   return res;
 };
 
 // 数据合成安全 - 最新交易信息列配置
 export const getLatestTransactionsColumnApi = async () => {
-  const res = await defHttp.get<any[]>({ url: Api.LATEST_TRANSACTIONS_COLUMN});
+  const res = await defHttp.get<any[]>({ url: Api.LATEST_TRANSACTIONS_COLUMN });
   console.log('数据合成安全-最新交易信息列配置-接口返回数据', res);
   return res;
 };
@@ -163,6 +171,17 @@ export const getFDSynthColumnExceptionApi = async () => {
   console.log('数据合成安全-获取异常列配置-接口返回数据', res);
   return res;
 };
+
+// 数据合成安全 - 查询接口
+export const getQueryDataApi = async (queryData) => {
+  const res = await defHttp.get<any>({
+    url: Api.FINDATASYNTHSECURITY_ORACLE_QUERY,
+    params: queryData
+  })
+  console.log('数据合成安全-获取查询数据-接口返回数据', res);
+  return res;
+};
+
 interface BlockInfo {
   blockHash: string;
   parentHash: string;
@@ -173,7 +192,7 @@ interface BlockInfo {
 }
 // 数据合成安全 - 获取区块信息 add by zhmye
 export const getBlockInfoApi: () => Promise<BlockInfo> = async () => {
-  const res = await defHttp.get({ url: Api.CERTAIN_BLOCK_DATA});
+  const res = await defHttp.get({ url: Api.CERTAIN_BLOCK_DATA });
   console.log('数据合成安全-获取区块信息-接口返回数据', res);
   return res;
 } 
