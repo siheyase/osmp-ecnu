@@ -26,9 +26,6 @@
         <a-button type="link" @click="viewProofClick(record)">查看凭证</a-button>
         <a-button type="link" @click="deleteClick(record)">删除</a-button>
       </template>
-      <template #toolbar>
-        <a-button @click="batchClick"> 批量操作</a-button>
-      </template>
     </BasicTable>
   </CollapseContainer>
 </template>
@@ -37,7 +34,7 @@
   import { BasicTable } from '/@/components/Table';
   import { useSearchTable } from './useSearchTable';
 
-  const { histCompTasksTable, downloadClick, viewProofClick, deleteClick, batchClick, selectDate } = useSearchTable();
+  const { histCompTasksTable, downloadClick, viewProofClick, deleteClick, selectDate } = useSearchTable();
 </script>
 <style scoped lang="less">
   .formSlot {
