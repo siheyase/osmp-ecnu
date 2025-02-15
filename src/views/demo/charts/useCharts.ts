@@ -8,7 +8,7 @@
  *
  */
 import { getChartsDataApi } from '../../../api/demo/chartsApi';
-import { getUpChainTPSDataApi } from '../../../api/demo/finDataSynthSecurityApi';
+import { getSynthDataApi, getUpChainTPSDataApi } from '../../../api/demo/finDataSynthSecurityApi';
 import { ChartsInfo } from '../../../api/demo/model/chartsModel';
 import { onMounted, ref } from 'vue';
 import { cloneDeep } from 'lodash-es';
@@ -208,8 +208,41 @@ export const useUpChainTPSChart = () => {
   };
   const getUpChainTPSData = async () => {
     try {
-      const res = await getUpChainTPSDataApi();
-      chartsListData.value = res ? setChartOption(res) : [];
+      // const res =[
+      //   {
+      //     id: '008',
+      //     title: '上链TPS',
+      //     type: 'line',
+      //     chartList: [
+      //       {
+      //         chartConfig: {
+      //           xAxis: { data: ['9月26日', '9月27日', '9月28日', '9月29日', '9月30日', '10月1日', '10月2日', '10月3日'] },
+      //         },
+      //         chartData: [13000, 14000, 18000, 19000, 17000, 18500, 16000, 13000],
+      //       },
+      //     ],
+      //   },]
+      const res = await getSynthDataApi({
+        query: 'DateTransactionQuery'
+      })
+
+      const times = res.data.date
+      const txs = res.data.txs
+
+      chartsListData.value = setChartOption([
+        {
+          id: '008',
+          title: '上链交易数',
+          type: 'line',
+          chartList: [
+            {
+              chartConfig: {
+                xAxis: { data: times },
+              },
+              chartData: txs,
+            },
+          ],
+        },]);
     } catch (error) {
       console.error('Error:', error);
     }
@@ -219,5 +252,5 @@ export const useUpChainTPSChart = () => {
     getUpChainTPSData();
   });
 
-  return { chartsListData};
+  return { chartsListData };
 };

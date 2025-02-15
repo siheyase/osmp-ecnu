@@ -40,6 +40,8 @@ enum Api {
   //这里是真实的接口接口
   FINDATASYNTHSECURITY_ORACLE_QUERY = '/oracle',
   FINDATASYNTHSECURITY_DATA_QUERY = '/dataSynth',
+  FINDATASYNTHSECURITY_CREATE_TASK = '/create',
+  FINDATASYNTHSECURITY_BLOCKCHAIN_INFO = '/blockchain'
 }
 
 export const getFDSynthNodeSynDataApi = async () => {
@@ -172,6 +174,10 @@ export const getFDSynthColumnExceptionApi = async () => {
   return res;
 };
 
+
+
+//==========================这些是真实的接口====================================================
+
 // 数据合成安全 - 查询接口
 export const getQueryDataApi = async (queryData) => {
   const res = await defHttp.get<any>({
@@ -182,7 +188,39 @@ export const getQueryDataApi = async (queryData) => {
   return res;
 };
 
-// 数据合成安全 - 查询接口
+//数据合成安全 -创建任务接口
+export const createTaskApi = async (queryData) => {
+  const res = await defHttp.post<any>({
+    url: Api.FINDATASYNTHSECURITY_CREATE_TASK,
+    data: queryData
+  })
+  console.log('数据合成安全-获取查询数据-接口返回数据', res);
+  return res;
+}
+
+//数据合成安全 -创建任务接口
+export const getSynthDataApi = async (queryData) => {
+  const res = await defHttp.get<any>({
+    url: Api.FINDATASYNTHSECURITY_DATA_QUERY,
+    params: queryData
+  })
+  console.log('数据合成安全-获取查询数据-接口返回数据', res);
+  return res;
+}
+
+//数据合成安全 -区块链接口
+export const getBlockChainInfoApi = async (queryData) => {
+  const res = await defHttp.get<any>({
+    url: Api.FINDATASYNTHSECURITY_BLOCKCHAIN_INFO,
+    params: queryData
+  })
+  console.log('数据合成安全-获取查询数据-接口返回数据', res);
+  return res;
+}
+
+
+//==============这些用于Table查询的API=================
+// 数据合成安全 - 节点查询接口
 export const getQueryNodeSysApi = async (queryData) => {
   const res = await defHttp.get<any>({
     url: Api.FINDATASYNTHSECURITY_DATA_QUERY,
@@ -191,6 +229,17 @@ export const getQueryNodeSysApi = async (queryData) => {
   console.log('数据合成安全-获取查询数据-接口返回数据', res);
   return res.data.nodes;
 };
+
+// 数据合成安全 - 任务查询接口
+export const getQueryAllTasksApi = async () => {
+  const res = await defHttp.get<any>({
+    url: Api.FINDATASYNTHSECURITY_DATA_QUERY,
+    params: {
+      query: 'SynthTaskQuery'
+    }
+  })
+  return res.data.tasks;
+}
 
 interface BlockInfo {
   blockHash: string;

@@ -104,20 +104,19 @@
               0x
             </a-avatar>
           </a-col>
-
           <!-- 交易哈希 -->
-          <a-col :span="5" style="line-height: 64px; height: 64px;margin: 0">
-            <h3>{{ TransactionItem.txHash }}</h3>
+          <a-col :span="18" style="line-height: 64px; height: 64px">
+            <h3>{{ TransactionItem.txHash.substring(0, 40) + '....' }}</h3>
           </a-col>
           <!-- 标签部分 -->
-          <a-col :span="6">
-            <a-tag color="success">
+          <a-col :span="4">
+            <a-tag v-if="TaskItem.total == TaskItem.process" color="success">
               <template #icon>
                 <check-circle-outlined />
               </template>
               success
             </a-tag>
-            <a-tag color="processing">
+            <a-tag v-else color="processing">
               <template #icon>
                 <sync-outlined :spin="true" />
               </template>
@@ -125,10 +124,8 @@
             </a-tag>
             <!-- <a-tag color="orange">Tag3</a-tag> -->
           </a-col>
-
         </a-row>
-        <a-table :columns="taskProcess.tableColumn" :data-source="evidenceTable" bordered :pagination="false"
-          :showHeader="false" />
+        <a-table :columns="TaskCol" :data-source="evidenceTable" bordered :pagination="false" :showHeader="false" />
         <!-- <a-divider /> -->
         <a-tabs v-model:activeKey="activeKey2">
           <a-tab-pane key="1">
@@ -142,33 +139,39 @@
               <!-- 第一个列表项 -->
               <a-list-item>
                 <a-row gutter={16} style="width: 100%">
-                  <a-col :span="8">
+                  <a-col :span="24">
                     <strong>交易哈希:</strong>
                     <a-tag color="purple">{{ TransactionItem.txHash }}</a-tag>
                   </a-col>
-                  <a-col :span="8">
+                </a-row>
+              </a-list-item>
+              <a-list-item>
+                <a-row gutter={10} style="width: 100%">
+                  <a-col :span="20">
                     <strong>区块哈希:</strong>
                     <a-tag color="pink">{{ TransactionItem.blockHash }}</a-tag>
                   </a-col>
-                  <a-col :span="8">
+                  <a-col :span="4">
                     <strong>区块高度:</strong>
                     <a-tag color="orange">{{ TransactionItem.blockHeight }}</a-tag>
                   </a-col>
                 </a-row>
               </a-list-item>
-
-
               <a-list-item>
-                <a-row gutter={16} style="width: 100%">
-                  <a-col :span="8">
+                <a-row gutter={8} style="width: 100%">
+                  <a-col :span="24">
                     <strong>合约地址:</strong>
                     <a-tag color="green">{{ TransactionItem.contract }}</a-tag>
                   </a-col>
-                  <a-col :span="8">
+                </a-row>
+              </a-list-item>
+              <a-list-item>
+                <a-row gutter={2} style="width: 100%">
+                  <a-col :span="5">
                     <strong>合约接口:</strong>
                     <a-tag color="blue">{{ TransactionItem.method }}</a-tag>
                   </a-col>
-                  <a-col :span="8">
+                  <a-col :span="19">
                     <strong>默克尔根:</strong>
                     <a-tag color="red">{{ TransactionItem.merkleRoot }}</a-tag>
                   </a-col>
@@ -197,7 +200,7 @@
                   </a-col>
                   <a-col :span="8">
                     <strong>合成总量:</strong>
-                    <a-tag color="pink">{{ TaskItem.total }}TB</a-tag>
+                    <a-tag color="pink">{{ TaskItem.total }}GB</a-tag>
                   </a-col>
                   <a-col :span="8">
                     <strong>数据集:</strong>
@@ -219,7 +222,7 @@
                   </a-col>
                   <a-col :span="8">
                     <strong>已合成:</strong>
-                    <a-tag color="red">{{ TaskItem.process }} TB</a-tag>
+                    <a-tag color="red">{{ TaskItem.process }} GB</a-tag>
                   </a-col>
                 </a-row>
               </a-list-item>
@@ -233,16 +236,13 @@
 
 
       <!-- 这里画initTask->每个epoch的commit+finalized -->
-      <a-card title="时间轴" style="height: 440px;">
+      <a-card title="时间轴" style="height: 340px; overflow: scroll;margin-top: 100px;">
         <a-timeline mode="alternate">
           <a-timeline-item v-for="(item, index) in timelineItems" :key="index" color="red">
             <ClockCircleOutlined style="font-size: 16px" />
             {{ item[1] }}
           </a-timeline-item>
         </a-timeline>
-
-
-
       </a-card>
     </a-col>
 
@@ -268,11 +268,11 @@
                       </a-col>
                       <a-col :span="8">
                         <strong>调度总量:</strong>
-                        <a-tag color="pink">{{ schedule.total }}TB</a-tag>
+                        <a-tag color="pink">{{ schedule.total }}GB</a-tag>
                       </a-col>
                       <a-col :span="8">
                         <strong>已完成数据:</strong>
-                        <a-tag color="orange">{{ schedule.process }} TB</a-tag>
+                        <a-tag color="orange">{{ schedule.process }} GB</a-tag>
                       </a-col>
                     </a-row>
                   </a-list-item>
@@ -333,7 +333,7 @@
 
                     <template v-else-if="column.key === 'process' || column.key === 'size'">
                       <!-- <span> -->
-                      {{ column.key === 'process' ? record.process : record.size }} TB
+                      {{ column.key === 'process' ? record.process : record.size }} GB
                       <!-- </span> -->
                     </template>
                   </template>
@@ -380,16 +380,12 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref } from 'vue';
+import { computed, reactive, ref } from 'vue';
 import { useEvidenceOnChain } from './useDataOnChain';
-const { taskQueryResult, taskProcess, taskValidation, taskPhase, taskException } = useEvidenceOnChain();
 import { InfoCircleOutlined, LineChartOutlined, PieChartOutlined, CheckCircleOutlined, SyncOutlined, GoldOutlined, ClockCircleOutlined, ControlOutlined, TransactionOutlined } from '@ant-design/icons-vue';
 import { BarChart, PieChart } from '/@/components/Charts';
 import { getQueryDataApi } from '/@/api/demo/finDataSynthSecurityApi';
 import { message } from 'ant-design-vue';
-
-
-const [messageApi, contextHolder] = message.useMessage();
 
 const activeKey1 = ref('1');
 const activeKey2 = ref('1');
@@ -423,6 +419,12 @@ const SchduleSlotTableColumn = [
     key: 'action'
   }
 ]
+
+const TaskCol = [
+  { dataIndex: 'name', key: 'name' },
+  { dataIndex: 'value', key: 'value' },
+]
+
 // 定义类型
 interface ScheduleSlot {
   slotHash: string;
@@ -478,7 +480,7 @@ const barChartConfig = {
   chartConfig: {
     yAxis: {
       axisLabel: {
-        formatter: '{value}TB',
+        formatter: '{value}GB',
       },
     },
   },
@@ -522,16 +524,14 @@ const onQuery = async () => {
         TaskItem.nbSchedule = taskInfo.schedule
         TaskItem.nbFinalized = taskInfo.commit
         //获取交易信息
-        TransactionItem.txHash = `0x${Math.floor(Math.random() * 9999999999999)}`, // 交易哈希
-          TransactionItem.blockHash = `0x${Math.floor(Math.random() * 9999999999999)}`, // 区块哈希
-          TransactionItem.blockHeight = -1, // 区块高度
-          TransactionItem.contract = `0x${Math.floor(Math.random() * 9999999999999)}`, // 合约地址
-          TransactionItem.method = 'InitTask', // 合约接口
-          TransactionItem.upchainTime = '2024-10-08 14:15:30', // 上链时间
-          TransactionItem.merkleRoot = `0x${Math.floor(Math.random() * 9999999999999)}` // 交易所在的区块的merkle root，下面提供一个按钮验证merkle
-        //TODO 这里需要补全
         const txInfo = res.data.tx_info
-        TransactionItem.method = txInfo.abi
+        TransactionItem.txHash = txInfo.txHash, // 交易哈希
+          TransactionItem.blockHash = txInfo.blockHash, // 区块哈希
+          TransactionItem.blockHeight = txInfo.blockHeight, // 区块高度
+          TransactionItem.contract = txInfo.contractAddress, // 合约地址
+          TransactionItem.method = txInfo.abi
+        TransactionItem.upchainTime = '2024-10-08 14:15:30', // 上链时间(这个是假的)
+          TransactionItem.merkleRoot = txInfo.MerkleRoot // 交易所在的区块的merkle root，下面提供一个按钮验证merkle
         //获取epoch信息
         let epochArray = []
         for (let i = 0; i < res.data.epochProcessData.length; i++) {
@@ -566,6 +566,12 @@ const onQuery = async () => {
           })
         }
         schedules.value = scheduleArray
+
+        evidenceTable.value = [
+          { name: '任务标识', value: TaskItem.sign },
+          { name: '交易哈希', value: TransactionItem.txHash },
+          { name: '任务状态', value: TaskItem.process == TaskItem.total ? '已完成' : '处理中' },
+        ]
         console.log(schedules)
       } else {
         message.error("查找失败")
@@ -638,11 +644,7 @@ let EpochItem = reactive({
 })
 
 // 左下角显示的epoch/task表格
-let evidenceTable = [
-  { name: '任务标识', value: TaskItem.sign },
-  { name: '交易哈希', value: TransactionItem.txHash },
-  { name: '任务状态', value: '处理中' },
-];
+let evidenceTable = ref([]);
 
 
 // 重置表单

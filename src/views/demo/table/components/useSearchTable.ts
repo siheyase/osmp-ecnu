@@ -12,13 +12,14 @@ import { getHistCompTasksColumns, histCompTaskFormSchema } from './tableData';
 import { ref } from 'vue';
 import { getHistCompTaskDataApi } from '../../../../api/demo/tableApi';
 import dayjs, { Dayjs } from 'dayjs';
+import { getQueryAllTasksApi, getQueryDataApi } from '/@/api/demo/finDataSynthSecurityApi';
 export const useSearchTable = () => {
   // 表格勾选key
   const checkedKeys = ref();
 
   // 任务表格配置
   const [histCompTasksTable, { reload, getForm }] = useTable({
-    api: getHistCompTaskDataApi,
+    api: getQueryAllTasksApi,
     columns: getHistCompTasksColumns(),
     fetchSetting: {
       pageField: 'pageNum',
@@ -113,5 +114,5 @@ export const useSearchTable = () => {
     console.log('批量操作', checkedKeys.value);
   };
 
-  return { histCompTasksTable, downloadClick, viewProofClick, deleteClick, batchClick, selectDate };
+  return { histCompTasksTable, downloadClick, viewProofClick, deleteClick, batchClick, selectDate, reload };
 };

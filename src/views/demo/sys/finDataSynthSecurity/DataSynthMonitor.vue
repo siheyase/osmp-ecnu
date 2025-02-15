@@ -86,11 +86,15 @@
       </div>
     </div>
     <div class="table">
-      <BasicTable @register="nodeTable">
+      <BasicTable :pagination="false" @register="nodeTable">
         <template #nodeInfo="{ record }">
           <div class="nodeInfo">
-            Node{{ record?.NodeID }}
+            <img :src="ECNU_ICON" />
+            节点{{ record?.NodeID }}
           </div>
+        </template>
+        <template #speed="{ record }">
+          {{ (Math.random() * (200 - 100) + 100).toFixed(2) }} GB/S
         </template>
         <template #storage="{ record }">
           <div class="storage-container">
@@ -100,12 +104,15 @@
               </div> -->
             <!-- 信息部分 -->
             <div class="storage-info">
-              <div class="storage-progress">
+              <div class="storage-progress" v-if="record.storage != 0">
                 <a-progress :percent="((record.disk / record.storage) * 100).toFixed(2)" :show-info="false"
                   stroke-width="10" stroke-color="#1890ff" />
               </div>
-              <div class="storage-details">
+              <div class="storage-details" v-if="record.storage != 0">
                 {{ record?.disk.toFixed(1) }} B 可用，共 {{ record?.storage.toFixed(1) }} B
+              </div>
+              <div v-if="record.storage == 0">
+                暂无数据
               </div>
             </div>
           </div>
@@ -114,7 +121,7 @@
         <template #nodeTaskProgress="{ record }">
           <!-- <div style="display: flex; justify-content: center; align-items: center; width: 100%;"> -->
           <a-progress
-            :percent="(record.NbFinishedTasks / (record.NbFinishedTasks + record.NbPendingTasks) * 100).toFixed(2)"
+            :percent="(record.NbFinishedTasks + record.NbPendingTasks == 0) ? 0 : (record.NbFinishedTasks / (record.NbFinishedTasks + record.NbPendingTasks) * 100).toFixed(2)"
             :steps="10" strokeColor="#52c41a"
             style="display: flex; justify-content: center; align-items: center; width: 100%;" />
           <!-- </div> -->
@@ -147,6 +154,7 @@
 </template>
 <script lang="ts" setup>
 import { PageWrapper } from '/@/components/Page';
+import ECNU_ICON from '/@/assets/ecnu.png';
 import { BarChart, PieChart } from '/@/components/Charts';
 import { BasicTable } from '/@/components/Table';
 import { useBasicForm } from '/@/views/demo/table/components/useBasicForm';

@@ -87,6 +87,15 @@ export function getNodeColumns(): BasicColumn[] {
       },
     },
     {
+      title: '平均合成速度',
+      dataIndex: 'speed',
+      width: 80,
+      // 自定义样式
+      slots: {
+        customRender: 'speed',
+      },
+    },
+    {
       title: '节点任务进度',
       dataIndex: 'progress',
       width: 100,
@@ -143,26 +152,26 @@ export function getHistCompTasksColumns(): BasicColumn[] {
   return [
     {
       title: '合成任务ID',
-      dataIndex: 'id',
+      dataIndex: 'taskID',
       width: 80,
       slots: {
-        customRender: 'nodeInfo',
+        customRender: 'taskId',
       },
       fixed: 'left',
     },
     {
       title: '交易哈希',
-      dataIndex: 'transactionHash',
+      dataIndex: 'txHash',
       width: 80,
     },
     {
-      title: '数据总量（TB）',
-      dataIndex: 'totalDataSize',
+      title: '数据总量（GB）',
+      dataIndex: 'total',
       width: 80,
     },
     {
-      title: '已合成（TB）',
-      dataIndex: 'synthesizedDataSize',
+      title: '已合成（GB）',
+      dataIndex: 'process',
       width: 80,
     },
     {
@@ -172,22 +181,29 @@ export function getHistCompTasksColumns(): BasicColumn[] {
       // 自定义样式
       customCell: (record) => {
         let fontColor;
-        if (record.synthesisStatus === '已完成') {
+        if (record.status === true) {
           fontColor = '#06A94E';
         } else {
           fontColor = '#F82906';
         }
         return { style: { color: fontColor } };
       },
+      customRender:({record})=>{
+        if (record.status === true) {
+          return '已完成'
+        } else {
+          return '未完成'
+        }
+      }
     },
     {
       title: '任务创建时间',
-      dataIndex: 'taskCreateTime',
+      dataIndex: 'startTime',
       width: 80,
     },
     {
       title: '任务结束时间',
-      dataIndex: 'taskEndTime',
+      dataIndex: 'endTime',
       width: 80,
     },
     {
