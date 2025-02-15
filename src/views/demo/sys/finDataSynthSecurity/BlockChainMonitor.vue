@@ -82,27 +82,30 @@
               这里点击查询区块信息后要跳出一个弹窗，展示区块内容
               下面的交易同理  
             -->
-                <a-modal v-model:open="blockModalVisable" title="区块详情" centered @ok="blockModalVisable = false">
+                <a-modal v-model:open="blockModalVisable" title="区块详情" :style="{width:'800px'}" centered @ok="blockModalVisable = false">
                   <template #footer>
                     <a-button key="back" @click="blockModalVisable = false">返回</a-button>
                   </template>
                   <a-list bordered size="large">
                     <a-list-item>
                       <span><strong>区块哈希:</strong> <a-tag color="pink">{{ blockItem.blockHash }}</a-tag></span>
+                    </a-list-item>
+                    <a-list-item>
                       <span><strong>父区块哈希:</strong> <a-tag color="orange">{{ blockItem.parentHash }}</a-tag></span>
                     </a-list-item>
                     <a-list-item>
                       <span><strong>区块高度:</strong> <a-tag color="green">{{ blockItem.blockHeight }}</a-tag></span>
                       <span><strong>交易数量:</strong> <a-tag color="blue">{{ blockItem.nbTransactions }}</a-tag></span>
+                    </a-list-item>
+                    <a-list-item>
                       <span><strong>Merkle Root:</strong> <a-tag color="cyan">{{ blockItem.merkleRoot }}</a-tag></span>
                     </a-list-item>
-
                     <a-list-item>
                       <div>
                         <span><strong>交易哈希:</strong></span>
-                        <a-table v-if="blockItem.txHashs && blockItem.txHashs.length > 0"
+                        <BasicTable v-if="blockItem.txHashs && blockItem.txHashs.length > 0"
                           :data-source="blockItem.txHashs" :columns="blockInfoColumn" bordered size="small"
-                          row-key="index" :scroll="{ y: 'calc(30vh)' }" :pagination="false" />
+                          row-key="index"  :pagination="false" />
                         <span v-else>暂无交易</span>
                       </div>
                     </a-list-item>
@@ -179,7 +182,12 @@ const getChartComponent = (type: string | undefined) => {
 // 这里定义的是两个弹窗是否可见
 const blockModalVisable = ref<boolean>(false);
 const txModalVisable = ref<boolean>(false);
-const blockInfoColumn = getBlockInfoColumns();
+const blockInfoColumn = [
+  { title: "交易哈希", dataIndex: 'TxHash', key: 'TxHash' },
+  { title: "合约地址", dataIndex: 'Contract', key: 'Contract' },
+  { title: "调用接口", dataIndex: 'abi', key: 'abi' },
+
+];
 // 搜索表单数据
 const searchForm = reactive({
   blockHash: '',
@@ -192,20 +200,21 @@ let blockItem = reactive({
   blockHeight: -1,
   merkleRoot: '',
   nbTransactions: -1,
-  txHashs: [] as string[],
+  txHashs: [] as any[],
 })
 const getBlockInfoQuery = async () => {
-  const res = await getBlockInfoApi();
-  if (res) {
-    blockItem.blockHash = res.blockHash;
-    blockItem.parentHash = res.parentHash;
-    blockItem.blockHeight = res.blockHeight;
-    blockItem.merkleRoot = res.merkleRoot;
-    blockItem.nbTransactions = res.nbTransactions;
-
+  const res = await getBlockChainInfoApi({
+    query: "BlockchainBlockHashQuery",
+    blockHash: searchForm.blockHash,
+  });
+  if (res.status == 'OK') {
+    blockItem.blockHash = res.data.BlockHash;
+    blockItem.parentHash = res.data.ParentHash;
+    blockItem.blockHeight = res.data.BlockHeight;
+    blockItem.merkleRoot = res.data.TransactionRoot;
+    blockItem.nbTransactions = res.data.Txs.length;
     // 修改数组内容时需要先清空再添加元素，保证响应性
-    blockItem.txHashs.length = 0; // 清空数组
-    blockItem.txHashs.push(...res.txHashs); // 添加新数据
+    blockItem.txHashs = res.data.Txs
   }
   console.log(res, blockItem)
 }
