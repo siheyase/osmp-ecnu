@@ -163,6 +163,7 @@ import { BasicTable } from '/@/components/Table';
 import { ref } from 'vue';
 import { getBlockChainInfoApi, getBlockInfoApi } from '../../../../api/demo/finDataSynthSecurityApi';
 import { getBlockInfoColumns } from '../../table/components/tableData';
+import { message } from 'ant-design-vue';
 const { chartsListData } = useUpChainTPSChart();
 const { epochTable, transactionTable } = queryEpochAndTransactionTableData(); // modify by zhmye 这里用来获取这个页面里面的两个表格数据
 
@@ -219,6 +220,10 @@ const getBlockInfoQuery = async () => {
   console.log(res, blockItem)
 }
 const queryBlockInfo = () => {
+  if (searchForm.blockHash == "") {
+    message.error("请输入区块哈希")
+    return
+  }
   console.log('查询区块信息:', searchForm.blockHash);
   // add by zhmye 
   // 这里打开一个弹窗，里面显示区块信息 具体要看fisco-bcos能给出什么样的数据，至少

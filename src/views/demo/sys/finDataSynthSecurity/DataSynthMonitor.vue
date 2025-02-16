@@ -40,7 +40,10 @@
           <a-tabs v-model:activeKey="activeKey2">
             <a-tab-pane key="1">
               <template #tab>
-                <h3 class="chart-title" style="margin-top: 20px;">上链交易数</h3>
+                <span>
+                  <ShopOutlined />
+                  系统存储情况
+                </span>
               </template>
               <PieChart :chartData="nodeStorage?.chartData" :optionConfig="nodeStorage?.chartConfig"
                 :seriesConfig="nodeStorage?.seriesConfig" height="30vh" width="100%" />
@@ -90,7 +93,7 @@
         <template #nodeInfo="{ record }">
           <div class="nodeInfo">
             <img :src="ECNU_ICON" />
-            节点{{ record?.NodeID }}
+            ECNU-合成节点-{{ record?.NodeID }}
           </div>
         </template>
         <template #speed="{ record }">

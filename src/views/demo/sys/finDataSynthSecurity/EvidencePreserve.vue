@@ -19,19 +19,32 @@
           </a-form-item>
 
           <!-- 合成任务ID -->
-          <a-form-item v-if="TaskSearchForm.queryType === 'taskId'" label="合成任务标识" name="taskId" style="width: 50%;">
-            <a-input v-model:value="TaskSearchForm.taskId" placeholder="请输入合成任务标识" />
+          <a-form-item v-if="TaskSearchForm.queryType === 'taskId'" label="合成任务标识" name="taskId">
+            <a-row gutter={16} style="width: 50%">
+              <!-- 交易哈希类型下拉框 -->
+              <!-- <a-col :span="4" style="margin-right: 8px">
+                <a-select v-model:value="TaskSearchForm.transactionType" placeholder="选择交易类型">
+                  <a-select-option value="InitTask">InitTask</a-select-option>
+                  <a-select-option value="CommitSlot">CommitSlot</a-select-option>
+                </a-select>
+              </a-col> -->
+
+              <!-- 交易哈希输入框 -->
+              <a-col :span="18">
+                <a-input v-model:value="TaskSearchForm.taskId" placeholder="请输入合成任务标识" />
+              </a-col>
+            </a-row>
           </a-form-item>
           <!-- 交易哈希和交易哈希类型 -->
           <a-form-item v-if="TaskSearchForm.queryType === 'transactionHash'" label="交易哈希" name="transactionHash">
             <a-row gutter={16} style="width: 50%">
               <!-- 交易哈希类型下拉框 -->
-              <a-col :span="4" style="margin-right: 8px">
+              <!-- <a-col :span="4" style="margin-right: 8px">
                 <a-select v-model:value="TaskSearchForm.transactionType" placeholder="选择交易类型">
                   <a-select-option value="InitTask">InitTask</a-select-option>
                   <a-select-option value="CommitSlot">CommitSlot</a-select-option>
                 </a-select>
-              </a-col>
+              </a-col> -->
 
               <!-- 交易哈希输入框 -->
               <a-col :span="18">
@@ -69,13 +82,13 @@
           <a-form-item v-if="EpochSearchForm.queryType === 'transactionHash'" label="交易哈希" name="transactionHash">
             <a-row gutter={16} style="width: 50%">
               <!-- 交易哈希类型下拉框 -->
-              <a-col :span="4" style="margin-right: 8px">
+              <!-- <a-col :span="4" style="margin-right: 8px">
                 <a-select v-model:value="EpochSearchForm.transactionType" placeholder="选择交易类型">
                   <a-select-option value="EpochRecord">EpochRecord</a-select-option>
                   <a-select-option value="TaskInit">TaskInit</a-select-option>
                   <a-select-option value="CommitSlot">CommitSlot</a-select-option>
                 </a-select>
-              </a-col>
+              </a-col> -->
 
               <!-- 交易哈希输入框 -->
               <a-col :span="18">
@@ -91,7 +104,7 @@
       </a-tab-pane>
     </a-tabs>
   </a-card>
-  <a-row gutter="16">
+  <a-row gutter="16" v-if="infoType === 'task' || infoType === 'epoch'">
     <!-- 左侧搜索框 -->
     <a-col :span="8">
 
@@ -105,12 +118,12 @@
             </a-avatar>
           </a-col>
           <!-- 交易哈希 -->
-          <a-col :span="18" style="line-height: 64px; height: 64px">
+          <a-col :span="12" style="line-height: 64px; height: 64px">
             <h3>{{ TransactionItem.txHash.substring(0, 40) + '....' }}</h3>
           </a-col>
           <!-- 标签部分 -->
           <a-col :span="4">
-            <a-tag v-if="TaskItem.total == TaskItem.process" color="success">
+            <a-tag v-if="(infoType == 'task' && TaskItem.total <= TaskItem.process) || (infoType == 'epoch')" color="success">
               <template #icon>
                 <check-circle-outlined />
               </template>
@@ -125,73 +138,14 @@
             <!-- <a-tag color="orange">Tag3</a-tag> -->
           </a-col>
         </a-row>
-        <a-table :columns="TaskCol" :data-source="evidenceTable" bordered :pagination="false" :showHeader="false" />
-        <!-- <a-divider /> -->
-        <a-tabs v-model:activeKey="activeKey2">
-          <a-tab-pane key="1">
-            <template #tab>
-              <span>
-                <GoldOutlined />
-                交易信息
-              </span>
+        <a-tabs v-model:activeKey="activeKey4">
+        <a-tab-pane key="1">
+        <template #tab>
+              <ControlOutlined />
+              <span v-if="infoType === 'task'">任务信息</span>
+              <span v-else-if="infoType === 'epoch'">纪元信息</span>
             </template>
-            <a-list bordered size="large">
-              <!-- 第一个列表项 -->
-              <a-list-item>
-                <a-row gutter={16} style="width: 100%">
-                  <a-col :span="24">
-                    <strong>交易哈希:</strong>
-                    <a-tag color="purple">{{ TransactionItem.txHash }}</a-tag>
-                  </a-col>
-                </a-row>
-              </a-list-item>
-              <a-list-item>
-                <a-row gutter={10} style="width: 100%">
-                  <a-col :span="20">
-                    <strong>区块哈希:</strong>
-                    <a-tag color="pink">{{ TransactionItem.blockHash }}</a-tag>
-                  </a-col>
-                  <a-col :span="4">
-                    <strong>区块高度:</strong>
-                    <a-tag color="orange">{{ TransactionItem.blockHeight }}</a-tag>
-                  </a-col>
-                </a-row>
-              </a-list-item>
-              <a-list-item>
-                <a-row gutter={8} style="width: 100%">
-                  <a-col :span="24">
-                    <strong>合约地址:</strong>
-                    <a-tag color="green">{{ TransactionItem.contract }}</a-tag>
-                  </a-col>
-                </a-row>
-              </a-list-item>
-              <a-list-item>
-                <a-row gutter={2} style="width: 100%">
-                  <a-col :span="5">
-                    <strong>合约接口:</strong>
-                    <a-tag color="blue">{{ TransactionItem.method }}</a-tag>
-                  </a-col>
-                  <a-col :span="19">
-                    <strong>默克尔根:</strong>
-                    <a-tag color="red">{{ TransactionItem.merkleRoot }}</a-tag>
-                  </a-col>
-                </a-row>
-              </a-list-item>
-              <a-list-item style="justify-content: center;">
-                <a-button type="primary">校验默克尔证明</a-button> <!-- 这里最好可以用echarts来一个树状图，验证merkler root -->
-              </a-list-item>
-            </a-list>
-          </a-tab-pane>
-
-
-          <a-tab-pane key="2">
-            <template #tab>
-              <span>
-                <ControlOutlined />
-                任务信息
-              </span>
-            </template>
-            <a-list bordered size="large">
+            <a-list bordered size="large" v-if="infoType == 'task'">
               <a-list-item>
                 <a-row gutter={16} style="width: 100%">
                   <a-col :span="8">
@@ -226,17 +180,119 @@
                   </a-col>
                 </a-row>
               </a-list-item>
+              <!-- <a-list-item style="justify-content: center;">
+                <a-button type="primary">查看任务详情</a-button>
+              </a-list-item> -->
+            </a-list>
+            <a-list bordered size="large" v-else-if="infoType == 'epoch'">
+              <a-list-item>
+                <a-row gutter={16} style="width: 100%">
+                  <a-col :span="8">
+                    <strong>纪元编号:</strong>
+                    <a-tag color="purple">{{ EpochItem.epochID }}</a-tag>
+                  </a-col>
+                  <a-col :span="8">
+                    <strong>合成总量:</strong>
+                    <a-tag color="pink">{{ EpochItem.process }}GB</a-tag>
+                  </a-col>
+                  <a-col :span="8">
+                    <strong>确认单元:</strong>
+                    <a-tag color="orange">{{ EpochItem.nbFinalized }}</a-tag>
+                  </a-col>
+                </a-row>
+              </a-list-item>
+
+
+              <a-list-item>
+                <a-row gutter={16} style="width: 100%">
+                  <a-col :span="8">
+                    <strong>提交单元:</strong>
+                    <a-tag color="green">{{ EpochItem.nbCommit }}</a-tag>
+                  </a-col>
+                  <a-col :span="8">
+                    <strong>异常单元:</strong>
+                    <a-tag color="blue">{{ EpochItem.nbInvalid }}</a-tag>
+                  </a-col>
+                  <a-col :span="8">
+                    <strong>异常节点数:</strong>
+                    <a-tag color="red">{{ EpochItem.nbInvalidNode }}</a-tag>
+                  </a-col>
+                </a-row>
+              </a-list-item>
+              <!-- <a-list-item style="justify-content: center;">
+                <a-button type="primary" v-if="infoType == 'task'">查看任务详情</a-button> 
+
+                <a-button type="primary" v-else-if="infoType == 'epoch'">查看纪元详情</a-button> 
+
+              </a-list-item> -->
+            </a-list>
+        <!-- <a-divider /> -->
+         </a-tab-pane>
+          </a-tabs>
+
+        <a-tabs v-model:activeKey="activeKey2">
+          <a-tab-pane key="1">
+            <template #tab>
+              <span>
+                <GoldOutlined />
+                交易信息
+              </span>
+            </template>
+            <a-list bordered size="large">
+              <!-- 第一个列表项 -->
+              <a-list-item>
+                <a-row gutter={16} style="width: 100%">
+                  <a-col :span="24">
+                    <strong>交易哈希:</strong>
+                    <a-tag color="purple">{{ TransactionItem.txHash }}</a-tag>
+                  </a-col>
+                </a-row>
+              </a-list-item>
+              <a-list-item>
+                <a-row gutter={10} style="width: 100%">
+                  <a-col :span="20">
+                    <strong>区块哈希:</strong>
+                    <a-tag color="pink">{{ TransactionItem.blockHash }}</a-tag>
+                  </a-col>
+                </a-row>
+              </a-list-item>
+              <a-list-item>
+                <a-row gutter={8} style="width: 100%">
+                  <a-col :span="4">
+                    <strong>区块高度:</strong>
+                    <a-tag color="orange">{{ TransactionItem.blockHeight }}</a-tag>
+                  </a-col>
+                  <a-col :span="12">
+                    <strong>合约地址:</strong>
+                    <a-tag color="green">{{ TransactionItem.contract }}</a-tag>
+                  </a-col>
+                  <a-col :span="5">
+                    <strong>合约接口:</strong>
+                    <a-tag color="blue">{{ TransactionItem.method }}</a-tag>
+                  </a-col>
+                </a-row>
+              </a-list-item>
+              <a-list-item>
+                <a-row gutter={2} style="width: 100%">
+                  <a-col :span="19">
+                    <strong>默克尔根:</strong>
+                    <a-tag color="red">{{ TransactionItem.merkleRoot }}</a-tag>
+                  </a-col>
+                </a-row>
+              </a-list-item>
               <a-list-item style="justify-content: center;">
-                <a-button type="primary">查看任务详情</a-button> <!-- 这里就把上面那些再抄在一个弹窗里，然后加一些字段，比如用了哪个模型，哪些节点目前合成了多少数据等 -->
+                <a-button type="primary">校验默克尔证明</a-button> <!-- 这里最好可以用echarts来一个树状图，验证merkler root -->
               </a-list-item>
             </a-list>
           </a-tab-pane>
+
+
         </a-tabs>
       </a-card>
 
 
       <!-- 这里画initTask->每个epoch的commit+finalized -->
-      <a-card title="时间轴" style="height: 340px; overflow: scroll;margin-top: 100px;">
+      <a-card title="时间轴" style="height: 340px; overflow: scroll;margin-top: 100px;" v-if="infoType == 'task'">
         <a-timeline mode="alternate">
           <a-timeline-item v-for="(item, index) in timelineItems" :key="index" color="red">
             <ClockCircleOutlined style="font-size: 16px" />
@@ -244,6 +300,18 @@
           </a-timeline-item>
         </a-timeline>
       </a-card>
+      <a-card title="异常溯源" style="height: 340px; overflow: scroll; margin-top: 100px;" v-else-if="infoType == 'epoch'">
+      <a-tabs>
+        <a-tab-pane key="1" tab="节点异常检测">
+          <a-table :columns="invalidNodeTableColumn" :data-source="invalidNodeTable" bordered :showHeader="false" />
+        </a-tab-pane>
+        <a-tab-pane key="2" tab="提交单元异常">
+          <a-table :columns="invalidSlotTableColumn" :data-source="invalidSlotTable" bordered :showHeader="false" />
+        </a-tab-pane>
+        
+
+      </a-tabs>
+    </a-card>
     </a-col>
 
     <!-- 右侧查询结果 -->
@@ -258,8 +326,8 @@
               </span>
             </template>
             <a-collapse v-model:activeKey="scheduleActiveKey" accordion style="height: 850px; overflow: scroll;">
-              <a-collapse-panel v-for="(schedule, index) in schedules" :key="index" :header="`Schedule ${index}`">
-                <a-list bordered size="large">
+              <a-collapse-panel v-for="(schedule, index) in schedules" :key="index" :header="schedule.id">
+                <a-list bordered size="large" v-if="infoType=='task'">
                   <a-list-item>
                     <a-row gutter={16} style="width: 100%">
                       <a-col :span="8">
@@ -293,6 +361,36 @@
                     </a-row>
                   </a-list-item>
                 </a-list>
+                <a-list bordered size="large" v-else-if="infoType=='epoch'">
+                  <a-list-item v-if="index == 0">
+                    <a-row gutter={16} style="width: 100%">
+                      <a-col :span="8">
+                        <strong>纪元编号:</strong>
+                        <a-tag color="purple">{{ EpochItem.epochID }}</a-tag>
+                      </a-col>
+                      <a-col :span="8">
+                        <strong>合成总量:</strong>
+                        <a-tag color="pink">{{ EpochItem.process }}GB</a-tag>
+                      </a-col>
+                      <a-col :span="8">
+                        <strong>确认单元数:</strong>
+                        <a-tag color="orange">{{ EpochItem.nbFinalized }}</a-tag>
+                      </a-col>
+                    </a-row>
+                  </a-list-item>
+                  <a-list-item v-else-if="index == 1">
+                    <a-row gutter={16} style="width: 100%">
+                      <a-col :span="8">
+                        <strong>纪元编号:</strong>
+                        <a-tag color="purple">{{ EpochItem.epochID }}</a-tag>
+                      </a-col>
+                      <a-col :span="8">
+                        <strong>提交单元数:</strong>
+                        <a-tag color="pink">{{ EpochItem.nbCommit }}</a-tag>
+                      </a-col>
+                    </a-row>
+                  </a-list-item>
+                </a-list>
                 <a-table :columns="SchduleSlotTableColumn" :data-source="schedule.tableDatas" style="margin-top: 1%;">
                   <template #headerCell="{ column }">
                     <!-- <template v-if="column.key === 'name'">
@@ -302,7 +400,7 @@
                       </span>
                     </template> -->
                     <span>
-                      {{ column.key }}
+                      {{ column.name }}
                     </span>
                   </template>
 
@@ -356,7 +454,9 @@
                   合成进度
                 </span>
               </template>
-              <BarChart :chartData="taskBarData" :optionConfig="barChartConfig.chartConfig" height="30vh" />
+              <BarChart :chartData="BarData" :optionConfig="barChartConfig.chartConfig" height="30vh" v-if="infoType == 'task'"/>
+              <BarChart :chartData="BarData" :optionConfig="barChartConfig.chartConfig" height="30vh" v-else-if="infoType == 'epoch'"/>
+
             </a-tab-pane>
           </a-tabs>
         </div>
@@ -364,12 +464,16 @@
           <a-tabs activeKey="1" type="card">
             <a-tab-pane key="1">
               <template #tab>
-                <span>
+                <span v-if="infoType == 'task'">
                   <PieChartOutlined />
                   调度完成情况
                 </span>
+                <span v-else-if="infoType == 'epoch'">
+                  <PieChartOutlined />
+                  单元监控情况
+                </span>
               </template>
-              <PieChart :chartData="taskPieData" :optionConfig="pieChartConfig.chartConfig"
+              <PieChart :chartData="PieData" :optionConfig="pieChartConfig.chartConfig"
                 :seriesConfig="pieChartConfig.seriesConfig" height="30vh" width="100%" />
             </a-tab-pane>
           </a-tabs>
@@ -380,21 +484,22 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, reactive, ref } from 'vue';
+import {computed, reactive, ref } from 'vue';
 import { useEvidenceOnChain } from './useDataOnChain';
-import { InfoCircleOutlined, LineChartOutlined, PieChartOutlined, CheckCircleOutlined, SyncOutlined, GoldOutlined, ClockCircleOutlined, ControlOutlined, TransactionOutlined } from '@ant-design/icons-vue';
+import { InfoCircleOutlined, LineChartOutlined, PieChartOutlined, CheckCircleOutlined, SyncOutlined, GoldOutlined, ClockCircleOutlined, ControlOutlined, TransactionOutlined, ConsoleSqlOutlined } from '@ant-design/icons-vue';
 import { BarChart, PieChart } from '/@/components/Charts';
 import { getQueryDataApi } from '/@/api/demo/finDataSynthSecurityApi';
 import { message } from 'ant-design-vue';
-
+const infoType = ref("");
 const activeKey1 = ref('1');
 const activeKey2 = ref('1');
 const activeKey3 = ref('1');
+const activeKey4 = ref('1');
 const scheduleActiveKey = ref(['0']);
 const timelineItems = ref([])
 const SchduleSlotTableColumn = [
   {
-    name: '提交标识',
+    name: '提交单元',
     dataIndex: 'slotHash',
     key: 'slotHash',
   },
@@ -420,7 +525,7 @@ const SchduleSlotTableColumn = [
   }
 ]
 
-const TaskCol = [
+const InfoCol = [
   { dataIndex: 'name', key: 'name' },
   { dataIndex: 'value', key: 'value' },
 ]
@@ -485,9 +590,8 @@ const barChartConfig = {
     },
   },
 };
-const taskPieData = ref([])
-const taskBarData = ref([]);
-
+const PieData = ref([])
+const BarData = ref([]);
 const TaskSearchForm = reactive({
   queryType: 'taskId', // 查询方式
   taskId: '',
@@ -505,11 +609,23 @@ const EpochSearchForm = reactive({
 const onQuery = async () => {
   //这里获取查询信息
   if (activeKey1.value == '1') {
-    if (TaskSearchForm.queryType == 'taskId') {
-      const res = await getQueryDataApi({
-        query: 'EvidencePreserveTaskIDQuery',
-        taskID: TaskSearchForm.taskId
-      })
+    const res = await (TaskSearchForm.queryType == 'taskId'
+      ? getQueryDataApi({
+          query: 'EvidencePreserveTaskIDQuery',
+          taskID: TaskSearchForm.taskId
+        })
+      : getQueryDataApi({
+          query: 'EvidencePreserveTaskTxQuery',
+          txHash: TaskSearchForm.transactionHash
+        })
+    );
+
+    // 更新信息
+    console.log(res.status);
+      // const res = await getQueryDataApi({
+      //   query: 'EvidencePreserveTaskIDQuery',
+      //   taskID: TaskSearchForm.taskId
+      // })
       //更新信息
       console.log(res.status)
       if (res.status == 'OK') {
@@ -537,8 +653,8 @@ const onQuery = async () => {
         for (let i = 0; i < res.data.epochProcessData.length; i++) {
           epochArray.push({ name: `Epoch${res.data.epochs[i]}`, value: res.data.epochProcessData[i] })
         }
-        taskBarData.value = epochArray
-        taskPieData.value = [{ name: '处理中', value: res.data.scheduleDistributionData[2] },
+        BarData.value = epochArray
+        PieData.value = [{ name: '处理中', value: res.data.scheduleDistributionData[2] },
         { name: '已完成', value: res.data.scheduleDistributionData[0] },
         { name: '失败', value: res.data.scheduleDistributionData[1] }]
         //更新schedule
@@ -572,36 +688,121 @@ const onQuery = async () => {
           { name: '交易哈希', value: TransactionItem.txHash },
           { name: '任务状态', value: TaskItem.process == TaskItem.total ? '已完成' : '处理中' },
         ]
+        infoType.value = "task"
         console.log(schedules)
       } else {
         message.error("查找失败")
       }
-    } else if (TaskSearchForm.queryType == 'transactionHash') {
-
-    }
   } else if (activeKey1.value == '2') {
-    if (EpochSearchForm.queryType == 'epochId') {
-      const res = await getQueryDataApi({
-        query: 'EvidencePreserveEpochIDQuery',
-        epochID: EpochSearchForm.epochId,
-      })
-      console.log(res)
-    } else if (EpochSearchForm.queryType == 'transactionHash') {
+      const res = await (EpochSearchForm.queryType == 'epochId'
+      ? getQueryDataApi({
+          query: 'EvidencePreserveEpochIDQuery',
+          epochID: EpochSearchForm.epochId,
+        })
+      : getQueryDataApi({
+          query: 'EvidencePreserveEpochTxQuery',
+          txHash: EpochSearchForm.transactionHash
+        })
+    );
+      //更新信息
+      console.log(res.status)
+      if (res.status == 'OK') {
+        message.success("查找成功")
+        //获取时间信息
+        // timelineItems.value = res.data.timeline
+        //获取任务信息
+        const epochInfo = res.data.epoch_info
+        EpochItem.epochID = epochInfo.epochID
+        EpochItem.nbCommit = epochInfo.nbCommit
+        EpochItem.nbFinalized = epochInfo.nbFinalized
+        EpochItem.nbJustified = epochInfo.nbJustified
+        EpochItem.process = epochInfo.process
+        // EpochItem.nbTasks = epochInfo.nbTasks
+        EpochItem.nbInvalid = epochInfo.nbInvalid
+        console.log(epochInfo, EpochItem)
+        //获取交易信息
+        const txInfo = res.data.tx_info
+        TransactionItem.txHash = txInfo.txHash, // 交易哈希
+          TransactionItem.blockHash = txInfo.blockHash, // 区块哈希
+          TransactionItem.blockHeight = txInfo.blockHeight, // 区块高度
+          TransactionItem.contract = txInfo.contractAddress, // 合约地址
+          TransactionItem.method = txInfo.abi
+        TransactionItem.upchainTime = '2024-10-08 14:15:30', // 上链时间(这个是假的)
+          TransactionItem.merkleRoot = txInfo.MerkleRoot // 交易所在的区块的merkle root，下面提供一个按钮验证merkle
+        evidenceTable.value = [
+          { name: '纪元编号', value: EpochItem.epochID },
+          { name: '交易哈希', value: TransactionItem.txHash },
+          { name: '纪元状态', value: '已完成' },
+        ]
+        let invalidSlot = []
+        for (let i = 0; i < res.data.invalidSlot.length; i++) {
+          // console.log(res.data.invalidSlot[i]);
+          invalidSlot.push({
+            "slot": res.data.invalidSlot[i].slotHash,
+            "errMessage": res.data.invalidSlot[i].err
+          })
+        }
+        invalidSlotTable.value = invalidSlot
+        let scheduleArray = []
+        let finalizedArray = []
+        for (let i = 0; i < res.data.finalized.length; i++) {
+          let item = res.data.finalized[i]
+          let sArr = ["Finished", "Processing", "Failed"]
+            finalizedArray.push({
+              slotHash: item.slotHash,
+              size: item.scheduleSize,
+              process: item.process,
+              status: sArr[item.status]
+            })
+      }
+      scheduleArray.push({
+            id: `确认单元信息`,  // 每个 Schedule 的 id 按序生成
+            total: 0,
+            process: 0,
+            nbCommit: 0,
+            nbInvalid: 0,
+            nbNodes: 0,
+            tableDatas: finalizedArray,
+          })
+      let commitArray = []
+      for (let i = 0; i < res.data.commit.length; i++) {
+        let item = res.data.commit[i]
+        let sArr = ["Finished", "Processing", "Failed"]
+        commitArray.push({
+            slotHash: item.slotHash,
+            size: item.scheduleSize,
+            process: item.process,
+            status: sArr[item.status]
+          })
     }
+    scheduleArray.push({
+          id: `提交单元信息`,  // 每个 Schedule 的 id 按序生成
+          total: 0,
+          process: 0,
+          nbCommit: 0,
+          nbInvalid: 0,
+          nbNodes: 0,
+          tableDatas: commitArray,
+        })
+      schedules.value = scheduleArray
+      //获取epoch信息
+      console.log(res.data.taskProcessDistributionData)
+      // 遍历 taskProcessDistributionData 对象的每对 key-value
+      let taskArray = []
+      Object.entries(res.data.taskProcessDistributionData).forEach(([key, value]) => {
+        taskArray.push({ name: key, value: value });
+      });
+      BarData.value = taskArray
+      PieData.value = [{ name: '提交单元', value: EpochItem.nbCommit },
+      { name: '确认单元', value: EpochItem.nbFinalized },
+      { name: '异常单元', value: EpochItem.nbInvalid }]
+      infoType.value = "epoch"
+    } else {
+        message.error("查找失败")
+      }
   }
 }
 
-
-// // 创建 ScheduleSlot 数据
-// const testScheduleSlotTableData = (): ScheduleSlot => {
-//   const statuses = ["Finished", "Failed", "Processing"];
-//   return {
-//   "slotHash": `0x${Math.floor(Math.random() * 9999999999999)}`,
-//   "size": "1",
-//   "process": "0.5",
-//   "status": statuses[Math.floor(Math.random() * 3)],
-// };
-// };
 
 // 创建 Schedule 数据
 const testScheduleSlotTableDatas = ref([])
@@ -609,17 +810,6 @@ const testScheduleSlotTableDatas = ref([])
 // 生成 10 个 Schedule 对象
 let schedules = ref([])
 
-
-// 左下角显示的task/epoch的交易
-// let TransactionItem = reactive({
-//   txHash: `0x${Math.floor(Math.random() * 9999999999999)}`, // 交易哈希
-//   blockHash: `0x${Math.floor(Math.random() * 9999999999999)}`, // 区块哈希
-//   blockHeight: -1, // 区块高度
-//   contract: `0x${Math.floor(Math.random() * 9999999999999)}`, // 合约地址
-//   method: 'InitTask', // 合约接口
-//   upchainTime: '2024-10-08 14:15:30', // 上链时间
-//   merkleRoot: `0x${Math.floor(Math.random() * 9999999999999)}` // 交易所在的区块的merkle root，下面提供一个按钮验证merkle
-// })
 let TransactionItem = reactive({
   txHash: `null`, // 交易哈希
   blockHash: `null`, // 区块哈希
@@ -640,13 +830,30 @@ let TaskItem = reactive({
 })
 // 左下角显示的epoch
 let EpochItem = reactive({
-
+  epochID: -1,
+  process: 0,
+  nbCommit: 0,
+  nbFinalized: 0,
+  nbJustified: 0,
+  nbInvalid: 0,
+  // nbTasks: 0, 这个已经不会有了
+  nbInvalidNode: 0, // 这里添加异常节点数量，目前后端还没有，先固定为0
 })
 
+const invalidSlotTableColumn = [
+  { title: '提交单元', dataIndex: 'slot', key: 'slot' },
+  { title: '异常检测', dataIndex: 'errMessage', key: 'errMessage' },
+];
+const invalidNodeTableColumn = [
+  { title: '节点名称', dataIndex: 'nodeID', key: 'nodeID' },
+  { title: '异常检测', dataIndex: 'errMessage', key: 'errMessage' },
+];
+let invalidSlotTable = ref([])
+let invalidNodeTable = ref([])
 // 左下角显示的epoch/task表格
-let evidenceTable = ref([]);
-
-
+// let evidenceTaskTable = ref([]);
+// let evidenceEpochTable = ref([]);
+let evidenceTable = ref([])
 // 重置表单
 function resetSearchForm() {
   TaskSearchForm.taskId = '';
