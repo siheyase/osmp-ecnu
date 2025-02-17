@@ -840,10 +840,6 @@ const onQuery = async () => {
   }
 }
 
-
-// 创建 Schedule 数据
-const testScheduleSlotTableDatas = ref([])
-
 // 生成 10 个 Schedule 对象
 let schedules = ref([])
 

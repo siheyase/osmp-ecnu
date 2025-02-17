@@ -82,7 +82,8 @@
               这里点击查询区块信息后要跳出一个弹窗，展示区块内容
               下面的交易同理  
             -->
-                <a-modal v-model:open="blockModalVisable" title="区块详情" :style="{width:'800px'}" centered @ok="blockModalVisable = false">
+                <a-modal v-model:open="blockModalVisable" title="区块详情" :style="{ width: '800px' }" centered
+                  @ok="blockModalVisable = false">
                   <template #footer>
                     <a-button key="back" @click="blockModalVisable = false">返回</a-button>
                   </template>
@@ -105,13 +106,33 @@
                         <span><strong>交易哈希:</strong></span>
                         <BasicTable v-if="blockItem.txHashs && blockItem.txHashs.length > 0"
                           :data-source="blockItem.txHashs" :columns="blockInfoColumn" bordered size="small"
-                          row-key="index"  :pagination="false" />
+                          row-key="index" :pagination="false" />
                         <span v-else>暂无交易</span>
                       </div>
                     </a-list-item>
                   </a-list>
                 </a-modal>
-
+                <a-modal v-model:open="txModalVisable" title="交易详情" :style="{ width: '800px' }" centered
+                  @ok="txModalVisable = false">
+                  <template #footer>
+                    <a-button key="back" @click="txModalVisable = false">返回</a-button>
+                  </template>
+                  <a-list bordered size="large">
+                    <a-list-item>
+                      <span><strong>区块哈希:</strong> <a-tag color="pink">{{ txItem.BlockHash }}</a-tag></span>
+                    </a-list-item>
+                    <a-list-item>
+                      <span><strong>交易哈希:</strong> <a-tag color="orange">{{ txItem.TxHash }}</a-tag></span>
+                    </a-list-item>
+                    <a-list-item>
+                      <span><strong>合约地址:</strong> <a-tag color="red">{{ txItem.Contract }}</a-tag></span>
+                    </a-list-item>
+                    <a-list-item>
+                      <span><strong>交易数据类型:</strong> <a-tag color="green">{{ txItem.Abi }}</a-tag></span>
+                      <span><strong>上链时间:</strong> <a-tag color="blue">{{ txItem.UpchainTime}}</a-tag></span>
+                    </a-list-item>
+                  </a-list>
+                </a-modal>
               </a-row>
               <!-- 交易哈希查询 -->
               <a-row :gutter="16" align="middle" style="margin-top: 5px;">
@@ -203,6 +224,19 @@ let blockItem = reactive({
   nbTransactions: -1,
   txHashs: [] as any[],
 })
+
+let txItem = reactive({
+  Abi: "",
+  BlockHash: "",
+  Contract: "",
+  ErrorMessage: "",
+  Invalid: false,
+  TxHash: "",
+  "UpchainTime": ""
+})
+
+
+
 const getBlockInfoQuery = async () => {
   const res = await getBlockChainInfoApi({
     query: "BlockchainBlockHashQuery",
@@ -219,6 +253,22 @@ const getBlockInfoQuery = async () => {
   }
   console.log(res, blockItem)
 }
+
+const getTransactionInfo = async () => {
+  const res = await getBlockChainInfoApi({
+    query: "BlockchainTransactionQuery",
+    txHash: searchForm.transactionHash,
+  });
+  if (res.status == 'OK') {
+    txItem.Abi = res.data.Abi;
+    txItem.BlockHash = res.data.BlockHash;
+    txItem.Contract = res.data.Contract;
+    txItem.TxHash = res.data.TxHash;
+    txItem.UpchainTime = res.data.UpchainTime;
+  }
+  console.log(res, blockItem)
+}
+
 const queryBlockInfo = () => {
   if (searchForm.blockHash == "") {
     message.error("请输入区块哈希")
@@ -240,7 +290,13 @@ const queryBlockInfo = () => {
 };
 
 const queryTransactionInfo = () => {
+  if (searchForm.transactionHash == "") {
+    message.error("请输入交易哈希")
+    return
+  }
   console.log('查询交易信息:', searchForm.transactionHash);
+  getTransactionInfo()
+  txModalVisable.value = true
 };
 
 const resetBlockHash = () => {

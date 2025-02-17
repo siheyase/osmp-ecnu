@@ -49,7 +49,7 @@ export const useDataOnChain = () => {
     chartConfig: {
       yAxis: {
         axisLabel: {
-          formatter: '{value}T',
+          formatter: '{value}',
         },
       },
     },
@@ -76,7 +76,7 @@ export const useDataOnChain = () => {
       label: {
         show: true,
         // 标签内容格式器，支持字符串模板和回调函数两种形式
-        formatter: '{c}T',
+        formatter: '{c} GB',
       },
     },
     chartConfig: {
@@ -280,18 +280,18 @@ export const useDataOnChain = () => {
     }
   };
 
-  onMounted(() => {
-    getFDSynthNodeSynData();
-    getFDSynthNodeSynTask()
-    getFDSynthNodeStorageData();
-    getFDSysthNodeTaskData();
-    getFDSynthNodeStatusData();
-    getFDSysthDatasetData()
-    getLatestBlocksData();
-    getLatestBlocksColumn();
-    getLatestTransactionsData();
-    getLatestTransactionsColumn();
-  });
+  // onMounted(() => {
+  //   getFDSynthNodeSynData();
+  //   getFDSynthNodeSynTask()
+  //   getFDSynthNodeStorageData();
+  //   getFDSysthNodeTaskData();
+  //   getFDSynthNodeStatusData();
+  //   getFDSysthDatasetData()
+  //   getLatestBlocksData();
+  //   getLatestBlocksColumn();
+  //   getLatestTransactionsData();
+  //   getLatestTransactionsColumn();
+  // });
 
   return {
     nodeSynData,
