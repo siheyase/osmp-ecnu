@@ -421,8 +421,7 @@
                     <template v-else-if="column.key === 'action'">
                       <span>
                         <!-- 如果状态是 'success' 显示 '完整性检验' 按钮 -->
-                        <a-button v-if="record.status === 'Finished'" type="link">完整性检验</a-button>
-
+                        <a-button v-if="record.status === 'Finished'" type="link" @click="getSlotInfo(record, false)">完整性检验</a-button>
                         <!-- 默认情况下，显示一个提示信息或空的按钮 -->
                         <a-button v-else-if="record.status === 'Processing'" type="link" disabled>等待中</a-button>
                         <a-button v-else type="link" danger>错误原因</a-button>
@@ -437,6 +436,21 @@
                   </template>
 
                 </a-table>
+                <a-modal v-model:open="FinalizedSlotModalVisable" :title="slotItem.slotHash + '完整性检验'" :style="{width:'800px'}" :maskStyle="{ backgroundColor: 'rgba(0, 0, 0, 0.1)', boxShadow: 'none' }" centered @ok="FinalizedSlotModalVisable = false">
+                            <template #footer>
+                              <a-button key="back" @click="FinalizedSlotModalVisable = false">返回</a-button>
+                            </template>
+                            <a-list bordered size="large">
+                              <a-list-item>
+                                <span><strong>单元标识:</strong> <a-tag color="pink">{{ slotItem.slotHash }}</a-tag></span>
+                              </a-list-item>
+                              <a-list-item>
+                                <span><strong>单元承诺:</strong> <a-tag color="orange">{{ slotItem.commitment }}</a-tag></span>
+                                <span><strong>承诺检验:</strong> <a-tag color="green">{{ slotItem.commitment }}</a-tag></span>
+                              </a-list-item>
+                              
+                            </a-list>
+                          </a-modal>
               </a-collapse-panel>
             </a-collapse>
           </a-tab-pane>
@@ -497,6 +511,18 @@ const activeKey3 = ref('1');
 const activeKey4 = ref('1');
 const scheduleActiveKey = ref(['0']);
 const timelineItems = ref([])
+const FinalizedSlotModalVisable = ref<boolean>(false);
+  const getSlotInfo = (slot, is_err) => {   
+    console.log(111, slot)
+    slotItem.commitment = slot.commitment
+    slotItem.err = slot.err
+    slotItem.slotHash = slot.slotHash
+    if (!is_err) {
+      FinalizedSlotModalVisable.value = true
+    } else {
+
+    }
+};
 const SchduleSlotTableColumn = [
   {
     name: '提交单元',
@@ -524,7 +550,11 @@ const SchduleSlotTableColumn = [
     key: 'action'
   }
 ]
-
+let slotItem = reactive({
+  slotHash: "",
+  commitment: "",
+  err: "",
+})
 const InfoCol = [
   { dataIndex: 'name', key: 'name' },
   { dataIndex: 'value', key: 'value' },
@@ -668,7 +698,9 @@ const onQuery = async () => {
               slotHash: item.slots[i].slotHash,
               size: item.slots[i].scheduleSize,
               process: item.slots[i].process,
-              status: sArr[item.slots[i].status]
+              status: sArr[item.slots[i].status],
+              commitment: item.slots[i].commitment,
+              err: item.slots[i].err
             })
           }
           scheduleArray.push({
@@ -747,12 +779,15 @@ const onQuery = async () => {
         let finalizedArray = []
         for (let i = 0; i < res.data.finalized.length; i++) {
           let item = res.data.finalized[i]
+          console.log(item)
           let sArr = ["Finished", "Processing", "Failed"]
             finalizedArray.push({
               slotHash: item.slotHash,
               size: item.scheduleSize,
               process: item.process,
-              status: sArr[item.status]
+              status: sArr[item.status],
+              commitment: item.commitment,
+              err: item.err
             })
       }
       scheduleArray.push({
@@ -769,10 +804,12 @@ const onQuery = async () => {
         let item = res.data.commit[i]
         let sArr = ["Finished", "Processing", "Failed"]
         commitArray.push({
-            slotHash: item.slotHash,
-            size: item.scheduleSize,
-            process: item.process,
-            status: sArr[item.status]
+          slotHash: item.slotHash,
+              size: item.scheduleSize,
+              process: item.process,
+              status: sArr[item.status],
+              commitment: item.commitment,
+              err: item.err
           })
     }
     scheduleArray.push({

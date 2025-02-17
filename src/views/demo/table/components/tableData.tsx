@@ -69,7 +69,7 @@ export function getNodeColumns(): BasicColumn[] {
       },
     },
     {
-      title: '完成任务数量',
+      title: '完成单元数量',
       dataIndex: 'NbFinishedTasks',
       width: 80,
       // 自定义样式
