@@ -41,7 +41,8 @@ enum Api {
   FINDATASYNTHSECURITY_ORACLE_QUERY = '/oracle',
   FINDATASYNTHSECURITY_DATA_QUERY = '/dataSynth',
   FINDATASYNTHSECURITY_CREATE_TASK = '/create',
-  FINDATASYNTHSECURITY_BLOCKCHAIN_INFO = '/blockchain'
+  FINDATASYNTHSECURITY_BLOCKCHAIN_INFO = '/blockchain',
+  FINDATASYNTHSECURITY_COLLECT = '/collect'
 }
 
 export const getFDSynthNodeSynDataApi = async () => {
@@ -212,6 +213,17 @@ export const getSynthDataApi = async (queryData) => {
 export const getBlockChainInfoApi = async (queryData) => {
   const res = await defHttp.get<any>({
     url: Api.FINDATASYNTHSECURITY_BLOCKCHAIN_INFO,
+    params: queryData
+  })
+  console.log('数据合成安全-获取查询数据-接口返回数据', res);
+  return res;
+}
+
+
+//数据合成安全 -下载接口
+export const getCollectApi = async (queryData) => {
+  const res = await defHttp.get<any>({
+    url: Api.FINDATASYNTHSECURITY_COLLECT,
     params: queryData
   })
   console.log('数据合成安全-获取查询数据-接口返回数据', res);

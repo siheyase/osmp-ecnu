@@ -94,7 +94,7 @@ export const useDataOnChain = () => {
       tooltip: {
         // 提示框配置
         trigger: 'item', // 触发类型（'item' 适合饼图）
-        formatter: '{a} <br/>{b}: {c}T ({d}%)', // 提示内容格式
+        formatter: '{a} <br/>{b}: {c}GB ({d}%)', // 提示内容格式
       },
     },
   });
@@ -171,7 +171,7 @@ export const useDataOnChain = () => {
         const datasetData = ref<ChartInfo>({
           seriesConfig: {
             // 设置图表每块/列/行的颜色（非必填，为空时默认使用系统设定的颜色）
-            color: ['#2578F2', '#84B7F9', '#9A9A9A', '#DE868F'],
+            color: ['#2578F2', '#84B7F9', '#DE868F'],
             itemStyle: {
               // 设置扇形的圆角半径
               borderRadius: 4,

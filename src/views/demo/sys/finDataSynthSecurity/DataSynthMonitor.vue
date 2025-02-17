@@ -71,7 +71,7 @@
                   合成任务状态
                 </span>
               </template>
-              <PieChart :chartData="taskData?.chartData" :optionConfig="taskData?.chartConfig"
+              <PieChart :chartData="NodeDetail.taskStatusDistribution" :optionConfig="taskData?.chartConfig"
                 :seriesConfig="taskData?.seriesConfig" height="30vh" width="100%" />
             </a-tab-pane>
             <a-tab-pane key="2">
@@ -81,7 +81,7 @@
                   合成数据集分布
                 </span>
               </template>
-              <PieChart :chartData="datasetData?.chartData" :optionConfig="datasetData?.chartConfig"
+              <PieChart :chartData="NodeDetail.datasetDistribution" :optionConfig="datasetData?.chartConfig"
                 :seriesConfig="datasetData?.seriesConfig" height="30vh" width="100%" />
             </a-tab-pane>
           </a-tabs>
@@ -165,7 +165,7 @@ import { useDataOnChain } from './useDataOnChain';
 import { onMounted, ref } from 'vue';
 import { MonitorOutlined, ShopOutlined, DatabaseOutlined, TagOutlined, CheckOutlined, ClockCircleOutlined } from '@ant-design/icons-vue';
 import { render } from '/@/utils/common/renderUtils';
-import { getQueryNodeSysApi, getSynthDataApi } from '/@/api/demo/finDataSynthSecurityApi';
+import { getQueryDataApi, getQueryNodeSysApi, getSynthDataApi } from '/@/api/demo/finDataSynthSecurityApi';
 const { nodeSynData, nodeSynTask, nodeStorage, nodeStatusData, taskData, datasetData } = useDataOnChain();
 const { nodeTable, nodeDetail, statusClick, historyClick, dataClick, editClick, addClick, batchDelete } = useBasicForm();
 const activeKey1 = ref('1');
@@ -177,7 +177,9 @@ let NodeDetail = ref({
   statusDistribution: [],
   storageDistribution: [],
   taskRecord: [],
-  dataRecord: []
+  dataRecord: [],
+  taskStatusDistribution: [],
+  datasetDistribution: []
 })
 
 
@@ -299,6 +301,7 @@ onMounted(async () => {
   const res2 = await getSynthDataApi({
     query: "DateSynthDataQuery"
   })
+
   NodeDetail.value.nodes = res1.data.nodes;
   NodeDetail.value.storageDistribution = [
     { name: '使用中', value: res1.data.storageDistribution.used },
@@ -317,6 +320,18 @@ onMounted(async () => {
   }
   NodeDetail.value.taskRecord = tasks;
   NodeDetail.value.dataRecord = data;
+
+  NodeDetail.value.taskStatusDistribution = [
+    { name: '已完成', value: res2.data.taskDistribution.finish },
+    { name: '未完成', value: res2.data.taskDistribution.processing }
+  ];
+
+
+  NodeDetail.value.datasetDistribution = [
+    { name: 'elliptic', value: Math.floor(Math.random() * 100) },
+    { name: 'FINKAN_default', value: Math.floor(Math.random() * 100) },
+    { name: 'ABM_SHL2', value: Math.floor(Math.random() * 100) },
+  ]
 })
 </script>
 <style scoped lang="less">

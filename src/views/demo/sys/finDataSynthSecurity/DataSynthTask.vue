@@ -93,7 +93,7 @@
               </div>
             </template>
             <template #action="{ record }">
-              <a-button type="link" @click="downloadClick(record)">下载数据</a-button>
+              <a-button type="link" :disabled="record.status == false" @click="handleDownload(record)">下载数据</a-button>
               <a-button type="link" @click="viewProofClick(record)">查看凭证</a-button>
               <a-button type="link" danger @click="deleteClick(record)">删除</a-button>
             </template>
@@ -109,7 +109,7 @@
 import { ref, computed, onMounted } from 'vue';
 import { BasicTable } from '/@/components/Table';
 import { useSearchTable } from '../../table/components/useSearchTable';
-import { createTaskApi } from '/@/api/demo/finDataSynthSecurityApi';
+import { createTaskApi, getCollectApi } from '/@/api/demo/finDataSynthSecurityApi';
 import { message } from 'ant-design-vue';
 import { sleep } from '/@/utils';
 
@@ -150,16 +150,13 @@ const modelMapping = {
 // 可用数据集映射
 const datasetMapping = {
   ABM: [
-    { label: 'Dataset 1', value: 'dataset_1' },
-    { label: 'Dataset 2', value: 'dataset_2' },
+    { label: 'ABM_SHL2', value: 'SHL2 TA0_600519_202401-202402_defreg' },
   ],
   BAED: [
-    { label: 'Dataset A', value: 'dataset_A' },
-    { label: 'Dataset B', value: 'dataset_B' },
+    { label: 'elliptic', value: 'elliptic' },
   ],
   FINKAN: [
-    { label: 'Dataset X', value: 'dataset_X' },
-    { label: 'Dataset Y', value: 'dataset_Y' },
+    { label: 'FINKAN_default', value: 'default of credit card clients' },
   ],
 };
 
@@ -199,7 +196,7 @@ const createTask = async () => {
     const res = await createTaskApi({
       model: newTask.value.model,
       params: {
-
+        "dataset": newTask.value.dataset
       },
       size: newTask.value.synthesisAmount,
       isReliable: !newTask.value.trustedProof
@@ -219,6 +216,45 @@ const createTask = async () => {
     }
   }
 };
+
+const handleDownload = async (task) => {
+  try {
+    // 1. 调用接口获取数据（假设已通过其他方式获取到接口返回的data）
+    const response = await getCollectApi({
+      query: "CollectTaskQuery",
+      taskID: task.taskID,
+      size: task.total
+    })
+    const { file, filename } = response.data
+
+    // 2. Base64转Blob
+    const byteCharacters = atob(file)
+    const byteNumbers = new Array(byteCharacters.length)
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i)
+    }
+    const byteArray = new Uint8Array(byteNumbers)
+    const blob = new Blob([byteArray])
+
+    // 3. 创建下载链接
+    const link = document.createElement('a')
+    link.href = URL.createObjectURL(blob)
+    link.download = filename // 使用接口返回的文件名
+    link.style.display = 'none'
+
+    // 4. 触发下载
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(link.href)
+
+    // 5. 可选：显示成功提示
+    message.success('文件下载成功')
+  } catch (error) {
+    console.error('下载失败:', error)
+    message.error('文件下载失败')
+  }
+}
 
 // 过滤任务
 const applyFilters = async () => {
