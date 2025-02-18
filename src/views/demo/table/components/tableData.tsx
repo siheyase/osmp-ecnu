@@ -10,6 +10,7 @@
 import { FormSchema } from '/@/components/Table';
 import { BasicColumn } from '/@/components/Table/src/types/table';
 import { render } from '/@/utils/common/renderUtils';
+import { calculateDataSize } from '/@/utils/value/calDataSize';
 
 // 数据合成监控-表格配置项
 export function getNodeColumns(): BasicColumn[] {
@@ -48,7 +49,7 @@ export function getNodeColumns(): BasicColumn[] {
         })();
         return render.renderTag(value, color);
       },
-      
+
     },
     {
       title: '负载状态',
@@ -165,14 +166,18 @@ export function getHistCompTasksColumns(): BasicColumn[] {
       width: 80,
     },
     {
-      title: '数据总量（GB）',
+      title: '数据总量',
       dataIndex: 'total',
-      width: 80,
+      width: 80, customRender: ({ value }) => {
+        return calculateDataSize(value, 'ABM', 'AUTO');
+      },
     },
     {
-      title: '已合成（GB）',
+      title: '已合成',
       dataIndex: 'process',
-      width: 80,
+      width: 80, customRender: ({ value }) => {
+        return calculateDataSize(value, 'ABM', 'AUTO');
+      },
     },
     {
       title: '合成状态',
@@ -188,7 +193,7 @@ export function getHistCompTasksColumns(): BasicColumn[] {
         }
         return { style: { color: fontColor } };
       },
-      customRender:({record})=>{
+      customRender: ({ record }) => {
         if (record.status === true) {
           return '已完成'
         } else {
@@ -274,15 +279,15 @@ export function getEpochColumns(): BasicColumn[] {
     { title: '提交单元数', dataIndex: 'nbCommitSlot', key: 'nbCommitSlot', },
     { title: '确认单元数', dataIndex: 'nbFinalizedSlot', key: 'nbFinalizedSlot', },
     { title: '异常单元数', dataIndex: 'nbInvalidSlot', key: 'nbInvalidSlot' },
-    { title: '交易哈希', dataIndex: 'txHash', key: 'txHash'},
+    { title: '交易哈希', dataIndex: 'txHash', key: 'txHash' },
   ];
 }
 export function getTransactionColumns(): BasicColumn[] {
   return [
     { title: "交易哈希", dataIndex: 'hash', key: 'hash' },
     { title: "交易数据类型", dataIndex: 'txType', key: 'txType' },
-    { title: "区块哈希", dataIndex: 'blockHash', key: 'blockHash'},
-    { title: "合约地址", dataIndex: 'contractAddress', key: 'contractAddress'},
+    { title: "区块哈希", dataIndex: 'blockHash', key: 'blockHash' },
+    { title: "合约地址", dataIndex: 'contractAddress', key: 'contractAddress' },
     { title: "交易上链时间", dataIndex: 'time', key: 'time' },
   ];
 }
@@ -290,8 +295,8 @@ export function getTransactionColumns(): BasicColumn[] {
 export function getBlockInfoColumns(): BasicColumn[] {
   return [
     { title: "交易哈希", dataIndex: 'hash', key: 'hash' },
-    { title: "合约地址", dataIndex: 'contract', key: 'contract'},
-    { title: "调用接口", dataIndex: 'method', key: 'method'},
+    { title: "合约地址", dataIndex: 'contract', key: 'contract' },
+    { title: "调用接口", dataIndex: 'method', key: 'method' },
 
   ]
 }

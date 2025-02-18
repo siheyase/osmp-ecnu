@@ -29,7 +29,7 @@
               <a-col :span="8">
                 <a-card :style="cardStyles.green">
                   <p class="title">合成数据统计</p>
-                  <h2 class="value">{{ blockChainInfo.SynthData }}</h2>
+                  <h2 class="value">{{ calculateDataSize(blockChainInfo.SynthData, 'ABM', 'AUTO') }}</h2>
                   <p class="subtitle">已合成数据量</p>
                 </a-card>
               </a-col>
@@ -129,7 +129,7 @@
                     </a-list-item>
                     <a-list-item>
                       <span><strong>交易数据类型:</strong> <a-tag color="green">{{ txItem.Abi }}</a-tag></span>
-                      <span><strong>上链时间:</strong> <a-tag color="blue">{{ txItem.UpchainTime}}</a-tag></span>
+                      <span><strong>上链时间:</strong> <a-tag color="blue">{{ txItem.UpchainTime }}</a-tag></span>
                     </a-list-item>
                   </a-list>
                 </a-modal>
@@ -185,6 +185,7 @@ import { ref } from 'vue';
 import { getBlockChainInfoApi, getBlockInfoApi } from '../../../../api/demo/finDataSynthSecurityApi';
 import { getBlockInfoColumns } from '../../table/components/tableData';
 import { message } from 'ant-design-vue';
+import { calculateDataSize } from '/@/utils/value/calDataSize';
 const { chartsListData } = useUpChainTPSChart();
 const { epochTable, transactionTable } = queryEpochAndTransactionTableData(); // modify by zhmye 这里用来获取这个页面里面的两个表格数据
 

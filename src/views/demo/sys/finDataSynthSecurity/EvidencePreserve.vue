@@ -123,7 +123,8 @@
           </a-col>
           <!-- 标签部分 -->
           <a-col :span="4">
-            <a-tag v-if="(infoType == 'task' && TaskItem.total <= TaskItem.process) || (infoType == 'epoch')" color="success">
+            <a-tag v-if="(infoType == 'task' && TaskItem.total <= TaskItem.process) || (infoType == 'epoch')"
+              color="success">
               <template #icon>
                 <check-circle-outlined />
               </template>
@@ -139,8 +140,8 @@
           </a-col>
         </a-row>
         <a-tabs v-model:activeKey="activeKey4">
-        <a-tab-pane key="1">
-        <template #tab>
+          <a-tab-pane key="1">
+            <template #tab>
               <ControlOutlined />
               <span v-if="infoType === 'task'">任务信息</span>
               <span v-else-if="infoType === 'epoch'">纪元信息</span>
@@ -154,7 +155,7 @@
                   </a-col>
                   <a-col :span="8">
                     <strong>合成总量:</strong>
-                    <a-tag color="pink">{{ TaskItem.total }}GB</a-tag>
+                    <a-tag color="pink">{{ calculateDataSize(TaskItem.total, 'ABM', 'AUTO') }}</a-tag>
                   </a-col>
                   <a-col :span="8">
                     <strong>数据集:</strong>
@@ -176,7 +177,7 @@
                   </a-col>
                   <a-col :span="8">
                     <strong>已合成:</strong>
-                    <a-tag color="red">{{ TaskItem.process }} GB</a-tag>
+                    <a-tag color="red">{{ calculateDataSize(TaskItem.process, 'ABM', 'AUTO') }} </a-tag>
                   </a-col>
                 </a-row>
               </a-list-item>
@@ -193,7 +194,7 @@
                   </a-col>
                   <a-col :span="8">
                     <strong>合成总量:</strong>
-                    <a-tag color="pink">{{ EpochItem.process }}GB</a-tag>
+                    <a-tag color="pink">{{ calculateDataSize(EpochItem.process, 'ABM', 'AUTO') }}</a-tag>
                   </a-col>
                   <a-col :span="8">
                     <strong>确认单元:</strong>
@@ -226,9 +227,9 @@
 
               </a-list-item> -->
             </a-list>
-        <!-- <a-divider /> -->
-         </a-tab-pane>
-          </a-tabs>
+            <!-- <a-divider /> -->
+          </a-tab-pane>
+        </a-tabs>
 
         <a-tabs v-model:activeKey="activeKey2">
           <a-tab-pane key="1">
@@ -301,17 +302,17 @@
         </a-timeline>
       </a-card>
       <a-card title="异常溯源" style="height: 340px; overflow: scroll; margin-top: 100px;" v-else-if="infoType == 'epoch'">
-      <a-tabs>
-        <a-tab-pane key="1" tab="节点异常检测">
-          <a-table :columns="invalidNodeTableColumn" :data-source="invalidNodeTable" bordered :showHeader="false" />
-        </a-tab-pane>
-        <a-tab-pane key="2" tab="提交单元异常">
-          <a-table :columns="invalidSlotTableColumn" :data-source="invalidSlotTable" bordered :showHeader="false" />
-        </a-tab-pane>
-        
+        <a-tabs>
+          <a-tab-pane key="1" tab="节点异常检测">
+            <a-table :columns="invalidNodeTableColumn" :data-source="invalidNodeTable" bordered :showHeader="false" />
+          </a-tab-pane>
+          <a-tab-pane key="2" tab="提交单元异常">
+            <a-table :columns="invalidSlotTableColumn" :data-source="invalidSlotTable" bordered :showHeader="false" />
+          </a-tab-pane>
 
-      </a-tabs>
-    </a-card>
+
+        </a-tabs>
+      </a-card>
     </a-col>
 
     <!-- 右侧查询结果 -->
@@ -327,7 +328,7 @@
             </template>
             <a-collapse v-model:activeKey="scheduleActiveKey" accordion style="height: 850px; overflow: scroll;">
               <a-collapse-panel v-for="(schedule, index) in schedules" :key="index" :header="schedule.id">
-                <a-list bordered size="large" v-if="infoType=='task'">
+                <a-list bordered size="large" v-if="infoType == 'task'">
                   <a-list-item>
                     <a-row gutter={16} style="width: 100%">
                       <a-col :span="8">
@@ -336,11 +337,11 @@
                       </a-col>
                       <a-col :span="8">
                         <strong>调度总量:</strong>
-                        <a-tag color="pink">{{ schedule.total }}GB</a-tag>
+                        <a-tag color="pink">{{ calculateDataSize(schedule.total, 'ABM', 'AUTO') }}</a-tag>
                       </a-col>
                       <a-col :span="8">
                         <strong>已完成数据:</strong>
-                        <a-tag color="orange">{{ schedule.process }} GB</a-tag>
+                        <a-tag color="orange">{{ calculateDataSize(schedule.process, 'ABM', 'AUTO') }}</a-tag>
                       </a-col>
                     </a-row>
                   </a-list-item>
@@ -361,7 +362,7 @@
                     </a-row>
                   </a-list-item>
                 </a-list>
-                <a-list bordered size="large" v-else-if="infoType=='epoch'">
+                <a-list bordered size="large" v-else-if="infoType == 'epoch'">
                   <a-list-item v-if="index == 0">
                     <a-row gutter={16} style="width: 100%">
                       <a-col :span="8">
@@ -370,7 +371,7 @@
                       </a-col>
                       <a-col :span="8">
                         <strong>合成总量:</strong>
-                        <a-tag color="pink">{{ EpochItem.process }}GB</a-tag>
+                        <a-tag color="pink">{{ calculateDataSize(EpochItem.process, 'ABM', 'AUTO') }}</a-tag>
                       </a-col>
                       <a-col :span="8">
                         <strong>确认单元数:</strong>
@@ -421,36 +422,33 @@
                     <template v-else-if="column.key === 'action'">
                       <span>
                         <!-- 如果状态是 'success' 显示 '完整性检验' 按钮 -->
-                        <a-button v-if="record.status === 'Finished'" type="link" @click="getSlotInfo(record, false)">完整性检验</a-button>
+                        <a-button v-if="record.status === 'Finished'" type="link"
+                          @click="getSlotInfo(record, false)">完整性检验</a-button>
                         <!-- 默认情况下，显示一个提示信息或空的按钮 -->
                         <a-button v-else-if="record.status === 'Processing'" type="link" disabled>等待中</a-button>
                         <a-button v-else type="link" danger>错误原因</a-button>
                       </span>
                     </template>
-
-                    <template v-else-if="column.key === 'process' || column.key === 'size'">
-                      <!-- <span> -->
-                      {{ column.key === 'process' ? record.process : record.size }} GB
-                      <!-- </span> -->
-                    </template>
                   </template>
 
                 </a-table>
-                <a-modal v-model:open="FinalizedSlotModalVisable" :title="slotItem.slotHash + '完整性检验'" :style="{width:'800px'}" :maskStyle="{ backgroundColor: 'rgba(0, 0, 0, 0.1)', boxShadow: 'none' }" centered @ok="FinalizedSlotModalVisable = false">
-                            <template #footer>
-                              <a-button key="back" @click="FinalizedSlotModalVisable = false">返回</a-button>
-                            </template>
-                            <a-list bordered size="large">
-                              <a-list-item>
-                                <span><strong>单元标识:</strong> <a-tag color="pink">{{ slotItem.slotHash }}</a-tag></span>
-                              </a-list-item>
-                              <a-list-item>
-                                <span><strong>单元承诺:</strong> <a-tag color="orange">{{ slotItem.commitment }}</a-tag></span>
-                                <span><strong>承诺检验:</strong> <a-tag color="green">{{ slotItem.commitment }}</a-tag></span>
-                              </a-list-item>
-                              
-                            </a-list>
-                          </a-modal>
+                <a-modal v-model:open="FinalizedSlotModalVisable" :title="slotItem.slotHash + '完整性检验'"
+                  :style="{ width: '800px' }" :maskStyle="{ backgroundColor: 'rgba(0, 0, 0, 0.1)', boxShadow: 'none' }"
+                  centered @ok="FinalizedSlotModalVisable = false">
+                  <template #footer>
+                    <a-button key="back" @click="FinalizedSlotModalVisable = false">返回</a-button>
+                  </template>
+                  <a-list bordered size="large">
+                    <a-list-item>
+                      <span><strong>单元标识:</strong> <a-tag color="pink">{{ slotItem.slotHash }}</a-tag></span>
+                    </a-list-item>
+                    <a-list-item>
+                      <span><strong>单元承诺:</strong> <a-tag color="orange">{{ slotItem.commitment }}</a-tag></span>
+                      <span><strong>承诺检验:</strong> <a-tag color="green">{{ slotItem.commitment }}</a-tag></span>
+                    </a-list-item>
+
+                  </a-list>
+                </a-modal>
               </a-collapse-panel>
             </a-collapse>
           </a-tab-pane>
@@ -468,8 +466,10 @@
                   合成进度
                 </span>
               </template>
-              <BarChart :chartData="BarData" :optionConfig="barChartConfig.chartConfig" height="30vh" v-if="infoType == 'task'"/>
-              <BarChart :chartData="BarData" :optionConfig="barChartConfig.chartConfig" height="30vh" v-else-if="infoType == 'epoch'"/>
+              <BarChart :chartData="BarData" :optionConfig="barChartConfig.chartConfig" height="30vh"
+                v-if="infoType == 'task'" />
+              <BarChart :chartData="BarData" :optionConfig="barChartConfig.chartConfig" height="30vh"
+                v-else-if="infoType == 'epoch'" />
 
             </a-tab-pane>
           </a-tabs>
@@ -498,12 +498,13 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, reactive, ref } from 'vue';
+import { computed, reactive, ref } from 'vue';
 import { useEvidenceOnChain } from './useDataOnChain';
 import { InfoCircleOutlined, LineChartOutlined, PieChartOutlined, CheckCircleOutlined, SyncOutlined, GoldOutlined, ClockCircleOutlined, ControlOutlined, TransactionOutlined, ConsoleSqlOutlined } from '@ant-design/icons-vue';
 import { BarChart, PieChart } from '/@/components/Charts';
 import { getQueryDataApi } from '/@/api/demo/finDataSynthSecurityApi';
 import { message } from 'ant-design-vue';
+import { calculateDataSize } from '/@/utils/value/calDataSize';
 const infoType = ref("");
 const activeKey1 = ref('1');
 const activeKey2 = ref('1');
@@ -512,16 +513,16 @@ const activeKey4 = ref('1');
 const scheduleActiveKey = ref(['0']);
 const timelineItems = ref([])
 const FinalizedSlotModalVisable = ref<boolean>(false);
-  const getSlotInfo = (slot, is_err) => {   
-    console.log(111, slot)
-    slotItem.commitment = slot.commitment
-    slotItem.err = slot.err
-    slotItem.slotHash = slot.slotHash
-    if (!is_err) {
-      FinalizedSlotModalVisable.value = true
-    } else {
+const getSlotInfo = (slot, is_err) => {
+  console.log(111, slot)
+  slotItem.commitment = slot.commitment
+  slotItem.err = slot.err
+  slotItem.slotHash = slot.slotHash
+  if (!is_err) {
+    FinalizedSlotModalVisable.value = true
+  } else {
 
-    }
+  }
 };
 const SchduleSlotTableColumn = [
   {
@@ -532,12 +533,16 @@ const SchduleSlotTableColumn = [
   {
     name: '预期数据量',
     dataIndex: 'size',
-    key: 'size',
+    key: 'size', customRender: ({ value }) => {
+      return calculateDataSize(value, 'ABM', 'AUTO');
+    },
   },
   {
     name: '实际完成量',
     dataIndex: 'process',
-    key: 'process',
+    key: 'process', customRender: ({ value }) => {
+      return calculateDataSize(value, 'ABM', 'AUTO');
+    },
 
   },
   {
@@ -615,7 +620,7 @@ const barChartConfig = {
   chartConfig: {
     yAxis: {
       axisLabel: {
-        formatter: '{value}GB',
+        formatter: '{value} B',
       },
     },
   },
@@ -641,186 +646,186 @@ const onQuery = async () => {
   if (activeKey1.value == '1') {
     const res = await (TaskSearchForm.queryType == 'taskId'
       ? getQueryDataApi({
-          query: 'EvidencePreserveTaskIDQuery',
-          taskID: TaskSearchForm.taskId
-        })
+        query: 'EvidencePreserveTaskIDQuery',
+        taskID: TaskSearchForm.taskId
+      })
       : getQueryDataApi({
-          query: 'EvidencePreserveTaskTxQuery',
-          txHash: TaskSearchForm.transactionHash
-        })
+        query: 'EvidencePreserveTaskTxQuery',
+        txHash: TaskSearchForm.transactionHash
+      })
     );
 
     // 更新信息
     console.log(res.status);
-      // const res = await getQueryDataApi({
-      //   query: 'EvidencePreserveTaskIDQuery',
-      //   taskID: TaskSearchForm.taskId
-      // })
-      //更新信息
-      console.log(res.status)
-      if (res.status == 'OK') {
-        message.success("查找成功")
-        //获取时间信息
-        timelineItems.value = res.data.timeline
-        //获取任务信息
-        const taskInfo = res.data.task_info
-        TaskItem.sign = taskInfo.taskID
-        TaskItem.total = taskInfo.total
-        TaskItem.process = taskInfo.process
-        TaskItem.nbSchedule = taskInfo.schedule
-        TaskItem.nbFinalized = taskInfo.commit
-        //获取交易信息
-        const txInfo = res.data.tx_info
-        TransactionItem.txHash = txInfo.txHash, // 交易哈希
-          TransactionItem.blockHash = txInfo.blockHash, // 区块哈希
-          TransactionItem.blockHeight = txInfo.blockHeight, // 区块高度
-          TransactionItem.contract = txInfo.contractAddress, // 合约地址
-          TransactionItem.method = txInfo.abi
-        TransactionItem.upchainTime = '2024-10-08 14:15:30', // 上链时间(这个是假的)
-          TransactionItem.merkleRoot = txInfo.MerkleRoot // 交易所在的区块的merkle root，下面提供一个按钮验证merkle
-        //获取epoch信息
-        let epochArray = []
-        for (let i = 0; i < res.data.epochProcessData.length; i++) {
-          epochArray.push({ name: `Epoch${res.data.epochs[i]}`, value: res.data.epochProcessData[i] })
-        }
-        BarData.value = epochArray
-        PieData.value = [{ name: '处理中', value: res.data.scheduleDistributionData[2] },
-        { name: '已完成', value: res.data.scheduleDistributionData[0] },
-        { name: '失败', value: res.data.scheduleDistributionData[1] }]
-        //更新schedule
-        let scheduleArray = []
-        for (let i = 0; i < res.data.schedules.length; i++) {
-          let slotArray = []
-          let item = res.data.schedules[i]
-          let sArr = ["Finished", "Processing", "Failed"]
-          for (let i = 0; i < item.slots.length; i++) {
-            slotArray.push({
-              slotHash: item.slots[i].slotHash,
-              size: item.slots[i].scheduleSize,
-              process: item.slots[i].process,
-              status: sArr[item.slots[i].status],
-              commitment: item.slots[i].commitment,
-              err: item.slots[i].err
-            })
-          }
-          scheduleArray.push({
-            id: `schedule-${i + 1}`,  // 每个 Schedule 的 id 按序生成
-            total: item.scheduleSize,
-            process: item.process,
-            nbCommit: item.commitNumber,
-            nbInvalid: item.invalidNumber,
-            nbNodes: item.commitNumber + item.invalidNumber,//这里暂时用提交数代替
-            tableDatas: slotArray,
-          })
-        }
-        schedules.value = scheduleArray
-
-        evidenceTable.value = [
-          { name: '任务标识', value: TaskItem.sign },
-          { name: '交易哈希', value: TransactionItem.txHash },
-          { name: '任务状态', value: TaskItem.process == TaskItem.total ? '已完成' : '处理中' },
-        ]
-        infoType.value = "task"
-        console.log(schedules)
-      } else {
-        message.error("查找失败")
+    // const res = await getQueryDataApi({
+    //   query: 'EvidencePreserveTaskIDQuery',
+    //   taskID: TaskSearchForm.taskId
+    // })
+    //更新信息
+    console.log(res.status)
+    if (res.status == 'OK') {
+      message.success("查找成功")
+      //获取时间信息
+      timelineItems.value = res.data.timeline
+      //获取任务信息
+      const taskInfo = res.data.task_info
+      TaskItem.sign = taskInfo.taskID
+      TaskItem.total = taskInfo.total
+      TaskItem.process = taskInfo.process
+      TaskItem.nbSchedule = taskInfo.schedule
+      TaskItem.nbFinalized = taskInfo.commit
+      //获取交易信息
+      const txInfo = res.data.tx_info
+      TransactionItem.txHash = txInfo.txHash, // 交易哈希
+        TransactionItem.blockHash = txInfo.blockHash, // 区块哈希
+        TransactionItem.blockHeight = txInfo.blockHeight, // 区块高度
+        TransactionItem.contract = txInfo.contractAddress, // 合约地址
+        TransactionItem.method = txInfo.abi
+      TransactionItem.upchainTime = '2024-10-08 14:15:30', // 上链时间(这个是假的)
+        TransactionItem.merkleRoot = txInfo.MerkleRoot // 交易所在的区块的merkle root，下面提供一个按钮验证merkle
+      //获取epoch信息
+      let epochArray = []
+      for (let i = 0; i < res.data.epochProcessData.length; i++) {
+        epochArray.push({ name: `Epoch${res.data.epochs[i]}`, value: res.data.epochProcessData[i] })
       }
-  } else if (activeKey1.value == '2') {
-      const res = await (EpochSearchForm.queryType == 'epochId'
-      ? getQueryDataApi({
-          query: 'EvidencePreserveEpochIDQuery',
-          epochID: EpochSearchForm.epochId,
-        })
-      : getQueryDataApi({
-          query: 'EvidencePreserveEpochTxQuery',
-          txHash: EpochSearchForm.transactionHash
-        })
-    );
-      //更新信息
-      console.log(res.status)
-      if (res.status == 'OK') {
-        message.success("查找成功")
-        //获取时间信息
-        // timelineItems.value = res.data.timeline
-        //获取任务信息
-        const epochInfo = res.data.epoch_info
-        EpochItem.epochID = epochInfo.epochID
-        EpochItem.nbCommit = epochInfo.nbCommit
-        EpochItem.nbFinalized = epochInfo.nbFinalized
-        EpochItem.nbJustified = epochInfo.nbJustified
-        EpochItem.process = epochInfo.process
-        // EpochItem.nbTasks = epochInfo.nbTasks
-        EpochItem.nbInvalid = epochInfo.nbInvalid
-        console.log(epochInfo, EpochItem)
-        //获取交易信息
-        const txInfo = res.data.tx_info
-        TransactionItem.txHash = txInfo.txHash, // 交易哈希
-          TransactionItem.blockHash = txInfo.blockHash, // 区块哈希
-          TransactionItem.blockHeight = txInfo.blockHeight, // 区块高度
-          TransactionItem.contract = txInfo.contractAddress, // 合约地址
-          TransactionItem.method = txInfo.abi
-        TransactionItem.upchainTime = '2024-10-08 14:15:30', // 上链时间(这个是假的)
-          TransactionItem.merkleRoot = txInfo.MerkleRoot // 交易所在的区块的merkle root，下面提供一个按钮验证merkle
-        evidenceTable.value = [
-          { name: '纪元编号', value: EpochItem.epochID },
-          { name: '交易哈希', value: TransactionItem.txHash },
-          { name: '纪元状态', value: '已完成' },
-        ]
-        let invalidSlot = []
-        for (let i = 0; i < res.data.invalidSlot.length; i++) {
-          // console.log(res.data.invalidSlot[i]);
-          invalidSlot.push({
-            "slot": res.data.invalidSlot[i].slotHash,
-            "errMessage": res.data.invalidSlot[i].err
+      BarData.value = epochArray
+      PieData.value = [{ name: '处理中', value: res.data.scheduleDistributionData[2] },
+      { name: '已完成', value: res.data.scheduleDistributionData[0] },
+      { name: '失败', value: res.data.scheduleDistributionData[1] }]
+      //更新schedule
+      let scheduleArray = []
+      for (let i = 0; i < res.data.schedules.length; i++) {
+        let slotArray = []
+        let item = res.data.schedules[i]
+        let sArr = ["Finished", "Processing", "Failed"]
+        for (let i = 0; i < item.slots.length; i++) {
+          slotArray.push({
+            slotHash: item.slots[i].slotHash,
+            size: item.slots[i].scheduleSize,
+            process: item.slots[i].process,
+            status: sArr[item.slots[i].status],
+            commitment: item.slots[i].commitment,
+            err: item.slots[i].err
           })
         }
-        invalidSlotTable.value = invalidSlot
-        let scheduleArray = []
-        let finalizedArray = []
-        for (let i = 0; i < res.data.finalized.length; i++) {
-          let item = res.data.finalized[i]
-          console.log(item)
-          let sArr = ["Finished", "Processing", "Failed"]
-            finalizedArray.push({
-              slotHash: item.slotHash,
-              size: item.scheduleSize,
-              process: item.process,
-              status: sArr[item.status],
-              commitment: item.commitment,
-              err: item.err
-            })
+        scheduleArray.push({
+          id: `schedule-${i + 1}`,  // 每个 Schedule 的 id 按序生成
+          total: item.scheduleSize,
+          process: item.process,
+          nbCommit: item.commitNumber,
+          nbInvalid: item.invalidNumber,
+          nbNodes: item.commitNumber + item.invalidNumber,//这里暂时用提交数代替
+          tableDatas: slotArray,
+        })
+      }
+      schedules.value = scheduleArray
+
+      evidenceTable.value = [
+        { name: '任务标识', value: TaskItem.sign },
+        { name: '交易哈希', value: TransactionItem.txHash },
+        { name: '任务状态', value: TaskItem.process == TaskItem.total ? '已完成' : '处理中' },
+      ]
+      infoType.value = "task"
+      console.log(schedules)
+    } else {
+      message.error("查找失败")
+    }
+  } else if (activeKey1.value == '2') {
+    const res = await (EpochSearchForm.queryType == 'epochId'
+      ? getQueryDataApi({
+        query: 'EvidencePreserveEpochIDQuery',
+        epochID: EpochSearchForm.epochId,
+      })
+      : getQueryDataApi({
+        query: 'EvidencePreserveEpochTxQuery',
+        txHash: EpochSearchForm.transactionHash
+      })
+    );
+    //更新信息
+    console.log(res.status)
+    if (res.status == 'OK') {
+      message.success("查找成功")
+      //获取时间信息
+      // timelineItems.value = res.data.timeline
+      //获取任务信息
+      const epochInfo = res.data.epoch_info
+      EpochItem.epochID = epochInfo.epochID
+      EpochItem.nbCommit = epochInfo.nbCommit
+      EpochItem.nbFinalized = epochInfo.nbFinalized
+      EpochItem.nbJustified = epochInfo.nbJustified
+      EpochItem.process = epochInfo.process
+      // EpochItem.nbTasks = epochInfo.nbTasks
+      EpochItem.nbInvalid = epochInfo.nbInvalid
+      console.log(epochInfo, EpochItem)
+      //获取交易信息
+      const txInfo = res.data.tx_info
+      TransactionItem.txHash = txInfo.txHash, // 交易哈希
+        TransactionItem.blockHash = txInfo.blockHash, // 区块哈希
+        TransactionItem.blockHeight = txInfo.blockHeight, // 区块高度
+        TransactionItem.contract = txInfo.contractAddress, // 合约地址
+        TransactionItem.method = txInfo.abi
+      TransactionItem.upchainTime = '2024-10-08 14:15:30', // 上链时间(这个是假的)
+        TransactionItem.merkleRoot = txInfo.MerkleRoot // 交易所在的区块的merkle root，下面提供一个按钮验证merkle
+      evidenceTable.value = [
+        { name: '纪元编号', value: EpochItem.epochID },
+        { name: '交易哈希', value: TransactionItem.txHash },
+        { name: '纪元状态', value: '已完成' },
+      ]
+      let invalidSlot = []
+      for (let i = 0; i < res.data.invalidSlot.length; i++) {
+        // console.log(res.data.invalidSlot[i]);
+        invalidSlot.push({
+          "slot": res.data.invalidSlot[i].slotHash,
+          "errMessage": res.data.invalidSlot[i].err
+        })
+      }
+      invalidSlotTable.value = invalidSlot
+      let scheduleArray = []
+      let finalizedArray = []
+      for (let i = 0; i < res.data.finalized.length; i++) {
+        let item = res.data.finalized[i]
+        console.log(item)
+        let sArr = ["Finished", "Processing", "Failed"]
+        finalizedArray.push({
+          slotHash: item.slotHash,
+          size: item.scheduleSize,
+          process: item.process,
+          status: sArr[item.status],
+          commitment: item.commitment,
+          err: item.err
+        })
       }
       scheduleArray.push({
-            id: `确认单元信息`,  // 每个 Schedule 的 id 按序生成
-            total: 0,
-            process: 0,
-            nbCommit: 0,
-            nbInvalid: 0,
-            nbNodes: 0,
-            tableDatas: finalizedArray,
-          })
+        id: `确认单元信息`,  // 每个 Schedule 的 id 按序生成
+        total: 0,
+        process: 0,
+        nbCommit: 0,
+        nbInvalid: 0,
+        nbNodes: 0,
+        tableDatas: finalizedArray,
+      })
       let commitArray = []
       for (let i = 0; i < res.data.commit.length; i++) {
         let item = res.data.commit[i]
         let sArr = ["Finished", "Processing", "Failed"]
         commitArray.push({
           slotHash: item.slotHash,
-              size: item.scheduleSize,
-              process: item.process,
-              status: sArr[item.status],
-              commitment: item.commitment,
-              err: item.err
-          })
-    }
-    scheduleArray.push({
-          id: `提交单元信息`,  // 每个 Schedule 的 id 按序生成
-          total: 0,
-          process: 0,
-          nbCommit: 0,
-          nbInvalid: 0,
-          nbNodes: 0,
-          tableDatas: commitArray,
+          size: item.scheduleSize,
+          process: item.process,
+          status: sArr[item.status],
+          commitment: item.commitment,
+          err: item.err
         })
+      }
+      scheduleArray.push({
+        id: `提交单元信息`,  // 每个 Schedule 的 id 按序生成
+        total: 0,
+        process: 0,
+        nbCommit: 0,
+        nbInvalid: 0,
+        nbNodes: 0,
+        tableDatas: commitArray,
+      })
       schedules.value = scheduleArray
       //获取epoch信息
       console.log(res.data.taskProcessDistributionData)
@@ -835,8 +840,8 @@ const onQuery = async () => {
       { name: '异常单元', value: EpochItem.nbInvalid }]
       infoType.value = "epoch"
     } else {
-        message.error("查找失败")
-      }
+      message.error("查找失败")
+    }
   }
 }
 

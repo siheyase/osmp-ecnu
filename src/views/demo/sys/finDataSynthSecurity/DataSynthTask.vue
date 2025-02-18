@@ -239,7 +239,7 @@ const handleDownload = async (task) => {
     // 3. 创建下载链接
     const link = document.createElement('a')
     link.href = URL.createObjectURL(blob)
-    link.download = filename // 使用接口返回的文件名
+    link.download = filename + '.csv' // 使用接口返回的文件名
     link.style.display = 'none'
 
     // 4. 触发下载

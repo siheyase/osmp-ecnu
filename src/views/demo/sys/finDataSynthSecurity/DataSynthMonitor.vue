@@ -166,6 +166,7 @@ import { onMounted, ref } from 'vue';
 import { MonitorOutlined, ShopOutlined, DatabaseOutlined, TagOutlined, CheckOutlined, ClockCircleOutlined } from '@ant-design/icons-vue';
 import { render } from '/@/utils/common/renderUtils';
 import { getQueryDataApi, getQueryNodeSysApi, getSynthDataApi } from '/@/api/demo/finDataSynthSecurityApi';
+import { calculateDataSize } from '/@/utils/value/calDataSize';
 const { nodeSynData, nodeSynTask, nodeStorage, nodeStatusData, taskData, datasetData } = useDataOnChain();
 const { nodeTable, nodeDetail, statusClick, historyClick, dataClick, editClick, addClick, batchDelete } = useBasicForm();
 const activeKey1 = ref('1');
@@ -254,6 +255,8 @@ const nodeColumn = [
     // 自定义样式
     slots: {
       customRender: 'systhData',
+    }, customRender: ({ value }) => {
+      return calculateDataSize(value,'ABM','AUTO');
     },
   },
   {
