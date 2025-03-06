@@ -112,7 +112,7 @@
                   stroke-width="10" stroke-color="#1890ff" />
               </div>
               <div class="storage-details" v-if="record.storage != 0">
-                {{ record?.disk.toFixed(1) }} GB 可用，共 {{ record?.storage.toFixed(1) }} GB
+                {{ ((record?.storage-record?.disk)/1024).toFixed(2) }} TB 可用，共 {{ (record?.storage/1024).toFixed(2) }} TB
               </div>
               <div v-if="record.storage == 0">
                 暂无数据
@@ -165,10 +165,10 @@ import { useDataOnChain } from './useDataOnChain';
 import { onMounted, ref } from 'vue';
 import { MonitorOutlined, ShopOutlined, DatabaseOutlined, TagOutlined, CheckOutlined, ClockCircleOutlined } from '@ant-design/icons-vue';
 import { render } from '/@/utils/common/renderUtils';
-import { getQueryDataApi, getQueryNodeSysApi, getSynthDataApi } from '/@/api/demo/finDataSynthSecurityApi';
+import { getSynthDataApi } from '/@/api/demo/finDataSynthSecurityApi';
 import { calculateDataSize } from '/@/utils/value/calDataSize';
 const { nodeSynData, nodeSynTask, nodeStorage, nodeStatusData, taskData, datasetData } = useDataOnChain();
-const { nodeTable, nodeDetail, statusClick, historyClick, dataClick, editClick, addClick, batchDelete } = useBasicForm();
+const { statusClick,dataClick,} = useBasicForm();
 const activeKey1 = ref('1');
 const activeKey2 = ref('1');
 const activeKey3 = ref('1');
@@ -307,8 +307,8 @@ onMounted(async () => {
 
   NodeDetail.value.nodes = res1.data.nodes;
   NodeDetail.value.storageDistribution = [
-    { name: '使用中', value: res1.data.storageDistribution.used },
-    { name: '未使用', value: res1.data.storageDistribution["not used"] },
+    { name: '使用中', value: (res1.data.storageDistribution.used/1024).toFixed(2) },
+    { name: '未使用', value: (res1.data.storageDistribution["not used"]/1024 ).toFixed(2)},
   ]
   NodeDetail.value.statusDistribution = [
     { name: '正常', value: res1.data.statusDistribution.normal },

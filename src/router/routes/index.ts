@@ -2,7 +2,7 @@ import type { AppRouteRecordRaw, AppRouteModule } from '/@/router/types';
 
 import { PAGE_NOT_FOUND_ROUTE } from '/@/router/routes/basic';
 import { DemoRoute } from './demo';
-import { DataOnChainRoute, DataSynthMonitorRoute, DataSynthTaskRoute, BlockChainMonitorRoute, EvidencePreserveRoute} from './dataOnChain';
+import { DataSynthMonitorRoute, DataSynthTaskRoute, BlockChainMonitorRoute, EvidencePreserveRoute} from './dataOnChain';
 
 import { PageEnum } from '/@/enums/pageEnum';
 
@@ -28,4 +28,4 @@ export const RootRoute: AppRouteRecordRaw = {
   },
 };
 
-export const basicRoutes = [RootRoute, PAGE_NOT_FOUND_ROUTE, DemoRoute, DataOnChainRoute, DataSynthMonitorRoute, DataSynthTaskRoute, BlockChainMonitorRoute, EvidencePreserveRoute];
+export const basicRoutes = [RootRoute, PAGE_NOT_FOUND_ROUTE, DemoRoute, DataSynthMonitorRoute, DataSynthTaskRoute, BlockChainMonitorRoute, EvidencePreserveRoute];

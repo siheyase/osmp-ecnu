@@ -233,7 +233,7 @@ function createAxios(opt?: Partial<CreateAxiosOptions>) {
         // authenticationScheme: 'Bearer',
         authenticationScheme: '',
         //接口超时设置
-        timeout: 10 * 1000,
+        // timeout: 10 * 1000,
         // 基础接口地址
         // baseURL: globSetting.apiUrl,
         headers: { 'Content-Type': ContentTypeEnum.JSON },

@@ -76,7 +76,7 @@ export const useDataOnChain = () => {
       label: {
         show: true,
         // 标签内容格式器，支持字符串模板和回调函数两种形式
-        formatter: '{c} GB',
+        formatter: '{c} TB',
       },
     },
     chartConfig: {
@@ -94,7 +94,7 @@ export const useDataOnChain = () => {
       tooltip: {
         // 提示框配置
         trigger: 'item', // 触发类型（'item' 适合饼图）
-        formatter: '{a} <br/>{b}: {c}GB ({d}%)', // 提示内容格式
+        formatter: '{a} <br/>{b}: {c}TB ({d}%)', // 提示内容格式
       },
     },
   });

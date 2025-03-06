@@ -13,7 +13,7 @@ const units = [
 ];
 
 
-export function calculateDataSize(n, model, type) {
+export function calculateDataSize(n, model, type, isStr = true) {
     if (n === 0) return '0 B'; // 处理n为0的情况
     const totalBytes = n * dataRates[model];
     let selectedUnit: any;
@@ -37,5 +37,5 @@ export function calculateDataSize(n, model, type) {
         .replace(/\.?0+$/, '') // 移除末尾的零
         .replace(/\.$/, '');   // 处理结尾的小数点
 
-    return `${formatted} ${selectedUnit.unit}`;
+    return isStr ? `${formatted} ${selectedUnit.unit}` : formatted;
 }

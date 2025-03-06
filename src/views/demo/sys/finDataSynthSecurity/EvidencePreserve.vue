@@ -686,7 +686,7 @@ const onQuery = async () => {
       //获取epoch信息
       let epochArray = []
       for (let i = 0; i < res.data.epochProcessData.length; i++) {
-        epochArray.push({ name: `Epoch${res.data.epochs[i]}`, value: res.data.epochProcessData[i] })
+        epochArray.push({ name: `Epoch${res.data.epochs[i]}`, value: calculateDataSize(res.data.epochProcessData[i], 'ABM', 'B', false)})
       }
       BarData.value = epochArray
       PieData.value = [{ name: '处理中', value: res.data.scheduleDistributionData[2] },
