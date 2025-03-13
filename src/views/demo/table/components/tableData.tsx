@@ -11,6 +11,7 @@ import { FormSchema } from '/@/components/Table';
 import { BasicColumn } from '/@/components/Table/src/types/table';
 import { render } from '/@/utils/common/renderUtils';
 import { calculateDataSize } from '/@/utils/value/calDataSize';
+import { modelToShow } from '/@/utils/value/typeConvert';
 
 // 数据合成监控-表格配置项
 export function getNodeColumns(): BasicColumn[] {
@@ -168,15 +169,22 @@ export function getHistCompTasksColumns(): BasicColumn[] {
     {
       title: '数据总量',
       dataIndex: 'total',
-      width: 80, customRender: ({ value }) => {
-        return calculateDataSize(value, 'ABM', 'AUTO');
+      width: 80, customRender: ({ value, record }) => {
+        return calculateDataSize(value, record.model, 'AUTO');
       },
     },
     {
       title: '已合成',
       dataIndex: 'process',
+      width: 80, customRender: ({ value, record }) => {
+        return calculateDataSize(value, record.model, 'AUTO');
+      },
+    },
+    {
+      title: '数据类型',
+      dataIndex: 'model',
       width: 80, customRender: ({ value }) => {
-        return calculateDataSize(value, 'ABM', 'AUTO');
+        return modelToShow(value);
       },
     },
     {

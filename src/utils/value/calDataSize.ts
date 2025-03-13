@@ -1,7 +1,7 @@
 const dataRates = {
-    FINKAN: 167.936,
-    BAED: 167.936,
-    ABM: 167.936
+    FINKAN: 160,
+    BAED: 113,
+    ABM: 7624000,
 };
 
 const units = [
@@ -14,7 +14,6 @@ const units = [
 
 
 export function calculateDataSize(n, model, type, isStr = true) {
-    if (n === 0) return '0 B'; // 处理n为0的情况
     const totalBytes = n * dataRates[model];
     let selectedUnit: any;
 
@@ -34,8 +33,36 @@ export function calculateDataSize(n, model, type, isStr = true) {
     // 计算数值并格式化
     const value = totalBytes / selectedUnit.divisor;
     let formatted = value.toFixed(2)
-        .replace(/\.?0+$/, '') // 移除末尾的零
-        .replace(/\.$/, '');   // 处理结尾的小数点
 
     return isStr ? `${formatted} ${selectedUnit.unit}` : formatted;
+}
+
+export function calculateDataMapSize(dataGroup, type, isStr = true) {
+    const ABM_size = dataGroup['ABM'] ? dataGroup['ABM'] * dataRates['ABM'] : 0;
+    const FINKA_size = dataGroup['FINKAN'] ? dataGroup['FINKAN'] * dataRates['FINKAN'] : 0;
+    const BAED_size = dataGroup['BAED'] ? dataGroup['BAED'] * dataRates['BAED'] : 0;
+
+    const totalBytes = ABM_size + FINKA_size + BAED_size;
+    console.log(totalBytes)
+    let selectedUnit: any;
+
+    if (type == 'AUTO') {
+        // 找到合适的单位
+        selectedUnit = units[4]; // 默认B单位
+        for (const unit of units) {
+            if (totalBytes >= unit.divisor) {
+                selectedUnit = unit;
+                break;
+            }
+        }
+    } else {
+        selectedUnit = units.find(it => it.unit == type)
+    }
+
+    // 计算数值并格式化
+    const value = totalBytes / selectedUnit.divisor;
+    let formatted = value.toFixed(2)
+
+    return isStr ? `${formatted} ${selectedUnit.unit}` : formatted;
+
 }

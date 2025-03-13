@@ -166,7 +166,8 @@ import { onMounted, ref } from 'vue';
 import { MonitorOutlined, ShopOutlined, DatabaseOutlined, TagOutlined, CheckOutlined, ClockCircleOutlined } from '@ant-design/icons-vue';
 import { render } from '/@/utils/common/renderUtils';
 import { getSynthDataApi } from '/@/api/demo/finDataSynthSecurityApi';
-import { calculateDataSize } from '/@/utils/value/calDataSize';
+import { calculateDataMapSize,calculateDataSize } from '/@/utils/value/calDataSize';
+
 const { nodeSynData, nodeSynTask, nodeStorage, nodeStatusData, taskData, datasetData } = useDataOnChain();
 const { statusClick,dataClick,} = useBasicForm();
 const activeKey1 = ref('1');
@@ -256,7 +257,7 @@ const nodeColumn = [
     slots: {
       customRender: 'systhData',
     }, customRender: ({ value }) => {
-      return calculateDataSize(value,'ABM','AUTO');
+      return calculateDataMapSize(value,'AUTO');
     },
   },
   {
@@ -319,7 +320,7 @@ onMounted(async () => {
   let data = []
   for (let i = 0; i < res2.data.date.length; i++) {
     tasks.push({ name: res2.data.date[i], value: res2.data.finish[i] })
-    data.push({ name: res2.data.date[i], value: res2.data.synthData[i] })
+    data.push({ name: res2.data.date[i], value: calculateDataMapSize(res2.data.synthData[i],'KB',false) })
   }
   NodeDetail.value.taskRecord = tasks;
   NodeDetail.value.dataRecord = data;
@@ -331,9 +332,9 @@ onMounted(async () => {
 
 
   NodeDetail.value.datasetDistribution = [
-    { name: 'elliptic', value: Math.floor(Math.random() * 100) },
-    { name: 'FINKAN_default', value: Math.floor(Math.random() * 100) },
-    { name: 'ABM_SHL2', value: Math.floor(Math.random() * 100) },
+    { name: 'elliptic', value: res2.data.datasetDistribution['elliptic'] },
+    { name: 'FINKAN_default', value: res2.data.datasetDistribution['default of credit card clients']  },
+    { name: 'ABM_SHL2', value: res2.data.datasetDistribution['SHL2 TA0_600519_202401-202402_defreg']},
   ]
 })
 </script>

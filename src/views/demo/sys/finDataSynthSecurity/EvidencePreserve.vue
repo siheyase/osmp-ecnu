@@ -155,7 +155,8 @@
                   </a-col>
                   <a-col :span="8">
                     <strong>合成总量:</strong>
-                    <a-tag color="pink">{{ calculateDataSize(TaskItem.total, 'ABM', 'AUTO') }}</a-tag>
+                    <a-tag color="pink">{{ calculateDataSize(TaskItem.total, TaskItem.model, 'AUTO')
+                      }}</a-tag>
                   </a-col>
                   <a-col :span="8">
                     <strong>数据集:</strong>
@@ -177,7 +178,9 @@
                   </a-col>
                   <a-col :span="8">
                     <strong>已合成:</strong>
-                    <a-tag color="red">{{ calculateDataSize(TaskItem.process, 'ABM', 'AUTO') }} </a-tag>
+                    <a-tag color="red">{{ calculateDataSize(TaskItem.process, TaskItem.model, 'AUTO')
+                      }}
+                    </a-tag>
                   </a-col>
                 </a-row>
               </a-list-item>
@@ -194,7 +197,7 @@
                   </a-col>
                   <a-col :span="8">
                     <strong>合成总量:</strong>
-                    <a-tag color="pink">{{ calculateDataSize(EpochItem.process, 'ABM', 'AUTO') }}</a-tag>
+                    <a-tag color="pink">{{ calculateDataMapSize(EpochItem.process, 'AUTO') }}</a-tag>
                   </a-col>
                   <a-col :span="8">
                     <strong>确认单元:</strong>
@@ -337,16 +340,22 @@
                       </a-col>
                       <a-col :span="8">
                         <strong>调度总量:</strong>
-                        <a-tag color="pink">{{ calculateDataSize(schedule.total, 'ABM', 'AUTO') }}</a-tag>
+                        <a-tag color="pink">{{ calculateDataSize(schedule.total, TaskItem.model,
+                          'AUTO')
+                          }}</a-tag>
                       </a-col>
                       <a-col :span="8">
                         <strong>已完成数据:</strong>
-                        <a-tag color="orange">{{ calculateDataSize(schedule.process, 'ABM', 'AUTO') }}</a-tag>
+                        <a-tag color="orange">{{ calculateDataSize(schedule.process, TaskItem.model,
+                          'AUTO') }}</a-tag>
                       </a-col>
                     </a-row>
                   </a-list-item>
                   <a-list-item>
                     <a-row gutter={16} style="width: 100%">
+
+
+
                       <a-col :span="8">
                         <strong>调度节点数:</strong>
                         <a-tag color="blue">{{ schedule.nbNodes }}</a-tag>
@@ -371,7 +380,7 @@
                       </a-col>
                       <a-col :span="8">
                         <strong>合成总量:</strong>
-                        <a-tag color="pink">{{ calculateDataSize(EpochItem.process, 'ABM', 'AUTO') }}</a-tag>
+                        <a-tag color="pink">{{ calculateDataMapSize(EpochItem.process, 'AUTO') }}</a-tag>
                       </a-col>
                       <a-col :span="8">
                         <strong>确认单元数:</strong>
@@ -392,7 +401,7 @@
                     </a-row>
                   </a-list-item>
                 </a-list>
-                <a-table :columns="SchduleSlotTableColumn" :data-source="schedule.tableDatas" style="margin-top: 1%;">
+                <a-table :columns="SchduleSlotTableColumn(infoType)" :data-source="schedule.tableDatas" style="margin-top: 1%;">
                   <template #headerCell="{ column }">
                     <!-- <template v-if="column.key === 'name'">
                       <span>
@@ -504,7 +513,8 @@ import { InfoCircleOutlined, LineChartOutlined, PieChartOutlined, CheckCircleOut
 import { BarChart, PieChart } from '/@/components/Charts';
 import { getQueryDataApi } from '/@/api/demo/finDataSynthSecurityApi';
 import { message } from 'ant-design-vue';
-import { calculateDataSize } from '/@/utils/value/calDataSize';
+import { calculateDataSize, calculateDataMapSize } from '/@/utils/value/calDataSize';
+import { datasetToModel } from '/@/utils/value/typeConvert';
 const infoType = ref("");
 const activeKey1 = ref('1');
 const activeKey2 = ref('1');
@@ -524,37 +534,44 @@ const getSlotInfo = (slot, is_err) => {
 
   }
 };
-const SchduleSlotTableColumn = [
-  {
-    name: '提交单元',
-    dataIndex: 'slotHash',
-    key: 'slotHash',
-  },
-  {
-    name: '预期数据量',
-    dataIndex: 'size',
-    key: 'size', customRender: ({ value }) => {
-      return calculateDataSize(value, 'ABM', 'AUTO');
+const SchduleSlotTableColumn = (infoType) => {
+  return [
+    {
+      name: '提交单元',
+      dataIndex: 'slotHash',
+      key: 'slotHash',
     },
-  },
-  {
-    name: '实际完成量',
-    dataIndex: 'process',
-    key: 'process', customRender: ({ value }) => {
-      return calculateDataSize(value, 'ABM', 'AUTO');
+    {
+      name: '预期数据量',
+      dataIndex: 'size',
+      key: 'size',
+      customRender: ({ value, record }) => {
+        // 对于 epoch，使用 record.model
+        const model = infoType === 'task' ? TaskItem.model : record.model;
+        return calculateDataSize(value, model, 'AUTO');
+      },
     },
-
-  },
-  {
-    name: '状态',
-    dataIndex: 'status',
-    key: 'status',
-  },
-  {
-    title: '操作',
-    key: 'action'
-  }
-]
+    {
+      name: '实际完成量',
+      dataIndex: 'process',
+      key: 'process',
+      customRender: ({ value, record }) => {
+        // 对于 epoch，使用 record.model
+        const model = infoType === 'task' ? TaskItem.model : record.model;
+        return calculateDataSize(value, model, 'AUTO');
+      },
+    },
+    {
+      name: '状态',
+      dataIndex: 'status',
+      key: 'status',
+    },
+    {
+      title: '操作',
+      key: 'action',
+    },
+  ];
+};
 let slotItem = reactive({
   slotHash: "",
   commitment: "",
@@ -620,7 +637,7 @@ const barChartConfig = {
   chartConfig: {
     yAxis: {
       axisLabel: {
-        formatter: '{value} B',
+        formatter: '{value} KB',
       },
     },
   },
@@ -656,13 +673,11 @@ const onQuery = async () => {
     );
 
     // 更新信息
-    console.log(res.status);
     // const res = await getQueryDataApi({
     //   query: 'EvidencePreserveTaskIDQuery',
     //   taskID: TaskSearchForm.taskId
     // })
     //更新信息
-    console.log(res.status)
     if (res.status == 'OK') {
       message.success("查找成功")
       //获取时间信息
@@ -674,6 +689,8 @@ const onQuery = async () => {
       TaskItem.process = taskInfo.process
       TaskItem.nbSchedule = taskInfo.schedule
       TaskItem.nbFinalized = taskInfo.commit
+      TaskItem.dataset = taskInfo.dataset
+      TaskItem.model = taskInfo.model
       //获取交易信息
       const txInfo = res.data.tx_info
       TransactionItem.txHash = txInfo.txHash, // 交易哈希
@@ -686,7 +703,7 @@ const onQuery = async () => {
       //获取epoch信息
       let epochArray = []
       for (let i = 0; i < res.data.epochProcessData.length; i++) {
-        epochArray.push({ name: `Epoch${res.data.epochs[i]}`, value: calculateDataSize(res.data.epochProcessData[i], 'ABM', 'B', false)})
+        epochArray.push({ name: `Epoch${res.data.epochs[i]}`, value: calculateDataSize(res.data.epochProcessData[i], TaskItem.model, 'KB', false) })
       }
       BarData.value = epochArray
       PieData.value = [{ name: '处理中', value: res.data.scheduleDistributionData[2] },
@@ -790,6 +807,7 @@ const onQuery = async () => {
           slotHash: item.slotHash,
           size: item.scheduleSize,
           process: item.process,
+          model: item.model,
           status: sArr[item.status],
           commitment: item.commitment,
           err: item.err
@@ -812,6 +830,7 @@ const onQuery = async () => {
           slotHash: item.slotHash,
           size: item.scheduleSize,
           process: item.process,
+          model: item.model,
           status: sArr[item.status],
           commitment: item.commitment,
           err: item.err
@@ -827,12 +846,10 @@ const onQuery = async () => {
         tableDatas: commitArray,
       })
       schedules.value = scheduleArray
-      //获取epoch信息
-      console.log(res.data.taskProcessDistributionData)
       // 遍历 taskProcessDistributionData 对象的每对 key-value
       let taskArray = []
       Object.entries(res.data.taskProcessDistributionData).forEach(([key, value]) => {
-        taskArray.push({ name: key, value: value });
+        taskArray.push({ name: key, value: calculateDataSize(value.schedule, value.model, 'KB', false) });
       });
       BarData.value = taskArray
       PieData.value = [{ name: '提交单元', value: EpochItem.nbCommit },
@@ -862,6 +879,7 @@ let TaskItem = reactive({
   sign: ``, // 任务标识
   total: 0, // 总量
   dataset: 'dataset1', // 数据集
+  model: 'default',
   nbSchedule: 0, // 调度数量，对应task slot
   nbFinalized: 0, // finalized的slot数量
   process: 0, // 已经完成的合成数

@@ -37,7 +37,7 @@
         <!-- 第二行：合成数量（占一行）+ 可信证明（右对齐） -->
         <a-row :gutter="16" align="middle">
           <a-col :span="6">
-            <a-form-item label="合成数量（条）">
+            <a-form-item :label="newTask.model == 'ABM' ? '合成数量（单位：8000条）' : '合成数量（单位：条）'">
               <a-input-number v-model:value="newTask.synthesisAmount" :min="1" style="width: 100%" />
             </a-form-item>
           </a-col>
@@ -111,9 +111,8 @@ import { BasicTable } from '/@/components/Table';
 import { useSearchTable } from '../../table/components/useSearchTable';
 import { createTaskApi, getCollectApi } from '/@/api/demo/finDataSynthSecurityApi';
 import { message } from 'ant-design-vue';
-import { sleep } from '/@/utils';
 
-const { histCompTasksTable, downloadClick, viewProofClick, deleteClick, selectDate, reload } = useSearchTable();
+const { histCompTasksTable, viewProofClick, deleteClick, selectDate, reload } = useSearchTable();
 
 // 任务搜索条件
 const filters = ref({
@@ -171,9 +170,9 @@ const availableDatasets = computed(() => {
 });
 
 
-// 这里设置定时刷新。5s一次
+// 这里设置定时刷新。1min一次
 const timer = onMounted(() => {
-  setInterval(reload, 10000)
+  setInterval(reload, 60000)
 })
 
 // 当选择数据类型时，更新可选模型
@@ -239,7 +238,9 @@ const handleDownload = async (task) => {
     // 3. 创建下载链接
     const link = document.createElement('a')
     link.href = URL.createObjectURL(blob)
-    link.download = filename + '.csv' // 使用接口返回的文件名
+    // 根据数据类型决定文件扩展名: 图数据类型返回json文件，其他返回csv文件
+    const fileExtension = task.model === 'BAED' ? '.json' : '.csv'
+    link.download = filename + fileExtension // 使用接口返回的文件名
     link.style.display = 'none'
 
     // 4. 触发下载

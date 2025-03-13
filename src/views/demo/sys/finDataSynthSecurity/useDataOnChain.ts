@@ -49,7 +49,7 @@ export const useDataOnChain = () => {
     chartConfig: {
       yAxis: {
         axisLabel: {
-          formatter: '{value}',
+          formatter: '{value} KB',
         },
       },
     },

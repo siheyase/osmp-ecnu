@@ -29,7 +29,7 @@
               <a-col :span="8">
                 <a-card :style="cardStyles.green">
                   <p class="title">合成数据统计</p>
-                  <h2 class="value">{{ calculateDataSize(blockChainInfo.SynthData, 'ABM', 'AUTO') }}</h2>
+                  <h2 class="value">{{ calculateDataMapSize(blockChainInfo.SynthData, 'AUTO') }}</h2>
                   <p class="subtitle">已合成数据量</p>
                 </a-card>
               </a-col>
@@ -183,11 +183,9 @@ import { queryEpochAndTransactionTableData } from './useDataOnChain';
 import { BasicTable } from '/@/components/Table';
 import { ref } from 'vue';
 import { getBlockChainInfoApi, getBlockInfoApi } from '../../../../api/demo/finDataSynthSecurityApi';
-import { getBlockInfoColumns } from '../../table/components/tableData';
 import { message } from 'ant-design-vue';
-import { calculateDataSize } from '/@/utils/value/calDataSize';
+import { calculateDataMapSize } from '/@/utils/value/calDataSize';
 const { chartsListData } = useUpChainTPSChart();
-const { epochTable, transactionTable } = queryEpochAndTransactionTableData(); // modify by zhmye 这里用来获取这个页面里面的两个表格数据
 
 const getChartComponent = (type: string | undefined) => {
   if (!type) {
@@ -208,7 +206,7 @@ const txModalVisable = ref<boolean>(false);
 const blockInfoColumn = [
   { title: "交易哈希", dataIndex: 'TxHash', key: 'TxHash' },
   { title: "合约地址", dataIndex: 'Contract', key: 'Contract' },
-  { title: "调用接口", dataIndex: 'abi', key: 'abi' },
+  { title: "上链时间", dataIndex: 'UpchainTime', key: 'UpchainTime' },
 
 ];
 // 搜索表单数据
