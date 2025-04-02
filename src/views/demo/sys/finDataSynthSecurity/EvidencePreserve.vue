@@ -149,23 +149,29 @@
             <a-list bordered size="large" v-if="infoType == 'task'">
               <a-list-item>
                 <a-row gutter={16} style="width: 100%">
-                  <a-col :span="8">
+                  <a-col :span="12">
                     <strong>任务标识:</strong>
                     <a-tag color="purple" class="break-tag">{{ TaskItem.sign }}</a-tag>
                   </a-col>
-                  <a-col :span="8">
+                  <a-col :span="12">
+                    <strong>任务名称:</strong>
+                    <a-tag color="purple" class="break-tag">{{ TaskItem.taskName }}</a-tag>
+                  </a-col>
+                </a-row>
+              </a-list-item>
+              <a-list-item>
+                <a-row gutter={16} style="width: 100%">
+                  <a-col :span="12">
                     <strong>合成总量:</strong>
                     <a-tag color="pink" class="break-tag">{{ calculateDataSize(TaskItem.total, TaskItem.model, 'AUTO')
                       }}</a-tag>
                   </a-col>
-                  <a-col :span="8">
+                  <a-col :span="12">
                     <strong>数据集:</strong>
                     <a-tag color="orange" class="break-tag">{{ TaskItem.dataset }}</a-tag>
                   </a-col>
                 </a-row>
               </a-list-item>
-
-
               <a-list-item>
                 <a-row gutter={16} style="width: 100%">
                   <a-col :span="8">
@@ -510,14 +516,11 @@
 
 <script lang="ts" setup>
 import { computed, reactive, ref, onMounted, onBeforeUnmount } from 'vue';
-import { useEvidenceOnChain } from './useDataOnChain';
 import { InfoCircleOutlined, LineChartOutlined, PieChartOutlined, CheckCircleOutlined, SyncOutlined, GoldOutlined, ClockCircleOutlined, ControlOutlined, TransactionOutlined, ConsoleSqlOutlined } from '@ant-design/icons-vue';
 import { BarChart, PieChart } from '/@/components/Charts';
 import { getQueryDataApi } from '/@/api/demo/finDataSynthSecurityApi';
 import { message } from 'ant-design-vue';
 import { calculateDataSize, calculateDataMapSize } from '/@/utils/value/calDataSize';
-import { datasetToModel } from '/@/utils/value/typeConvert';
-import { grid } from '/@/components/CardList/src/data';
 const infoType = ref("");
 const activeKey1 = ref('1');
 const activeKey2 = ref('1');
@@ -580,10 +583,6 @@ let slotItem = reactive({
   commitment: "",
   err: "",
 })
-const InfoCol = [
-  { dataIndex: 'name', key: 'name' },
-  { dataIndex: 'value', key: 'value' },
-]
 
 // 定义类型
 interface ScheduleSlot {
@@ -694,6 +693,7 @@ const onQuery = async () => {
       //获取任务信息
       const taskInfo = res.data.task_info
       TaskItem.sign = taskInfo.taskID
+      TaskItem.taskName=taskInfo.taskName
       TaskItem.total = taskInfo.total
       TaskItem.process = taskInfo.process
       TaskItem.nbSchedule = taskInfo.schedule
@@ -748,6 +748,7 @@ const onQuery = async () => {
 
       evidenceTable.value = [
         { name: '任务标识', value: TaskItem.sign },
+        { name: '任务名称', value: TaskItem.taskName },
         { name: '交易哈希', value: TransactionItem.txHash },
         { name: '任务状态', value: TaskItem.process == TaskItem.total ? '已完成' : '处理中' },
       ]
@@ -886,6 +887,7 @@ let TransactionItem = reactive({
 // 左下角显示的task
 let TaskItem = reactive({
   sign: ``, // 任务标识
+  taskName:`default`,
   total: 0, // 总量
   dataset: 'dataset1', // 数据集
   model: 'default',

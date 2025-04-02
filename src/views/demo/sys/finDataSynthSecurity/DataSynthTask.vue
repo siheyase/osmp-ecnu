@@ -193,6 +193,7 @@ const createTask = async () => {
     message.info('可信证明，该功能未实现')
   } else {
     const res = await createTaskApi({
+      name:newTask.value.taskName,
       model: newTask.value.model,
       params: {
         "dataset": newTask.value.dataset
@@ -216,46 +217,46 @@ const createTask = async () => {
   }
 };
 
-const handleDownload = async (task) => {
-  try {
-    // 1. 调用接口获取数据（假设已通过其他方式获取到接口返回的data）
-    const response = await getCollectApi({
-      query: "CollectTaskQuery",
-      taskID: task.taskID,
-      size: task.total
-    })
-    const { file, filename } = response.data
+// const handleDownload = async (task) => {
+//   try {
+//     // 1. 调用接口获取数据（假设已通过其他方式获取到接口返回的data）
+//     const response = await getCollectApi({
+//       query: "CollectTaskQuery",
+//       taskID: task.taskID,
+//       size: task.total
+//     })
+//     const { file, filename } = response.data
 
-    // 2. Base64转Blob
-    const byteCharacters = atob(file)
-    const byteNumbers = new Uint8Array(byteCharacters.length)
-    for (let i = 0; i < byteCharacters.length; i++) {
-      byteNumbers[i] = byteCharacters.charCodeAt(i)
-    }
-    const byteArray = new Uint8Array(byteNumbers)
-    const blob = new Blob([byteArray])
+//     // 2. Base64转Blob
+//     const byteCharacters = atob(file)
+//     const byteNumbers = new Uint8Array(byteCharacters.length)
+//     for (let i = 0; i < byteCharacters.length; i++) {
+//       byteNumbers[i] = byteCharacters.charCodeAt(i)
+//     }
+//     const byteArray = new Uint8Array(byteNumbers)
+//     const blob = new Blob([byteArray])
 
-    // 3. 创建下载链接
-    const link = document.createElement('a')
-    link.href = URL.createObjectURL(blob)
-    // 根据数据类型决定文件扩展名: 图数据类型返回json文件，其他返回csv文件
-    const fileExtension = task.model === 'BAED' ? '.json' : '.csv'
-    link.download = filename + fileExtension // 使用接口返回的文件名
-    link.style.display = 'none'
+//     // 3. 创建下载链接
+//     const link = document.createElement('a')
+//     link.href = URL.createObjectURL(blob)
+//     // 根据数据类型决定文件扩展名: 图数据类型返回json文件，其他返回csv文件
+//     const fileExtension = task.model === 'BAED' ? '.json' : '.csv'
+//     link.download = filename + fileExtension // 使用接口返回的文件名
+//     link.style.display = 'none'
 
-    // 4. 触发下载
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-    URL.revokeObjectURL(link.href)
+//     // 4. 触发下载
+//     document.body.appendChild(link)
+//     link.click()
+//     document.body.removeChild(link)
+//     URL.revokeObjectURL(link.href)
 
-    // 5. 可选：显示成功提示
-    message.success('文件下载成功')
-  } catch (error) {
-    console.error('下载失败:', error)
-    message.error('文件下载失败')
-  }
-}
+//     // 5. 可选：显示成功提示
+//     message.success('文件下载成功')
+//   } catch (error) {
+//     console.error('下载失败:', error)
+//     message.error('文件下载失败')
+//   }
+// }
 
 const handleDownloadStream = async (task) => {
   // 1. 调用接口获取数据（假设已通过其他方式获取到接口返回的data）

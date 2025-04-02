@@ -162,6 +162,15 @@ export function getHistCompTasksColumns(): BasicColumn[] {
       fixed: 'left',
     },
     {
+      title: '合成任务名',
+      dataIndex: 'taskName',
+      width: 80,
+      slots: {
+        customRender: 'taskName',
+      },
+      fixed: 'left',
+    },
+    {
       title: '交易哈希',
       dataIndex: 'txHash',
       width: 80,
