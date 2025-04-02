@@ -230,6 +230,17 @@ export const getCollectApi = async (queryData) => {
   return res;
 }
 
+export const downLoadCollectApi = async (queryData: any) => {
+  const params = new URLSearchParams();
+  for (const [key, value] of Object.entries(queryData)) {
+    params.append(key, value);
+  }
+
+  const queryString = params.toString();
+  const url = defHttp.getOptions().requestOptions.apiUrl + Api.FINDATASYNTHSECURITY_COLLECT + '?'+queryString;
+  window.open(url)
+};
+
 
 //==============这些用于Table查询的API=================
 // 数据合成安全 - 节点查询接口

@@ -572,7 +572,7 @@
 
       .ant-table-content {
         overflow-x: hidden !important;
-        //  overflow-y: scroll !important;
+        overflow-y: scroll !important;
       }
 
       td {

@@ -50,8 +50,7 @@ const transform: AxiosTransform = {
     }
     //  这里 code，result，message为 后台统一的字段，需要在 types.ts内修改为项目自己的接口返回格式
     // 这里逻辑可以根据项目进行修改
-    const hasSuccess = Reflect.has(res.data, 'status');
-    if (hasSuccess) {
+    if (res.status===200) {
       return res.data;
     }
 

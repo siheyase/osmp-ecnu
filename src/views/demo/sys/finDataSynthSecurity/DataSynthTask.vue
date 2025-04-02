@@ -41,6 +41,11 @@
               <a-input-number v-model:value="newTask.synthesisAmount" :min="1" style="width: 100%" />
             </a-form-item>
           </a-col>
+          <a-col :span="6">
+            <a-form-item label="合成任务名称">
+              <a-input v-model:value="newTask.taskName" style="width: 100%" />
+            </a-form-item>
+          </a-col>
           <a-col :span="8">
             <a-form-item label="需要可信证明">
               <a-switch v-model:checked="newTask.trustedProof" />
@@ -54,7 +59,7 @@
       </a-form>
     </a-card>
     <!-- 任务管理 Tabs -->
-    <div style="margin-top: 20px; padding: 20px; display: flex; justify-content: center;">
+    <div style="margin-top: 0px; padding: 20px; justify-content: center;">
       <a-tabs v-model:activeKey="activeTab" type="card">
         <a-tab-pane key="history" tab="历史合成任务">
           <!-- 搜索栏 -->
@@ -80,7 +85,7 @@
           </a-card>
 
           <!-- 任务表格 -->
-          <BasicTable @register="histCompTasksTable">
+          <BasicTable @register="histCompTasksTable" :scroll="{ x: 100, y: 400 }">
             <template #form-taskCompTime="{ model, field }">
               <div class="formSlot">
                 <a-range-picker v-model:value="model[field]" format="YYYY-MM-DD" />
@@ -93,9 +98,9 @@
               </div>
             </template>
             <template #action="{ record }">
-              <a-button type="link" :disabled="record.status == false" @click="handleDownload(record)">下载数据</a-button>
+              <a-button type="link" :disabled="record.status == false" @click="handleDownloadStream(record)">下载数据</a-button>
               <a-button type="link" @click="viewProofClick(record)">查看凭证</a-button>
-              <a-button type="link" danger @click="deleteClick(record)">删除</a-button>
+              <!-- <a-button type="link" danger @click="deleteClick(record)">删除</a-button> -->
             </template>
           </BasicTable>
         </a-tab-pane>
@@ -109,7 +114,7 @@
 import { ref, computed, onMounted } from 'vue';
 import { BasicTable } from '/@/components/Table';
 import { useSearchTable } from '../../table/components/useSearchTable';
-import { createTaskApi, getCollectApi } from '/@/api/demo/finDataSynthSecurityApi';
+import { createTaskApi, downLoadCollectApi, getCollectApi } from '/@/api/demo/finDataSynthSecurityApi';
 import { message } from 'ant-design-vue';
 
 const { histCompTasksTable, viewProofClick, deleteClick, selectDate, reload } = useSearchTable();
@@ -126,6 +131,7 @@ const activeTab = ref('history');
 
 // 新建任务表单数据
 const newTask = ref({
+  taskName: 'default',
   dataType: '', // 数据类型
   model: '', // 选择的模型
   dataset: '', // 选择的数据集
@@ -168,12 +174,6 @@ const availableModels = computed(() => {
 const availableDatasets = computed(() => {
   return newTask.value.model ? datasetMapping[newTask.value.model] : [];
 });
-
-
-// 这里设置定时刷新。1min一次
-const timer = onMounted(() => {
-  setInterval(reload, 60000)
-})
 
 // 当选择数据类型时，更新可选模型
 const updateModels = () => {
@@ -228,7 +228,7 @@ const handleDownload = async (task) => {
 
     // 2. Base64转Blob
     const byteCharacters = atob(file)
-    const byteNumbers = new Array(byteCharacters.length)
+    const byteNumbers = new Uint8Array(byteCharacters.length)
     for (let i = 0; i < byteCharacters.length; i++) {
       byteNumbers[i] = byteCharacters.charCodeAt(i)
     }
@@ -255,6 +255,15 @@ const handleDownload = async (task) => {
     console.error('下载失败:', error)
     message.error('文件下载失败')
   }
+}
+
+const handleDownloadStream = async (task) => {
+  // 1. 调用接口获取数据（假设已通过其他方式获取到接口返回的data）
+  downLoadCollectApi({
+    query: "CollectTaskQuery",
+    taskID: task.taskID,
+    size: task.total
+  })
 }
 
 // 过滤任务

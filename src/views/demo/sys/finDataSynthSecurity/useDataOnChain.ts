@@ -52,6 +52,12 @@ export const useDataOnChain = () => {
           formatter: '{value} KB',
         },
       },
+      grid: {
+        top: '20%',
+        bottom: '20%',
+        left: '10%',
+        right: '10%',
+      },
     },
   });
   const nodeSynTask = ref<ChartInfo>({
@@ -60,6 +66,12 @@ export const useDataOnChain = () => {
         axisLabel: {
           formatter: '{value}',
         },
+      },
+      grid: {
+        top: '20%',
+        bottom: '20%',
+        left: '10%',
+        right: '10%',
       },
     },
   });

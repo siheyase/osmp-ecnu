@@ -3,170 +3,170 @@
   <div class="demo-charts">
     <a-card :bordered="false">
       <div v-for="board in chartsListData" :key="board?.id">
-        <div class="charts-row">
-          <div class="realtime-monitor">
-            <h3 class="title">区块链数据实时监控</h3>
-            <a-row gutter="16">
-              <!-- 链上区块统计 -->
-              <a-col :span="8">
-                <a-card :style="cardStyles.red">
-                  <p class="title">链上区块统计</p>
-                  <h2 class="value">{{ blockChainInfo.NbBlock }}</h2>
-                  <p class="subtitle">当前区块总数</p>
-                </a-card>
-              </a-col>
-
-              <!-- 交易存证信息 -->
-              <a-col :span="8">
-                <a-card :style="cardStyles.blue">
-                  <p class="title">交易存证信息</p>
-                  <h2 class="value">{{ blockChainInfo.NbTransaction }}</h2>
-                  <p class="subtitle">已上链存证数量</p>
-                </a-card>
-              </a-col>
-
-              <!-- 合成数据统计 -->
-              <a-col :span="8">
-                <a-card :style="cardStyles.green">
-                  <p class="title">合成数据统计</p>
-                  <h2 class="value">{{ calculateDataMapSize(blockChainInfo.SynthData, 'AUTO') }}</h2>
-                  <p class="subtitle">已合成数据量</p>
-                </a-card>
-              </a-col>
-            </a-row>
-            <a-row gutter="16" style="margin-top: 16px;">
-              <!-- 稳定运行时间 -->
-              <a-col :span="8">
-                <a-card :style="cardStyles.yellow">
-                  <p class="title">稳定运行时间</p>
-                  <h2 class="value">365天</h2>
-                  <p class="subtitle">已稳定运行时间</p>
-                </a-card>
-              </a-col>
-
-              <!-- FISCO BCOS -->
-              <a-col :span="8">
-                <a-card :style="cardStyles.purple">
-                  <p class="title">历史纪元数</p>
-                  <h2 class="value">{{ blockChainInfo.NbEpoch }}</h2>
-                  <p class="subtitle">Epoch</p>
-                </a-card>
-              </a-col>
-
-              <!-- 总TPS -->
-              <a-col :span="8">
-                <a-card :style="cardStyles.lightBlue">
-                  <p class="title">提交单元数</p>
-                  <h2 class="value">{{ blockChainInfo.NbFinalized }}</h2>
-                  <p class="subtitle">Slots</p>
-                </a-card>
-              </a-col>
-            </a-row>
-
-            <a-form layout="vertical">
-              <!-- 区块哈希查询 -->
-              <a-row :gutter="16" align="middle" style="margin-top: 30px;">
-                <a-col :span="16">
-                  <a-form-item label="区块哈希">
-                    <a-input v-model:value="searchForm.blockHash" placeholder="请输入区块哈希" />
-                  </a-form-item>
+        <div class="chart">
+          <div class="realtime-monitor" style="width: 49%;">
+              <h3 class="title">区块链数据实时监控</h3>
+              <a-row :gutter="[{ lg: 16, xxl: 24 },{ lg: 16, xxl: 24 }]" >
+                <!-- 链上区块统计 -->
+                <a-col :span="8" :xxl="12">
+                  <a-card :style="cardStyles.red" size="small">
+                    <p class="title" :style="{ fontSize: titleSize }">链上区块统计</p>
+                    <h2 class="value" :style="{ fontSize: valueSize }">{{ blockChainInfo.NbBlock }}</h2>
+                    <p class="subtitle">当前区块总数</p>
+                  </a-card>
                 </a-col>
-                <a-col :span="4">
-                  <a-button type="primary" @click="queryBlockInfo">查询区块信息</a-button>
+
+                <!-- 交易存证信息 -->
+                <a-col :span="8" :xxl="12">
+                  <a-card :style="cardStyles.blue" size="small">
+                    <p class="title" :style="{ fontSize: titleSize }">交易存证信息</p>
+                    <h2 class="value" :style="{ fontSize: valueSize }">{{ blockChainInfo.NbTransaction }}</h2>
+                    <p class="subtitle">已上链存证数量</p>
+                  </a-card>
                 </a-col>
-                <!-- <a-col :span="4">
-                  <a-button @click="resetBlockHash">重置</a-button>
-              </a-col> -->
-                <!--
-              NOTE: add by zhmye
-              这里点击查询区块信息后要跳出一个弹窗，展示区块内容
-              下面的交易同理  
-            -->
-                <a-modal v-model:open="blockModalVisable" title="区块详情" :style="{ width: '800px' }" centered
-                  @ok="blockModalVisable = false">
-                  <template #footer>
-                    <a-button key="back" @click="blockModalVisable = false">返回</a-button>
-                  </template>
-                  <a-list bordered size="large">
-                    <a-list-item>
-                      <span><strong>区块哈希:</strong> <a-tag color="pink">{{ blockItem.blockHash }}</a-tag></span>
-                    </a-list-item>
-                    <a-list-item>
-                      <span><strong>父区块哈希:</strong> <a-tag color="orange">{{ blockItem.parentHash }}</a-tag></span>
-                    </a-list-item>
-                    <a-list-item>
-                      <span><strong>区块高度:</strong> <a-tag color="green">{{ blockItem.blockHeight }}</a-tag></span>
-                      <span><strong>交易数量:</strong> <a-tag color="blue">{{ blockItem.nbTransactions }}</a-tag></span>
-                    </a-list-item>
-                    <a-list-item>
-                      <span><strong>Merkle Root:</strong> <a-tag color="cyan">{{ blockItem.merkleRoot }}</a-tag></span>
-                    </a-list-item>
-                    <a-list-item>
-                      <div>
-                        <span><strong>交易哈希:</strong></span>
-                        <BasicTable v-if="blockItem.txHashs && blockItem.txHashs.length > 0"
-                          :data-source="blockItem.txHashs" :columns="blockInfoColumn" bordered size="small"
-                          row-key="index" :pagination="false" />
-                        <span v-else>暂无交易</span>
-                      </div>
-                    </a-list-item>
-                  </a-list>
-                </a-modal>
-                <a-modal v-model:open="txModalVisable" title="交易详情" :style="{ width: '800px' }" centered
-                  @ok="txModalVisable = false">
-                  <template #footer>
-                    <a-button key="back" @click="txModalVisable = false">返回</a-button>
-                  </template>
-                  <a-list bordered size="large">
-                    <a-list-item>
-                      <span><strong>区块哈希:</strong> <a-tag color="pink">{{ txItem.BlockHash }}</a-tag></span>
-                    </a-list-item>
-                    <a-list-item>
-                      <span><strong>交易哈希:</strong> <a-tag color="orange">{{ txItem.TxHash }}</a-tag></span>
-                    </a-list-item>
-                    <a-list-item>
-                      <span><strong>合约地址:</strong> <a-tag color="red">{{ txItem.Contract }}</a-tag></span>
-                    </a-list-item>
-                    <a-list-item>
-                      <span><strong>交易数据类型:</strong> <a-tag color="green">{{ txItem.Abi }}</a-tag></span>
-                      <span><strong>上链时间:</strong> <a-tag color="blue">{{ txItem.UpchainTime }}</a-tag></span>
-                    </a-list-item>
-                  </a-list>
-                </a-modal>
+
+                <!-- 合成数据统计 -->
+                <a-col :span="8" :xxl="12">
+                  <a-card :style="cardStyles.green" size="small">
+                    <p class="title" :style="{ fontSize: titleSize }">合成数据统计</p>
+                    <h2 class="value" :style="{ fontSize: valueSize }">{{ calculateDataMapSize(blockChainInfo.SynthData, 'AUTO') }}</h2>
+                    <p class="subtitle">已合成数据量</p>
+                  </a-card>
+                </a-col>
+              
+                <!-- 稳定运行时间 -->
+                <a-col :span="8" :xxl="12">
+                  <a-card :style="cardStyles.yellow" size="small">
+                    <p class="title" :style="{ fontSize: titleSize }">稳定运行时间</p>
+                    <h2 class="value" :style="{ fontSize: valueSize }">365天</h2>
+                    <p class="subtitle">已稳定运行时间</p>
+                  </a-card>
+                </a-col>
+
+                <!-- FISCO BCOS -->
+                <a-col :span="8" :xxl="12">
+                  <a-card :style="cardStyles.purple" size="small">
+                    <p class="title" :style="{ fontSize: titleSize }">历史纪元数</p>
+                    <h2 class="value" :style="{ fontSize: valueSize }">{{ blockChainInfo.NbEpoch }}</h2>
+                    <p class="subtitle">Epoch</p>
+                  </a-card>
+                </a-col>
+
+                <!-- 总TPS -->
+                <a-col :span="8" :xxl="12">
+                  <a-card :style="cardStyles.lightBlue" size="small">
+                    <p class="title" :style="{ fontSize: titleSize }">提交单元数</p>
+                    <h2 class="value" :style="{ fontSize: valueSize }">{{ blockChainInfo.NbFinalized }}</h2>
+                    <p class="subtitle">Slots</p>
+                  </a-card>
+                </a-col>
               </a-row>
-              <!-- 交易哈希查询 -->
-              <a-row :gutter="16" align="middle" style="margin-top: 5px;">
-                <a-col :span="16">
-                  <a-form-item label="交易哈希">
-                    <a-input v-model:value="searchForm.transactionHash" placeholder="请输入交易哈希" />
-                  </a-form-item>
-                </a-col>
-                <a-col :span="4">
-                  <a-button type="primary" @click="queryTransactionInfo">查询交易信息</a-button>
-                </a-col>
-                <!-- <a-col :span="4">
-                  <a-button @click="resetTransactionHash">重置</a-button>
-              </a-col> -->
-              </a-row>
-            </a-form>
           </div>
-          <div class="charts-row-item" v-for="(chart, i) in board?.chartList">
-            <h3 class="chart-title" style="margin-top: 20px;">上链交易数</h3>
-            <component :is="getChartComponent(board.type)" :dataType="'origVal'" :title="board?.title"
-              :chartData="chart?.chartData" :optionConfig="chart?.chartConfig" :seriesConfig="chart?.seriesConfig" />
+          <div class="realtime-monitor" style="width: 49%;">
+            <h3 class="chart-title">上链交易数</h3>
+            <div v-for="(chart, i) in board?.chartList">
+              <component :is="getChartComponent(board.type)" :dataType="'origVal'" :title="board?.title"
+                :chartData="chart?.chartData" :optionConfig="chart?.chartConfig" :seriesConfig="chart?.seriesConfig" />
+            </div>
           </div>
-          <div class="realtime-monitor">
+        </div>
+        <a-form layout="vertical">
+          <!-- 区块哈希查询 -->
+          <a-row :gutter="8" align="middle" style="margin-top: 20px;">
+            <a-col :span="8" style="margin-left: 1%;">
+              <a-form-item label="区块哈希" >
+                <a-input v-model:value="searchForm.blockHash" placeholder="请输入区块哈希" />
+              </a-form-item>
+            </a-col>
+            <a-col :span="2" :offset="1">
+              <a-button type="primary" @click="queryBlockInfo">查询区块信息</a-button>
+            </a-col>
+            <!-- <a-col :span="4">
+              <a-button @click="resetBlockHash">重置</a-button>
+          </a-col> -->
+            <!--
+          NOTE: add by zhmye
+          这里点击查询区块信息后要跳出一个弹窗，展示区块内容
+          下面的交易同理  
+        -->
+            <a-modal v-model:open="blockModalVisable" title="区块详情" :style="{ width: '800px' }" centered
+              @ok="blockModalVisable = false">
+              <template #footer>
+                <a-button key="back" @click="blockModalVisable = false">返回</a-button>
+              </template>
+              <a-list bordered size="large">
+                <a-list-item>
+                  <span><strong>区块哈希:</strong> <a-tag color="pink">{{ blockItem.blockHash }}</a-tag></span>
+                </a-list-item>
+                <a-list-item>
+                  <span><strong>父区块哈希:</strong> <a-tag color="orange">{{ blockItem.parentHash }}</a-tag></span>
+                </a-list-item>
+                <a-list-item>
+                  <span><strong>区块高度:</strong> <a-tag color="green">{{ blockItem.blockHeight }}</a-tag></span>
+                  <span><strong>交易数量:</strong> <a-tag color="blue">{{ blockItem.nbTransactions }}</a-tag></span>
+                </a-list-item>
+                <a-list-item>
+                  <span><strong>Merkle Root:</strong> <a-tag color="cyan">{{ blockItem.merkleRoot }}</a-tag></span>
+                </a-list-item>
+                <a-list-item>
+                  <div>
+                    <span><strong>交易哈希:</strong></span>
+                    <BasicTable v-if="blockItem.txHashs && blockItem.txHashs.length > 0"
+                      :data-source="blockItem.txHashs" :columns="blockInfoColumn" bordered size="small"
+                      row-key="index" :pagination="false" />
+                    <span v-else>暂无交易</span>
+                  </div>
+                </a-list-item>
+              </a-list>
+            </a-modal>
+            <a-modal v-model:open="txModalVisable" title="交易详情" :style="{ width: '800px' }" centered
+              @ok="txModalVisable = false">
+              <template #footer>
+                <a-button key="back" @click="txModalVisable = false">返回</a-button>
+              </template>
+              <a-list bordered size="large">
+                <a-list-item>
+                  <span><strong>区块哈希:</strong> <a-tag color="pink">{{ txItem.BlockHash }}</a-tag></span>
+                </a-list-item>
+                <a-list-item>
+                  <span><strong>交易哈希:</strong> <a-tag color="orange">{{ txItem.TxHash }}</a-tag></span>
+                </a-list-item>
+                <a-list-item>
+                  <span><strong>合约地址:</strong> <a-tag color="red">{{ txItem.Contract }}</a-tag></span>
+                </a-list-item>
+                <a-list-item>
+                  <span><strong>交易数据类型:</strong> <a-tag color="green">{{ txItem.Abi }}</a-tag></span>
+                  <span><strong>上链时间:</strong> <a-tag color="blue">{{ txItem.UpchainTime }}</a-tag></span>
+                </a-list-item>
+              </a-list>
+            </a-modal>
+            <a-col :span="8" :offset="1">
+              <a-form-item label="交易哈希">
+                <a-input v-model:value="searchForm.transactionHash" placeholder="请输入交易哈希" />
+              </a-form-item>
+            </a-col>
+            <!-- 交易哈希查询 -->
+            <a-col :span="2" :offset="1">
+              <a-button type="primary" @click="queryTransactionInfo">查询交易信息</a-button>
+            </a-col>
+            <!-- <a-col :span="4">
+              <a-button @click="resetTransactionHash">重置</a-button>
+          </a-col> -->
+          </a-row>
+        </a-form>
+        <div class="chart" style="margin-top: 20px;">
+          <div class="realtime-monitor" style="width: 49%;">
             <h3 class="title">最新纪元信息</h3>
             <a-divider />
             <!-- <BasicTable :pagination="false" @register="epochTable">
             </BasicTable> -->
-            <BasicTable :pagination="false" :columns="columnsEpoch" :data-source="blockChainInfo.LatestEpoch">
+            <BasicTable :pagination="false" :scroll="{ y: 400 }" :columns="columnsEpoch" :data-source="blockChainInfo.LatestEpoch">
             </BasicTable>
           </div>
-          <div class="realtime-monitor">
+          <div class="realtime-monitor" style="width: 49%;">
             <h3 class="title">最新交易信息</h3>
             <a-divider />
-            <BasicTable :pagination="false" :columns="columnsTransaction" :data-source="blockChainInfo.LatestTx">
+            <BasicTable :pagination="false" :scroll="{ y: 400 }" :columns="columnsTransaction" :data-source="blockChainInfo.LatestTx">
             </BasicTable>
             <!-- <BasicTable @register="transactionTable"></BasicTable> -->
           </div>
@@ -176,12 +176,11 @@
   </div>
 </template>
 <script name="demo-monDashboard" lang="ts" setup>
-import { onMounted, reactive } from 'vue';
+import { onMounted, reactive, ref, computed, onBeforeUnmount } from 'vue';
 import { LineChart } from '/@/components/Charts';
 import { useUpChainTPSChart } from '@/views/demo/charts/useCharts';
 import { queryEpochAndTransactionTableData } from './useDataOnChain';
 import { BasicTable } from '/@/components/Table';
-import { ref } from 'vue';
 import { getBlockChainInfoApi, getBlockInfoApi } from '../../../../api/demo/finDataSynthSecurityApi';
 import { message } from 'ant-design-vue';
 import { calculateDataMapSize } from '/@/utils/value/calDataSize';
@@ -347,7 +346,18 @@ const columnsTransaction = [
   { title: "交易上链时间", dataIndex: 'upchainTime', key: 'upchainTime' },
 ];
 
-
+const screenWidth = ref(window.innerWidth);
+const updateScreenSize = () => {
+  screenWidth.value = window.innerWidth;
+};
+onMounted(() => {
+  window.addEventListener("resize", updateScreenSize);
+});
+onBeforeUnmount(() => {
+  window.removeEventListener("resize", updateScreenSize);
+});
+const titleSize = computed(() => (screenWidth.value < 2500 ? '18px' : '25px'));
+const valueSize = computed(() => (screenWidth.value < 2500 ? '18px' : '24px'));
 
 const cardStyles = {
   red: {
@@ -442,6 +452,12 @@ a-form-item {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
+.chart {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
 .title {
   font-size: 25px;
   font-weight: bold;
@@ -450,7 +466,6 @@ a-form-item {
 .value {
   font-size: 24px;
   font-weight: bold;
-  margin: 8px 0;
 }
 
 .subtitle {

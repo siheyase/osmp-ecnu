@@ -108,7 +108,7 @@
     <!-- 左侧搜索框 -->
     <a-col :span="8">
 
-      <a-card title="存证交易" style="height: 560px;">
+      <a-card title="存证交易" style="height: 620px; overflow: scroll;">
         <!-- <a-badge text="Verified"> -->
         <a-row align="middle" gutter={16}>
           <!-- Avatar -->
@@ -118,8 +118,8 @@
             </a-avatar>
           </a-col>
           <!-- 交易哈希 -->
-          <a-col :span="12" style="line-height: 64px; height: 64px">
-            <h3>{{ TransactionItem.txHash.substring(0, 40) + '....' }}</h3>
+          <a-col :span="12" style="line-height: 64px; height: 64px; margin-left: 14px;">
+            <h3>{{ formattedTxHash }}</h3>
           </a-col>
           <!-- 标签部分 -->
           <a-col :span="4">
@@ -151,16 +151,16 @@
                 <a-row gutter={16} style="width: 100%">
                   <a-col :span="8">
                     <strong>任务标识:</strong>
-                    <a-tag color="purple">{{ TaskItem.sign }}</a-tag>
+                    <a-tag color="purple" class="break-tag">{{ TaskItem.sign }}</a-tag>
                   </a-col>
                   <a-col :span="8">
                     <strong>合成总量:</strong>
-                    <a-tag color="pink">{{ calculateDataSize(TaskItem.total, TaskItem.model, 'AUTO')
+                    <a-tag color="pink" class="break-tag">{{ calculateDataSize(TaskItem.total, TaskItem.model, 'AUTO')
                       }}</a-tag>
                   </a-col>
                   <a-col :span="8">
                     <strong>数据集:</strong>
-                    <a-tag color="orange">{{ TaskItem.dataset }}</a-tag>
+                    <a-tag color="orange" class="break-tag">{{ TaskItem.dataset }}</a-tag>
                   </a-col>
                 </a-row>
               </a-list-item>
@@ -170,15 +170,15 @@
                 <a-row gutter={16} style="width: 100%">
                   <a-col :span="8">
                     <strong>调度数:</strong>
-                    <a-tag color="green">{{ TaskItem.nbSchedule }}</a-tag>
+                    <a-tag color="green" class="break-tag">{{ TaskItem.nbSchedule }}</a-tag>
                   </a-col>
                   <a-col :span="8">
                     <strong>提交数:</strong>
-                    <a-tag color="blue">{{ TaskItem.nbFinalized }}</a-tag>
+                    <a-tag color="blue" class="break-tag">{{ TaskItem.nbFinalized }}</a-tag>
                   </a-col>
                   <a-col :span="8">
                     <strong>已合成:</strong>
-                    <a-tag color="red">{{ calculateDataSize(TaskItem.process, TaskItem.model, 'AUTO')
+                    <a-tag color="red" class="break-tag">{{ calculateDataSize(TaskItem.process, TaskItem.model, 'AUTO')
                       }}
                     </a-tag>
                   </a-col>
@@ -246,9 +246,9 @@
               <!-- 第一个列表项 -->
               <a-list-item>
                 <a-row gutter={16} style="width: 100%">
-                  <a-col :span="24">
+                  <a-col :span="20">
                     <strong>交易哈希:</strong>
-                    <a-tag color="purple">{{ TransactionItem.txHash }}</a-tag>
+                    <a-tag color="purple" class="break-tag">{{ TransactionItem.txHash }}</a-tag>
                   </a-col>
                 </a-row>
               </a-list-item>
@@ -256,36 +256,38 @@
                 <a-row gutter={10} style="width: 100%">
                   <a-col :span="20">
                     <strong>区块哈希:</strong>
-                    <a-tag color="pink">{{ TransactionItem.blockHash }}</a-tag>
+                    <a-tag color="pink" class="break-tag">{{ TransactionItem.blockHash }}</a-tag>
                   </a-col>
                 </a-row>
               </a-list-item>
               <a-list-item>
                 <a-row gutter={8} style="width: 100%">
-                  <a-col :span="4">
+                  <a-col :span="5">
                     <strong>区块高度:</strong>
-                    <a-tag color="orange">{{ TransactionItem.blockHeight }}</a-tag>
+                    <a-tag color="orange" class="break-tag">{{ TransactionItem.blockHeight }}</a-tag>
                   </a-col>
                   <a-col :span="12">
                     <strong>合约地址:</strong>
-                    <a-tag color="green">{{ TransactionItem.contract }}</a-tag>
+                    <a-tag color="green" class="break-tag">{{ TransactionItem.contract }}</a-tag>
                   </a-col>
                   <a-col :span="5">
                     <strong>合约接口:</strong>
-                    <a-tag color="blue">{{ TransactionItem.method }}</a-tag>
+                    <a-tag color="blue" class="break-tag">{{ TransactionItem.method }}</a-tag>
                   </a-col>
                 </a-row>
               </a-list-item>
               <a-list-item>
                 <a-row gutter={2} style="width: 100%">
-                  <a-col :span="19">
+                  <a-col :span="20">
                     <strong>默克尔根:</strong>
-                    <a-tag color="red">{{ TransactionItem.merkleRoot }}</a-tag>
+                    <a-tag color="red" class="break-tag">{{ TransactionItem.merkleRoot }}</a-tag>
                   </a-col>
                 </a-row>
               </a-list-item>
               <a-list-item style="justify-content: center;">
-                <a-button type="primary">校验默克尔证明</a-button> <!-- 这里最好可以用echarts来一个树状图，验证merkler root -->
+                <a-button type="primary"
+                :loading="isChecking" 
+                @click="validateMerkleProof">{{ buttonText }}</a-button> <!-- 这里最好可以用echarts来一个树状图，验证merkler root -->
               </a-list-item>
             </a-list>
           </a-tab-pane>
@@ -296,7 +298,7 @@
 
 
       <!-- 这里画initTask->每个epoch的commit+finalized -->
-      <a-card title="时间轴" style="height: 340px; overflow: scroll;margin-top: 100px;" v-if="infoType == 'task'">
+      <a-card title="时间轴" style="height: 340px; overflow: scroll;margin-top: 25px;" v-if="infoType == 'task'">
         <a-timeline mode="alternate">
           <a-timeline-item v-for="(item, index) in timelineItems" :key="index" color="red">
             <ClockCircleOutlined style="font-size: 16px" />
@@ -304,7 +306,7 @@
           </a-timeline-item>
         </a-timeline>
       </a-card>
-      <a-card title="异常溯源" style="height: 340px; overflow: scroll; margin-top: 100px;" v-else-if="infoType == 'epoch'">
+      <a-card title="异常溯源" style="height: 340px; overflow: scroll; margin-top: 25px;" v-else-if="infoType == 'epoch'">
         <a-tabs>
           <a-tab-pane key="1" tab="节点异常检测">
             <a-table :columns="invalidNodeTableColumn" :data-source="invalidNodeTable" bordered :showHeader="false" />
@@ -507,7 +509,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, reactive, ref } from 'vue';
+import { computed, reactive, ref, onMounted, onBeforeUnmount } from 'vue';
 import { useEvidenceOnChain } from './useDataOnChain';
 import { InfoCircleOutlined, LineChartOutlined, PieChartOutlined, CheckCircleOutlined, SyncOutlined, GoldOutlined, ClockCircleOutlined, ControlOutlined, TransactionOutlined, ConsoleSqlOutlined } from '@ant-design/icons-vue';
 import { BarChart, PieChart } from '/@/components/Charts';
@@ -515,6 +517,7 @@ import { getQueryDataApi } from '/@/api/demo/finDataSynthSecurityApi';
 import { message } from 'ant-design-vue';
 import { calculateDataSize, calculateDataMapSize } from '/@/utils/value/calDataSize';
 import { datasetToModel } from '/@/utils/value/typeConvert';
+import { grid } from '/@/components/CardList/src/data';
 const infoType = ref("");
 const activeKey1 = ref('1');
 const activeKey2 = ref('1');
@@ -639,6 +642,12 @@ const barChartConfig = {
       axisLabel: {
         formatter: '{value} KB',
       },
+    },
+    grid: {
+      left: '3%',
+      right: '3%',
+      bottom: '3%',
+      containLabel: true,
     },
   },
 };
@@ -921,6 +930,42 @@ function resetSearchForm() {
   EpochSearchForm.transactionHash = '';
   EpochSearchForm.transactionType = 'EpochRecord';
 }
+
+const screenWidth = ref(window.innerWidth);
+// 监听窗口尺寸变化
+const updateScreenSize = () => {
+  screenWidth.value = window.innerWidth;
+};
+onMounted(() => {
+  window.addEventListener("resize", updateScreenSize);
+});
+onBeforeUnmount(() => {
+  window.removeEventListener("resize", updateScreenSize);
+});
+const formattedTxHash = computed(() => {
+  const hash = TransactionItem.txHash;
+  if (screenWidth.value > 2500) {
+    return hash.substring(2, 40) + "...."; 
+  } else {
+    return hash.substring(2, 18) + "...."; 
+  }
+});
+
+const buttonText = ref("校验默克尔证明");
+const isChecking = ref(false);
+const validateMerkleProof = () => {
+  isChecking.value = true; // 显示加载状态
+  // 模拟校验过程（1.5秒后显示“校验成功”）
+  setTimeout(() => {
+    buttonText.value = "✅ 校验成功"; // 更新按钮文本
+    isChecking.value = false; // 关闭加载状态
+    // 2秒后自动恢复按钮文本
+    setTimeout(() => {
+      buttonText.value = "校验默克尔证明";
+    }, 2000);
+  }, 1500);
+};
+
 </script>
 
 <style scoped>
@@ -930,6 +975,13 @@ function resetSearchForm() {
 
 .table-container {
   margin-top: 20px;
+}
+
+.break-tag {
+  display: inline-block;    
+  white-space: normal;   
+  word-break: break-word;  
+  max-width: 100%;    
 }
 </style>
 

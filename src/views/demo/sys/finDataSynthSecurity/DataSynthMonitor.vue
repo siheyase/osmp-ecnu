@@ -21,7 +21,7 @@
               </span>
             </template>
             <BarChart :chartData="NodeDetail.dataRecord" :optionConfig="nodeSynData?.chartConfig"
-              :seriesConfig="nodeSynData?.seriesConfig" height="30vh" />
+              :seriesConfig="nodeSynData?.seriesConfig" height="30vh"/>
           </a-tab-pane>
           <a-tab-pane key="2">
             <template #tab>
@@ -92,7 +92,7 @@
       <BasicTable :pagination="false" :data-source="NodeDetail.nodes" :columns="nodeColumn">
         <template #nodeInfo="{ record }">
           <div class="nodeInfo">
-            <img :src="ECNU_ICON" />
+            <img :src="ECNU_ICON" :style="{ width: imgSize, height: imgSize }"/>
             ECNU-合成节点-{{ record?.NodeID }}
           </div>
         </template>
@@ -125,7 +125,7 @@
           <!-- <div style="display: flex; justify-content: center; align-items: center; width: 100%;"> -->
           <a-progress
             :percent="(record.NbFinishedTasks + record.NbPendingTasks == 0) ? 0 : (record.NbFinishedTasks / (record.NbFinishedTasks + record.NbPendingTasks) * 100).toFixed(2)"
-            :steps="10" strokeColor="#52c41a"
+            :size="progressSize" :steps="10" strokeColor="#52c41a"
             style="display: flex; justify-content: center; align-items: center; width: 100%;" />
           <!-- </div> -->
         </template>
@@ -162,7 +162,7 @@ import { BarChart, PieChart } from '/@/components/Charts';
 import { BasicTable } from '/@/components/Table';
 import { useBasicForm } from '/@/views/demo/table/components/useBasicForm';
 import { useDataOnChain } from './useDataOnChain';
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, computed, onBeforeUnmount } from 'vue';
 import { MonitorOutlined, ShopOutlined, DatabaseOutlined, TagOutlined, CheckOutlined, ClockCircleOutlined } from '@ant-design/icons-vue';
 import { render } from '/@/utils/common/renderUtils';
 import { getSynthDataApi } from '/@/api/demo/finDataSynthSecurityApi';
@@ -337,6 +337,25 @@ onMounted(async () => {
     { name: 'ABM_SHL2', value: res2.data.datasetDistribution['SHL2 TA0_600519_202401-202402_defreg']},
   ]
 })
+
+// 根据屏幕尺寸修改组件大小
+const screenWidth = ref(window.innerWidth);
+const updateScreenSize = () => {
+  screenWidth.value = window.innerWidth;
+};
+onMounted(() => {
+  window.addEventListener("resize", updateScreenSize);
+});
+onBeforeUnmount(() => {
+  window.removeEventListener("resize", updateScreenSize);
+});
+const progressSize = computed(() => (screenWidth.value < 2500 ? "small" : "default"));
+const imgSize = computed(() => {
+  if (screenWidth.value < 1024) return "40px"; // 小屏幕
+  if (screenWidth.value < 2500) return "50px"; // 中屏幕
+  return "60px"; // 大屏幕
+});
+
 </script>
 <style scoped lang="less">
 .chart {
@@ -369,6 +388,7 @@ onMounted(async () => {
   margin-bottom: 5px;
   margin-top: 5px;
 }
+
 
 /deep/ :where(.css-dev-only-do-not-override-1oyve5v).ant-table-wrapper .ant-table.ant-table-bordered>.ant-table-container>.ant-table-header>table>thead>tr>th {
   border-inline-end: none;

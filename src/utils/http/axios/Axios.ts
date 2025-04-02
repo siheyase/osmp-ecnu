@@ -267,4 +267,9 @@ export class VAxios {
         },
       });
   }
+
+
+  getOptions():CreateAxiosOptions{
+    return this.options;
+  }
 }

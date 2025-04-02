@@ -192,6 +192,12 @@ export const useUpChainTPSChart = () => {
                   formatter: '{value}',
                 },
               },
+              grid: {
+                top: '15%',
+                bottom: '15%',
+                left: '10%',
+                right: '10%',
+              },
             };
             chartItem.seriesConfig = {
               ...chartItem.seriesConfig,
