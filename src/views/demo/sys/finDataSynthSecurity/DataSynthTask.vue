@@ -63,7 +63,7 @@
       <a-tabs v-model:activeKey="activeTab" type="card">
         <a-tab-pane key="history" tab="历史合成任务">
           <!-- 搜索栏 -->
-          <a-card>
+          <!-- <a-card>
             <a-form layout="inline">
               <a-form-item>
                 <a-input v-model:value="filters.taskId" placeholder="输入合成任务ID" allow-clear />
@@ -82,11 +82,11 @@
                 <a-button style="margin-left: 8px" @click="resetFilters">重置</a-button>
               </a-form-item>
             </a-form>
-          </a-card>
+          </a-card> -->
 
           <!-- 任务表格 -->
           <BasicTable @register="histCompTasksTable" :scroll="{ x: 100, y: 400 }">
-            <template #form-taskCompTime="{ model, field }">
+            <!-- <template #form-taskCompTime="{ model, field }">
               <div class="formSlot">
                 <a-range-picker v-model:value="model[field]" format="YYYY-MM-DD" />
                 <div class="date-select-btn">
@@ -96,11 +96,22 @@
                   <a-button type="text" @click="selectDate('lastThirtyDays')">最近30天</a-button>
                 </div>
               </div>
-            </template>
+            </template> -->
             <template #action="{ record }">
-              <a-button type="link" :disabled="record.status == false" @click="handleDownloadStream(record)">下载数据</a-button>
-              <a-button type="link" @click="viewProofClick(record)">查看凭证</a-button>
+              <a-button type="link" :disabled="record.status !==0"
+                @click="handleDownloadStream(record)">下载数据</a-button>
+              <a-button type="link" @click="evidencePage(record.taskID)">查看凭证</a-button>
               <!-- <a-button type="link" danger @click="deleteClick(record)">删除</a-button> -->
+            </template>
+            <template #txHash="{ record }">
+              <a-typography-paragraph copyable>
+                {{record.txHash}}
+              </a-typography-paragraph>
+            </template>
+            <template #taskId="{ record }">
+              <a-typography-paragraph copyable>
+                {{record.taskID}}
+              </a-typography-paragraph>
             </template>
           </BasicTable>
         </a-tab-pane>
@@ -111,13 +122,24 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted} from 'vue';
 import { BasicTable } from '/@/components/Table';
 import { useSearchTable } from '../../table/components/useSearchTable';
-import { createTaskApi, downLoadCollectApi, getCollectApi } from '/@/api/demo/finDataSynthSecurityApi';
+import { createTaskApi, downLoadCollectApi } from '/@/api/demo/finDataSynthSecurityApi';
 import { message } from 'ant-design-vue';
+import { useRouter } from 'vue-router'
 
-const { histCompTasksTable, viewProofClick, deleteClick, selectDate, reload } = useSearchTable();
+const router = useRouter()
+
+// 跳转并传参（query 方式）
+const evidencePage = (taskId) => {
+  router.push({
+    path: '/finDataSynthSecurity/evidencePreserve',
+    query: { taskId: taskId }
+  })
+}
+
+const { histCompTasksTable, viewProofClick,reload } = useSearchTable();
 
 // 任务搜索条件
 const filters = ref({
@@ -190,32 +212,39 @@ const updateDatasets = () => {
 const createTask = async () => {
   console.log('创建任务:', newTask.value);
   if (newTask.value.trustedProof == true) {
-    message.info('可信证明，该功能未实现')
-  } else {
-    const res = await createTaskApi({
-      name:newTask.value.taskName,
-      model: newTask.value.model,
-      params: {
-        "dataset": newTask.value.dataset
-      },
-      size: newTask.value.synthesisAmount,
-      isReliable: !newTask.value.trustedProof
-    });
-    console.log(res)
-    if (res.status == 'OK') {
-      message.success("创建成功");
-      newTask.value = {
-        dataType: '', // 数据类型
-        model: '', // 选择的模型
-        dataset: '', // 选择的数据集
-        synthesisAmount: 1, // 合成数量（条）
-        trustedProof: false
-      }
-    } else {
-      message.error("创建失败");
+    message.info('可信证明，该功能未实现');
+    return;
+  }
+  const res = await createTaskApi({
+    name: newTask.value.taskName,
+    model: newTask.value.model,
+    params: {
+      "dataset": newTask.value.dataset
+    },
+    size: newTask.value.synthesisAmount,
+    isReliable: !newTask.value.trustedProof
+  });
+  if (res.status == 'OK') {
+    message.success("创建成功");
+    newTask.value = {
+      dataType: '', // 数据类型
+      model: '', // 选择的模型
+      dataset: '', // 选择的数据集
+      synthesisAmount: 1, // 合成数量（条）
+      trustedProof: false
     }
+    setTimeout(() => reload(), 5000)
+  } else {
+    message.error("创建失败");
   }
 };
+
+onMounted(()=>{
+  setInterval(function(){
+
+    reload();
+}, 10000);
+})
 
 // const handleDownload = async (task) => {
 //   try {

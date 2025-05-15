@@ -123,18 +123,24 @@
           </a-col>
           <!-- 标签部分 -->
           <a-col :span="4">
-            <a-tag v-if="(infoType == 'task' && TaskItem.total <= TaskItem.process) || (infoType == 'epoch')"
+            <a-tag v-if="(infoType == 'task' && TaskItem.status===0)"
               color="success">
               <template #icon>
                 <check-circle-outlined />
               </template>
               success
             </a-tag>
-            <a-tag v-else color="processing">
+            <a-tag v-else-if="(infoType == 'task' && TaskItem.status===1)" color="processing">
               <template #icon>
                 <sync-outlined :spin="true" />
               </template>
               processing
+            </a-tag>
+            <a-tag v-else-if="(infoType == 'task' && TaskItem.status===2)" color="error">
+              <template #icon>
+                <sync-outlined :spin="true" />
+              </template>
+              error
             </a-tag>
             <!-- <a-tag color="orange">Tag3</a-tag> -->
           </a-col>
@@ -164,7 +170,7 @@
                   <a-col :span="12">
                     <strong>合成总量:</strong>
                     <a-tag color="pink" class="break-tag">{{ calculateDataSize(TaskItem.total, TaskItem.model, 'AUTO')
-                      }}</a-tag>
+                    }}</a-tag>
                   </a-col>
                   <a-col :span="12">
                     <strong>数据集:</strong>
@@ -185,7 +191,7 @@
                   <a-col :span="8">
                     <strong>已合成:</strong>
                     <a-tag color="red" class="break-tag">{{ calculateDataSize(TaskItem.process, TaskItem.model, 'AUTO')
-                      }}
+                    }}
                     </a-tag>
                   </a-col>
                 </a-row>
@@ -291,9 +297,8 @@
                 </a-row>
               </a-list-item>
               <a-list-item style="justify-content: center;">
-                <a-button type="primary"
-                :loading="isChecking" 
-                @click="validateMerkleProof">{{ buttonText }}</a-button> <!-- 这里最好可以用echarts来一个树状图，验证merkler root -->
+                <a-button type="primary" :loading="isChecking" @click="validateMerkleProof">{{ buttonText }}</a-button>
+                <!-- 这里最好可以用echarts来一个树状图，验证merkler root -->
               </a-list-item>
             </a-list>
           </a-tab-pane>
@@ -350,7 +355,7 @@
                         <strong>调度总量:</strong>
                         <a-tag color="pink">{{ calculateDataSize(schedule.total, TaskItem.model,
                           'AUTO')
-                          }}</a-tag>
+                        }}</a-tag>
                       </a-col>
                       <a-col :span="8">
                         <strong>已完成数据:</strong>
@@ -409,7 +414,8 @@
                     </a-row>
                   </a-list-item>
                 </a-list>
-                <a-table :columns="SchduleSlotTableColumn(infoType)" :data-source="schedule.tableDatas" style="margin-top: 1%;">
+                <a-table :columns="SchduleSlotTableColumn(infoType)" :data-source="schedule.tableDatas"
+                  style="margin-top: 1%;">
                   <template #headerCell="{ column }">
                     <!-- <template v-if="column.key === 'name'">
                       <span>
@@ -521,6 +527,10 @@ import { BarChart, PieChart } from '/@/components/Charts';
 import { getQueryDataApi } from '/@/api/demo/finDataSynthSecurityApi';
 import { message } from 'ant-design-vue';
 import { calculateDataSize, calculateDataMapSize } from '/@/utils/value/calDataSize';
+import { useRoute } from 'vue-router';
+
+
+const route = useRoute();
 const infoType = ref("");
 const activeKey1 = ref('1');
 const activeKey2 = ref('1');
@@ -693,13 +703,14 @@ const onQuery = async () => {
       //获取任务信息
       const taskInfo = res.data.task_info
       TaskItem.sign = taskInfo.taskID
-      TaskItem.taskName=taskInfo.taskName
+      TaskItem.taskName = taskInfo.taskName
       TaskItem.total = taskInfo.total
       TaskItem.process = taskInfo.process
       TaskItem.nbSchedule = taskInfo.schedule
       TaskItem.nbFinalized = taskInfo.commit
       TaskItem.dataset = taskInfo.dataset
       TaskItem.model = taskInfo.model
+      TaskItem.status=taskInfo.status
       //获取交易信息
       const txInfo = res.data.tx_info
       TransactionItem.txHash = txInfo.txHash, // 交易哈希
@@ -887,13 +898,14 @@ let TransactionItem = reactive({
 // 左下角显示的task
 let TaskItem = reactive({
   sign: ``, // 任务标识
-  taskName:`default`,
+  taskName: `default`,
   total: 0, // 总量
   dataset: 'dataset1', // 数据集
   model: 'default',
   nbSchedule: 0, // 调度数量，对应task slot
   nbFinalized: 0, // finalized的slot数量
   process: 0, // 已经完成的合成数
+  status: 2
 })
 // 左下角显示的epoch
 let EpochItem = reactive({
@@ -940,6 +952,12 @@ const updateScreenSize = () => {
 };
 onMounted(() => {
   window.addEventListener("resize", updateScreenSize);
+  //检查params
+  if(route.query.taskId!=null){
+    TaskSearchForm.taskId=route.query.taskId
+    TaskSearchForm.queryType='taskId'
+    onQuery()
+  }
 });
 onBeforeUnmount(() => {
   window.removeEventListener("resize", updateScreenSize);
@@ -947,9 +965,9 @@ onBeforeUnmount(() => {
 const formattedTxHash = computed(() => {
   const hash = TransactionItem.txHash;
   if (screenWidth.value > 2500) {
-    return hash.substring(2, 40) + "...."; 
+    return hash.substring(2, 40) + "....";
   } else {
-    return hash.substring(2, 18) + "...."; 
+    return hash.substring(2, 18) + "....";
   }
 });
 
@@ -980,10 +998,10 @@ const validateMerkleProof = () => {
 }
 
 .break-tag {
-  display: inline-block;    
-  white-space: normal;   
-  word-break: break-word;  
-  max-width: 100%;    
+  display: inline-block;
+  white-space: normal;
+  word-break: break-word;
+  max-width: 100%;
 }
 </style>
 

@@ -173,6 +173,9 @@ export function getHistCompTasksColumns(): BasicColumn[] {
     {
       title: '交易哈希',
       dataIndex: 'txHash',
+      slots: {
+        customRender: 'txHash',
+      },
       width: 80,
     },
     {
@@ -203,18 +206,22 @@ export function getHistCompTasksColumns(): BasicColumn[] {
       // 自定义样式
       customCell: (record) => {
         let fontColor;
-        if (record.status === true) {
-          fontColor = '#06A94E';
-        } else {
+        if (record.status === 2) {
           fontColor = '#F82906';
+        } else if(record.status===1){
+          fontColor='#1E90FF'
+        }else{
+          fontColor = '#06A94E';
         }
         return { style: { color: fontColor } };
       },
       customRender: ({ record }) => {
-        if (record.status === true) {
-          return '已完成'
-        } else {
-          return '未完成'
+        if (record.status === 2) {
+          return '失败'
+        } else if(record.status===1){
+          return '处理中'
+        }else{
+          return "已完成"
         }
       }
     },

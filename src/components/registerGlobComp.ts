@@ -8,6 +8,7 @@ import { Button, JUploadButton } from './Button';
 import {
   // Need
   Button as AntButton,
+  Typography,
   Select,
   Alert,
   Checkbox,
@@ -76,7 +77,7 @@ export function registerGlobComp(app: App) {
   //   })
   // );
   // update-end--author:liaozhiyang---date:20240308---for：【QQYUN-8241】Tinymce异步加载
-  app.use(Select)
+  app.use(Select).use(Typography)
     .use(Alert)
     .use(Button)
     .use(Breadcrumb)
