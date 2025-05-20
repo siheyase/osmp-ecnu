@@ -123,20 +123,19 @@
           </a-col>
           <!-- 标签部分 -->
           <a-col :span="4">
-            <a-tag v-if="(infoType == 'task' && TaskItem.status===0)"
-              color="success">
+            <a-tag v-if="(infoType == 'task' && TaskItem.status === 0)" color="success">
               <template #icon>
                 <check-circle-outlined />
               </template>
               success
             </a-tag>
-            <a-tag v-else-if="(infoType == 'task' && TaskItem.status===1)" color="processing">
+            <a-tag v-else-if="(infoType == 'task' && TaskItem.status === 1)" color="processing">
               <template #icon>
                 <sync-outlined :spin="true" />
               </template>
               processing
             </a-tag>
-            <a-tag v-else-if="(infoType == 'task' && TaskItem.status===2)" color="error">
+            <a-tag v-else-if="(infoType == 'task' && TaskItem.status === 2)" color="error">
               <template #icon>
                 <sync-outlined :spin="true" />
               </template>
@@ -710,7 +709,7 @@ const onQuery = async () => {
       TaskItem.nbFinalized = taskInfo.commit
       TaskItem.dataset = taskInfo.dataset
       TaskItem.model = taskInfo.model
-      TaskItem.status=taskInfo.status
+      TaskItem.status = taskInfo.status
       //获取交易信息
       const txInfo = res.data.tx_info
       TransactionItem.txHash = txInfo.txHash, // 交易哈希
@@ -810,14 +809,20 @@ const onQuery = async () => {
         { name: '纪元状态', value: '已完成' },
       ]
       let invalidSlot = []
+      let invalidNode = []
       for (let i = 0; i < res.data.invalidSlot.length; i++) {
         // console.log(res.data.invalidSlot[i]);
         invalidSlot.push({
           "slot": res.data.invalidSlot[i].slotHash,
-          "errMessage": res.data.invalidSlot[i].err
+          "errMessage": res.data.invalidSlot[i].Err
+        })
+        invalidNode.push({
+          "nodeID": `ECNU-合成节点-${res.data.invalidSlot[i].nodeID}`,
+          "errMessage": res.data.invalidSlot[i].Err
         })
       }
       invalidSlotTable.value = invalidSlot
+      invalidNodeTable.value = invalidNode
       let scheduleArray = []
       let finalizedArray = []
       for (let i = 0; i < res.data.finalized.length; i++) {
@@ -953,9 +958,9 @@ const updateScreenSize = () => {
 onMounted(() => {
   window.addEventListener("resize", updateScreenSize);
   //检查params
-  if(route.query.taskId!=null){
-    TaskSearchForm.taskId=route.query.taskId
-    TaskSearchForm.queryType='taskId'
+  if (route.query.taskId != null) {
+    TaskSearchForm.taskId = route.query.taskId
+    TaskSearchForm.queryType = 'taskId'
     onQuery()
   }
 });

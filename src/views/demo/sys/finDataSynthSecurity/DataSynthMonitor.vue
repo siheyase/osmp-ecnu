@@ -166,7 +166,7 @@ import { onMounted, ref, computed, onBeforeUnmount } from 'vue';
 import { MonitorOutlined, ShopOutlined, DatabaseOutlined, TagOutlined, CheckOutlined, ClockCircleOutlined } from '@ant-design/icons-vue';
 import { render } from '/@/utils/common/renderUtils';
 import { getSynthDataApi } from '/@/api/demo/finDataSynthSecurityApi';
-import { calculateDataMapSize,calculateDataSize } from '/@/utils/value/calDataSize';
+import { calculateDataMapSize } from '/@/utils/value/calDataSize';
 
 const { nodeSynData, nodeSynTask, nodeStorage, nodeStatusData, taskData, datasetData } = useDataOnChain();
 const { statusClick,dataClick,} = useBasicForm();

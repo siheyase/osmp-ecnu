@@ -37,7 +37,7 @@
         <!-- 第二行：合成数量（占一行）+ 可信证明（右对齐） -->
         <a-row :gutter="16" align="middle">
           <a-col :span="6">
-            <a-form-item :label="newTask.model == 'ABM' ? '合成数量（单位：8000条）' : '合成数量（单位：条）'">
+            <a-form-item label="合成数量（单位：条）">
               <a-input-number v-model:value="newTask.synthesisAmount" :min="1" style="width: 100%" />
             </a-form-item>
           </a-col>
@@ -98,19 +98,20 @@
               </div>
             </template> -->
             <template #action="{ record }">
-              <a-button type="link" :disabled="record.status !==0"
+              <a-button type="link" @click="showSynthModal(record)">合成详情</a-button>
+              <a-button type="link" :disabled="record.status !== 0"
                 @click="handleDownloadStream(record)">下载数据</a-button>
               <a-button type="link" @click="evidencePage(record.taskID)">查看凭证</a-button>
               <!-- <a-button type="link" danger @click="deleteClick(record)">删除</a-button> -->
             </template>
             <template #txHash="{ record }">
               <a-typography-paragraph copyable>
-                {{record.txHash}}
+                {{ record.txHash }}
               </a-typography-paragraph>
             </template>
             <template #taskId="{ record }">
               <a-typography-paragraph copyable>
-                {{record.taskID}}
+                {{ record.taskID }}
               </a-typography-paragraph>
             </template>
           </BasicTable>
@@ -118,16 +119,57 @@
       </a-tabs>
     </div>
 
+    <a-modal v-model:open="nodeModalVisable" title="并行合成详情" :style="{ width: '800px' }" centered
+      @ok="nodeModalVisable = false">
+      <template #footer>
+        <a-button key="back" @click="nodeModalVisable = false">返回</a-button>
+      </template>
+      <!-- <a-list bordered size="large">
+        <a-list-item>
+          <span><strong>区块哈希:</strong> <a-tag color="pink">{{ blockItem.blockHash }}</a-tag></span>
+        </a-list-item>
+        <a-list-item>
+          <span><strong>父区块哈希:</strong> <a-tag color="orange">{{ blockItem.parentHash }}</a-tag></span>
+        </a-list-item>
+        <a-list-item>
+          <span><strong>区块高度:</strong> <a-tag color="green">{{ blockItem.blockHeight }}</a-tag></span>
+          <span><strong>交易数量:</strong> <a-tag color="blue">{{ blockItem.nbTransactions }}</a-tag></span>
+        </a-list-item>
+        <a-list-item>
+          <span><strong>Merkle Root:</strong> <a-tag color="cyan">{{ blockItem.merkleRoot }}</a-tag></span>
+        </a-list-item>
+        <a-list-item>
+          <div>
+            <span><strong>交易哈希:</strong></span>
+            <BasicTable v-if="blockItem.txHashs && blockItem.txHashs.length > 0" :data-source="blockItem.txHashs"
+              :columns="blockInfoColumn" bordered size="small" row-key="index" :pagination="false" />
+            <span v-else>暂无交易</span>
+          </div>
+        </a-list-item>
+      </a-list> -->
+      <BasicTable :data-source="dataItem.nodes" :columns="nodeInfoColumn" bordered size="small" row-key="index"
+        :pagination="false">
+        <template #nodeId="{ record }">
+          <div>
+            <img :src="ECNU_ICON" :style="{ width: '50px', height: '50px' }" />
+            {{ record.nodeId }}
+          </div>
+        </template>
+      </BasicTable>
+    </a-modal>
+
   </div>
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, onMounted} from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { BasicTable } from '/@/components/Table';
 import { useSearchTable } from '../../table/components/useSearchTable';
-import { createTaskApi, downLoadCollectApi } from '/@/api/demo/finDataSynthSecurityApi';
+import { createTaskApi, downLoadCollectApi, getSynthDataApi } from '/@/api/demo/finDataSynthSecurityApi';
 import { message } from 'ant-design-vue';
 import { useRouter } from 'vue-router'
+import { calculateDataSize } from '/@/utils/value/calDataSize';
+import ECNU_ICON from '/@/assets/ecnu.png';
 
 const router = useRouter()
 
@@ -139,7 +181,7 @@ const evidencePage = (taskId) => {
   })
 }
 
-const { histCompTasksTable, viewProofClick,reload } = useSearchTable();
+const { histCompTasksTable, viewProofClick, reload } = useSearchTable();
 
 // 任务搜索条件
 const filters = ref({
@@ -150,6 +192,9 @@ const filters = ref({
 
 // 选中的 tab
 const activeTab = ref('history');
+
+// 合成详情
+const nodeModalVisable = ref<boolean>(false);
 
 // 新建任务表单数据
 const newTask = ref({
@@ -239,12 +284,41 @@ const createTask = async () => {
   }
 };
 
-onMounted(()=>{
-  setInterval(function(){
+onMounted(() => {
+  setInterval(function () {
 
     reload();
-}, 10000);
+  }, 10000);
 })
+
+let dataItem = ref({
+  model: "default",
+  nodes: []
+})
+
+const nodeInfoColumn = [
+  {
+    title: "节点ID", dataIndex: 'nodeId', key: 'nodeId', slots: {
+      customRender: 'nodeId',
+    },
+  },
+  { title: "合成数据量", dataIndex: 'data', key: 'data' },
+];
+
+//查询合成详情
+const showSynthModal = async (task) => {
+  // 1. 调用接口获取数据（假设已通过其他方式获取到接口返回的data）
+  const res = await getSynthDataApi({
+    query: "TaskOnNodesQuery",
+    taskID: task.taskID,
+  });
+  dataItem.value = {
+    model: task.model,
+    nodes: Object.entries(res.data.nodeInfo).map(([nodeId, data]) => ({ nodeId: `ECNU-合成节点-${nodeId}`, data: calculateDataSize(data, task.model, 'AUTO') }))
+  };
+  nodeModalVisable.value = true;
+}
+
 
 // const handleDownload = async (task) => {
 //   try {
