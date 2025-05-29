@@ -169,7 +169,7 @@
                   <a-col :span="12">
                     <strong>合成总量:</strong>
                     <a-tag color="pink" class="break-tag">{{ calculateDataSize(TaskItem.total, TaskItem.model, 'AUTO')
-                    }}</a-tag>
+                      }}</a-tag>
                   </a-col>
                   <a-col :span="12">
                     <strong>数据集:</strong>
@@ -190,7 +190,7 @@
                   <a-col :span="8">
                     <strong>已合成:</strong>
                     <a-tag color="red" class="break-tag">{{ calculateDataSize(TaskItem.process, TaskItem.model, 'AUTO')
-                    }}
+                      }}
                     </a-tag>
                   </a-col>
                 </a-row>
@@ -319,10 +319,50 @@
       <a-card title="异常溯源" style="height: 340px; overflow: scroll; margin-top: 25px;" v-else-if="infoType == 'epoch'">
         <a-tabs>
           <a-tab-pane key="1" tab="节点异常检测">
-            <a-table :columns="invalidNodeTableColumn" :data-source="invalidNodeTable" bordered :showHeader="false" />
+            <a-list bordered :data-source="invalidNodeTable">
+              <template #renderItem="{ item }">
+                <a-list-item>
+                  <a-list-item-meta>
+                    <template #title>
+                      <a-tag color="error">
+                        {{ item.errMessage.split("||")[0] }}
+                      </a-tag>
+                      <a-tag color="error">
+                        {{ item.errMessage.split("||")[1].split("Error ")[1].split(": ")[0] }}
+                      </a-tag>
+                    </template>
+                  </a-list-item-meta>
+                  <a-tag>
+                    {{ item.nodeID }}
+                  </a-tag>
+                  {{ item.errMessage.split(": ")[1] }}
+                </a-list-item>
+              </template>
+            </a-list>
+            <!-- <a-table :columns="invalidNodeTableColumn" :data-source="invalidNodeTable" bordered :showHeader="false" /> -->
           </a-tab-pane>
           <a-tab-pane key="2" tab="提交单元异常">
-            <a-table :columns="invalidSlotTableColumn" :data-source="invalidSlotTable" bordered :showHeader="false" />
+            <a-list bordered :data-source="invalidSlotTable">
+              <template #renderItem="{ item }">
+                <a-list-item>
+                  <a-list-item-meta>
+                    <template #title>
+                      <a-tag color="error">
+                        {{ item.errMessage.split("||")[0] }}
+                      </a-tag>
+                      <a-tag color="error">
+                        {{ item.errMessage.split("||")[1].split("Error ")[1].split(": ")[0] }}
+                      </a-tag>
+                    </template>
+                  </a-list-item-meta>
+                  <a-tag>
+                    {{ item.slot }}
+                  </a-tag>
+                  {{ item.errMessage.split(": ")[1] }}
+                </a-list-item>
+              </template>
+            </a-list>
+            <!-- <a-table :columns="invalidSlotTableColumn" :data-source="invalidSlotTable" bordered :showHeader="false" /> -->
           </a-tab-pane>
 
 
@@ -354,7 +394,7 @@
                         <strong>调度总量:</strong>
                         <a-tag color="pink">{{ calculateDataSize(schedule.total, TaskItem.model,
                           'AUTO')
-                        }}</a-tag>
+                          }}</a-tag>
                       </a-col>
                       <a-col :span="8">
                         <strong>已完成数据:</strong>
@@ -454,22 +494,25 @@
                   </template>
 
                 </a-table>
-                <a-modal v-model:open="FinalizedSlotModalVisable" :title="slotItem.slotHash + '完整性检验'"
-                  :style="{ width: '800px' }" :maskStyle="{ backgroundColor: 'rgba(0, 0, 0, 0.1)', boxShadow: 'none' }"
+                <a-modal v-model:open="FinalizedSlotModalVisable" :title="slotItem.name + ' 完整性检验'"
+                  :style="{ width: '1000px' }" :maskStyle="{ backgroundColor: 'rgba(0, 0, 0, 0.1)', boxShadow: 'none' }"
                   centered @ok="FinalizedSlotModalVisable = false">
                   <template #footer>
                     <a-button key="back" @click="FinalizedSlotModalVisable = false">返回</a-button>
                   </template>
                   <a-list bordered size="large">
                     <a-list-item>
-                      <span><strong>单元标识:</strong> <a-tag color="pink">{{ slotItem.slotHash }}</a-tag></span>
+                      <span><strong>单元哈希:</strong> <a-tag color="pink">{{ slotItem.slotHash }}</a-tag></span>
                     </a-list-item>
                     <a-list-item>
-                      <span><strong>单元承诺:</strong> <a-tag color="orange">{{ slotItem.commitment }}</a-tag></span>
-                      <span><strong>承诺检验:</strong> <a-tag color="green">{{ slotItem.commitment }}</a-tag></span>
+                      <span><strong>任务默克尔根:</strong> <a-tag color="orange">{{ slotItem.merkle_root }}</a-tag></span>
                     </a-list-item>
-
+                    <a-list-item>
+                      <span><strong>承诺检验默克尔根:</strong> <a-tag color="green">{{ slotItem.merkle_root }}</a-tag></span>
+                      <span><strong>校验结果:</strong> <a-tag color="green">{{ slotItem.veritfy }}</a-tag></span>
+                    </a-list-item>
                   </a-list>
+                  <div id="proof" style="width: 1000px; height: 600px;"></div>
                 </a-modal>
               </a-collapse-panel>
             </a-collapse>
@@ -492,7 +535,6 @@
                 v-if="infoType == 'task'" />
               <BarChart :chartData="BarData" :optionConfig="barChartConfig.chartConfig" height="30vh"
                 v-else-if="infoType == 'epoch'" />
-
             </a-tab-pane>
           </a-tabs>
         </div>
@@ -520,13 +562,14 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, reactive, ref, onMounted, onBeforeUnmount } from 'vue';
+import { computed, reactive, ref, onMounted, onBeforeUnmount, nextTick } from 'vue';
 import { InfoCircleOutlined, LineChartOutlined, PieChartOutlined, CheckCircleOutlined, SyncOutlined, GoldOutlined, ClockCircleOutlined, ControlOutlined, TransactionOutlined, ConsoleSqlOutlined } from '@ant-design/icons-vue';
 import { BarChart, PieChart } from '/@/components/Charts';
 import { getQueryDataApi } from '/@/api/demo/finDataSynthSecurityApi';
 import { message } from 'ant-design-vue';
 import { calculateDataSize, calculateDataMapSize } from '/@/utils/value/calDataSize';
 import { useRoute } from 'vue-router';
+import * as echarts from 'echarts'
 
 
 const route = useRoute();
@@ -538,13 +581,159 @@ const activeKey4 = ref('1');
 const scheduleActiveKey = ref(['0']);
 const timelineItems = ref([])
 const FinalizedSlotModalVisable = ref<boolean>(false);
-const getSlotInfo = (slot, is_err) => {
-  console.log(111, slot)
-  slotItem.commitment = slot.commitment
+
+
+function buildTree(proof, merkleRoot, target) {
+  const show = 10
+  let rootNode = {
+    name: `${merkleRoot.slice(0, show)}...`,
+    value: merkleRoot,
+    children: []
+  };
+  let currentNode = rootNode
+  for (let i = 0; i < proof.length; i++) {
+    const { current, sibling } = proof[i];
+
+    let nextNode = { name: `${current.hash.slice(0, show)}...`, value: current.hash, children: [] };
+
+    if (current.hash === target) {
+      nextNode.label = {
+        backgroundColor: '#81c5f7',
+        color: '#fff'
+      }
+    }
+
+    let nodes = [
+      nextNode,
+      { name: `${sibling.hash.slice(0, show)}...`, value: sibling.hash }
+    ];
+
+    // 排序：index 小的在前，表示左侧
+    nodes.sort((a, b) => {
+      return (current.index < sibling.index) ? -1 : 1;
+    });
+
+    currentNode.children = nodes
+
+    currentNode = nextNode;
+  }
+
+  return rootNode;
+}
+
+
+const getSlotInfo = async (slot, is_err) => {
+
+  const res = await getQueryDataApi({
+    query: 'SlotIntegrityVerification',
+    slotHash: slot.slotHash
+  })
+
+  // 这里添加merkle tree
+  slotItem.merkle_root = res.data.merkleRoot
   slotItem.err = slot.err
-  slotItem.slotHash = slot.slotHash
+  slotItem.slotHash = res.data.leaf
+  slotItem.veritfy = res.data.verified
+  slotItem.name = slot.slotHash
+  //处理proof数据
+  slotItem.tree = buildTree(res.data.proof, res.data.merkleRoot, res.data.leaf)
+  console.log(slotItem.tree)
+
+  message.success("完整性校验成功")
   if (!is_err) {
     FinalizedSlotModalVisable.value = true
+    nextTick(() => {
+      const dom = document.getElementById('proof');
+      if (echarts.getInstanceByDom(dom)) {
+        echarts.dispose(dom); // 销毁已有实例
+      }
+      const chart = echarts.init(dom);
+      chart.setOption({
+        tooltip: {
+          trigger: 'item',
+          triggerOn: 'mousemove',
+          formatter: function (params) {
+            // 示例：保证长文本换行显示
+            return params.value;
+          }
+        },
+        series: [{
+          type: 'tree',
+          id: 0,
+          name: 'tree1',
+          data: [slotItem.tree],
+          avoidLabelOverlap: true,//防止标签重叠
+          roam: true, //移动+缩放  'scale' 或 'zoom'：只能够缩放。 'move' 或 'pan'：只能够平移。
+          scaleLimit: { //缩放比例
+            min: 0.7,//最小的缩放值
+            max: 6,//最大的缩放值  
+          },
+          layout: 'orthogonal',//树图布局，orthogonal水平垂直方向，radial径向布局 是指以根节点为圆心，每一层节点为环，一层层向外
+          orient: 'TB', //树形方向  TB为上下结构  LR为左右结构
+          // nodePadding: 100,//结点间距 （发现没用）
+          //layerPadding: 30,//连接线长度 （发现没用）
+          symbol: 'circle', //图形形状  rect方形  roundRect圆角 emptyCircle圆形 circle实心圆
+          symbolSize: 14, //状态大小
+          edgeShape: 'polyline', //线条类型  curve曲线
+          initialTreeDepth: -1, //初始展开的层级
+          expandAndCollapse: true,//子树折叠和展开的交互，默认打开
+          lineStyle: {//结构线条样式
+            width: 0.5,
+            color: '#1E9FFF',
+            type: 'broken'
+          },
+          label: {//节点文本样式
+            normal: {
+              backgroundColor: '#81c5f7',
+              position: 'bottom',
+              verticalAlign: 'middle', //文字垂直对齐方式
+              align: 'center',
+              borderColor: '#1E9FFF',
+              color: '#fff',
+              borderWidth: 1,
+              borderRadius: 5,
+              padding: 5,
+              height: 20,
+              width: 100,
+              offset: [0, 30],//节点文字与圆圈之间的距离
+              fontSize: 10,
+              // 节点文本阴影
+              shadowBlur: 10,
+              shadowColor: 'rgba(0,0,0,0.25)',
+              shadowOffsetX: 0,
+              shadowOffsetY: 2,
+            }
+          },
+          leaves: { //叶子节点文本样式
+            label: {
+              //backgroundColor: '#81c5f7',
+              backgroundColor: '#fff',
+              color: '#333',
+              position: 'bottom',
+              rotate: 0,//标签旋转。
+              verticalAlign: 'middle',
+              align: 'center',
+              //文本框内文字超过6个字折行
+              /* formatter: function(val) {
+               let strs = val.name.split(''); //字符串数组
+               let str = ''
+               for(let i = 0, s; s = strs[i++];) { //遍历字符串数组
+                 str += s;
+                 if(!(i % 6)) str += '\n'; //按需要求余，目前是一个字换一行
+               }
+               return str
+               }, */
+              //或者 
+              overflow: 'break',//break为文字折行，  truncate为文字超出部分省略号显示
+              lineOverflow: 'truncate',//文字超出高度后 直接截取
+            }
+          },
+          animationDuration: 550,
+          animationDurationUpdate: 750
+        }]
+      })
+    })
+
   } else {
 
   }
@@ -588,9 +777,12 @@ const SchduleSlotTableColumn = (infoType) => {
   ];
 };
 let slotItem = reactive({
+  name: "default",
   slotHash: "",
-  commitment: "",
+  merkle_root: "",
   err: "",
+  tree: [],
+  veritfy: false
 })
 
 // 定义类型
@@ -924,14 +1116,14 @@ let EpochItem = reactive({
   nbInvalidNode: 0, // 这里添加异常节点数量，目前后端还没有，先固定为0
 })
 
-const invalidSlotTableColumn = [
-  { title: '提交单元', dataIndex: 'slot', key: 'slot' },
-  { title: '异常检测', dataIndex: 'errMessage', key: 'errMessage' },
-];
-const invalidNodeTableColumn = [
-  { title: '节点名称', dataIndex: 'nodeID', key: 'nodeID' },
-  { title: '异常检测', dataIndex: 'errMessage', key: 'errMessage' },
-];
+// const invalidSlotTableColumn = [
+//   { title: '提交单元', dataIndex: 'slot', key: 'slot' },
+//   { title: '异常检测', dataIndex: 'errMessage', key: 'errMessage' },
+// ];
+// const invalidNodeTableColumn = [
+//   { title: '节点名称', dataIndex: 'nodeID', key: 'nodeID' },
+//   { title: '异常检测', dataIndex: 'errMessage', key: 'errMessage' },
+// ];
 let invalidSlotTable = ref([])
 let invalidNodeTable = ref([])
 // 左下角显示的epoch/task表格
@@ -955,6 +1147,56 @@ const screenWidth = ref(window.innerWidth);
 const updateScreenSize = () => {
   screenWidth.value = window.innerWidth;
 };
+
+
+// 生成完整 Merkle Tree 结构
+function generateHash() {
+  const hash = Array.from({ length: 64 }, () =>
+    Math.floor(Math.random() * 16).toString(16)
+  ).join('');
+  return `0x${hash}`;
+}
+
+function buildMerkleTreeWithProof(targetLeafName = 'L2') {
+  const leafNodes = [
+    { name: `${generateHash()}`, value: generateHash(), isLeaf: true },
+    { name: 'L2', value: generateHash(), isLeaf: true, proof: true },
+    { name: 'R1', value: generateHash(), isLeaf: true },
+    { name: 'R2', value: generateHash(), isLeaf: true }
+  ];
+
+  const leftParent = {
+    name: 'Left',
+    value: generateHash(),
+    children: [leafNodes[0], leafNodes[1]],
+    proof: targetLeafName === 'L2'
+  };
+
+  const rightParent = {
+    name: 'Right',
+    value: generateHash(),
+    children: [leafNodes[2], leafNodes[3]]
+  };
+
+  const root = {
+    name: 'Root',
+    value: generateHash(),
+    children: [
+      { ...leftParent },
+      rightParent
+    ],
+    proof: true
+  };
+
+  if (targetLeafName === 'L2') {
+    root.children[0].proof = true;
+  }
+
+  return root;
+}
+
+const merkleTreeData = buildMerkleTreeWithProof('L2');
+
 onMounted(() => {
   window.addEventListener("resize", updateScreenSize);
   //检查params
@@ -963,7 +1205,7 @@ onMounted(() => {
     TaskSearchForm.queryType = 'taskId'
     onQuery()
   }
-});
+})
 onBeforeUnmount(() => {
   window.removeEventListener("resize", updateScreenSize);
 });
