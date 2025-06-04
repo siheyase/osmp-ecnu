@@ -24,8 +24,8 @@
             </a-form-item>
           </a-col>
           <a-col :span="6">
-            <a-form-item label="选择数据集">
-              <a-select v-model:value="newTask.dataset" placeholder="请选择数据集" :disabled="!newTask.model">
+            <a-form-item label="选择参数集">
+              <a-select v-model:value="newTask.dataset" placeholder="请选择参数集" :disabled="!newTask.model">
                 <a-select-option v-for="dataset in availableDatasets" :key="dataset.value" :value="dataset.value">
                   {{ dataset.label }}
                 </a-select-option>

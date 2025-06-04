@@ -38,7 +38,7 @@ import {
   PageHeader,
   // Result,
   Empty,
-  // Avatar,
+  Avatar,
   // Menu,
   // Breadcrumb,
   Form,
@@ -48,7 +48,7 @@ import {
   Spin,
   Space,
   Layout,
-  // Collapse,
+  Collapse,
   // Slider,
   InputNumber,
   // Carousel,
@@ -107,7 +107,7 @@ export function registerGlobComp(app: App) {
     .use(PageHeader)
     // .use(Result)
     .use(Empty)
-    // .use(Avatar)
+    .use(Avatar)
     // .use(Menu)
     .use(Tabs)
     .use(Form)
@@ -117,7 +117,7 @@ export function registerGlobComp(app: App) {
     .use(Spin)
     .use(Space)
     .use(Layout)
-    // .use(Collapse)
+    .use(Collapse)
     // .use(Slider)
     .use(InputNumber)
     // .use(Carousel)

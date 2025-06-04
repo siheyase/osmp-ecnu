@@ -5,62 +5,63 @@
       <div v-for="board in chartsListData" :key="board?.id">
         <div class="chart">
           <div class="realtime-monitor" style="width: 49%;">
-              <h3 class="title">区块链数据实时监控</h3>
-              <a-row :gutter="[{ lg: 16, xxl: 24 },{ lg: 16, xxl: 24 }]" >
-                <!-- 链上区块统计 -->
-                <a-col :span="8" :xxl="12">
-                  <a-card :style="cardStyles.red" size="small">
-                    <p class="title" :style="{ fontSize: titleSize }">链上区块统计</p>
-                    <h2 class="value" :style="{ fontSize: valueSize }">{{ blockChainInfo.NbBlock }}</h2>
-                    <p class="subtitle">当前区块总数</p>
-                  </a-card>
-                </a-col>
+            <h3 class="title">区块链数据实时监控</h3>
+            <a-row :gutter="[{ lg: 16, xxl: 24 }, { lg: 16, xxl: 24 }]">
+              <!-- 链上区块统计 -->
+              <a-col :span="8" :xxl="12">
+                <a-card :style="cardStyles.red" size="small">
+                  <p class="title" :style="{ fontSize: titleSize }">链上区块统计</p>
+                  <h2 class="value" :style="{ fontSize: valueSize }">{{ blockChainInfo.NbBlock }}</h2>
+                  <p class="subtitle">当前区块总数</p>
+                </a-card>
+              </a-col>
 
-                <!-- 交易存证信息 -->
-                <a-col :span="8" :xxl="12">
-                  <a-card :style="cardStyles.blue" size="small">
-                    <p class="title" :style="{ fontSize: titleSize }">交易存证信息</p>
-                    <h2 class="value" :style="{ fontSize: valueSize }">{{ blockChainInfo.NbTransaction }}</h2>
-                    <p class="subtitle">已上链存证数量</p>
-                  </a-card>
-                </a-col>
+              <!-- 交易存证信息 -->
+              <a-col :span="8" :xxl="12">
+                <a-card :style="cardStyles.blue" size="small">
+                  <p class="title" :style="{ fontSize: titleSize }">交易存证信息</p>
+                  <h2 class="value" :style="{ fontSize: valueSize }">{{ blockChainInfo.NbTransaction }}</h2>
+                  <p class="subtitle">已上链存证数量</p>
+                </a-card>
+              </a-col>
 
-                <!-- 合成数据统计 -->
-                <a-col :span="8" :xxl="12">
-                  <a-card :style="cardStyles.green" size="small">
-                    <p class="title" :style="{ fontSize: titleSize }">合成数据统计</p>
-                    <h2 class="value" :style="{ fontSize: valueSize }">{{ calculateDataMapSize(blockChainInfo.SynthData, 'AUTO') }}</h2>
-                    <p class="subtitle">已合成数据量</p>
-                  </a-card>
-                </a-col>
-              
-                <!-- 稳定运行时间 -->
-                <a-col :span="8" :xxl="12">
-                  <a-card :style="cardStyles.yellow" size="small">
-                    <p class="title" :style="{ fontSize: titleSize }">稳定运行时间</p>
-                    <h2 class="value" :style="{ fontSize: valueSize }">365天</h2>
-                    <p class="subtitle">已稳定运行时间</p>
-                  </a-card>
-                </a-col>
+              <!-- 合成数据统计 -->
+              <a-col :span="8" :xxl="12">
+                <a-card :style="cardStyles.green" size="small">
+                  <p class="title" :style="{ fontSize: titleSize }">合成数据统计</p>
+                  <h2 class="value" :style="{ fontSize: valueSize }">{{ calculateDataMapSize(blockChainInfo.SynthData,
+                    'AUTO') }}</h2>
+                  <p class="subtitle">已合成数据量</p>
+                </a-card>
+              </a-col>
 
-                <!-- FISCO BCOS -->
-                <a-col :span="8" :xxl="12">
-                  <a-card :style="cardStyles.purple" size="small">
-                    <p class="title" :style="{ fontSize: titleSize }">历史纪元数</p>
-                    <h2 class="value" :style="{ fontSize: valueSize }">{{ blockChainInfo.NbEpoch }}</h2>
-                    <p class="subtitle">Epoch</p>
-                  </a-card>
-                </a-col>
+              <!-- 稳定运行时间 -->
+              <a-col :span="8" :xxl="12">
+                <a-card :style="cardStyles.yellow" size="small">
+                  <p class="title" :style="{ fontSize: titleSize }">稳定运行时间</p>
+                  <h2 class="value" :style="{ fontSize: valueSize }">365天</h2>
+                  <p class="subtitle">已稳定运行时间</p>
+                </a-card>
+              </a-col>
 
-                <!-- 总TPS -->
-                <a-col :span="8" :xxl="12">
-                  <a-card :style="cardStyles.lightBlue" size="small">
-                    <p class="title" :style="{ fontSize: titleSize }">提交单元数</p>
-                    <h2 class="value" :style="{ fontSize: valueSize }">{{ blockChainInfo.NbFinalized }}</h2>
-                    <p class="subtitle">Slots</p>
-                  </a-card>
-                </a-col>
-              </a-row>
+              <!-- FISCO BCOS -->
+              <a-col :span="8" :xxl="12">
+                <a-card :style="cardStyles.purple" size="small">
+                  <p class="title" :style="{ fontSize: titleSize }">历史纪元数</p>
+                  <h2 class="value" :style="{ fontSize: valueSize }">{{ blockChainInfo.NbEpoch }}</h2>
+                  <p class="subtitle">Epoch</p>
+                </a-card>
+              </a-col>
+
+              <!-- 总TPS -->
+              <a-col :span="8" :xxl="12">
+                <a-card :style="cardStyles.lightBlue" size="small">
+                  <p class="title" :style="{ fontSize: titleSize }">提交单元数</p>
+                  <h2 class="value" :style="{ fontSize: valueSize }">{{ blockChainInfo.NbFinalized }}</h2>
+                  <p class="subtitle">Slots</p>
+                </a-card>
+              </a-col>
+            </a-row>
           </div>
           <div class="realtime-monitor" style="width: 49%;">
             <h3 class="chart-title">上链交易数</h3>
@@ -74,7 +75,7 @@
           <!-- 区块哈希查询 -->
           <a-row :gutter="8" align="middle" style="margin-top: 20px;">
             <a-col :span="8" style="margin-left: 1%;">
-              <a-form-item label="区块哈希" >
+              <a-form-item label="区块哈希">
                 <a-input v-model:value="searchForm.blockHash" placeholder="请输入区块哈希" />
               </a-form-item>
             </a-col>
@@ -112,8 +113,8 @@
                   <div>
                     <span><strong>交易哈希:</strong></span>
                     <BasicTable v-if="blockItem.txHashs && blockItem.txHashs.length > 0"
-                      :data-source="blockItem.txHashs" :columns="blockInfoColumn" bordered size="small"
-                      row-key="index" :pagination="false" />
+                      :data-source="blockItem.txHashs" :columns="blockInfoColumn" bordered size="small" row-key="index"
+                      :pagination="false" />
                     <span v-else>暂无交易</span>
                   </div>
                 </a-list-item>
@@ -160,13 +161,30 @@
             <a-divider />
             <!-- <BasicTable :pagination="false" @register="epochTable">
             </BasicTable> -->
-            <BasicTable :pagination="false" :scroll="{ y: 400 }" :columns="columnsEpoch" :data-source="blockChainInfo.LatestEpoch">
+            <BasicTable :pagination="false" :scroll="{ y: 400 }" :columns="columnsEpoch"
+              :data-source="blockChainInfo.LatestEpoch">
+              <template #txHash="{ record }">
+                <a-typography-paragraph copyable>
+                  {{ record.TxHash }}
+                </a-typography-paragraph>
+              </template>
             </BasicTable>
           </div>
           <div class="realtime-monitor" style="width: 49%;">
             <h3 class="title">最新交易信息</h3>
             <a-divider />
-            <BasicTable :pagination="false" :scroll="{ y: 400 }" :columns="columnsTransaction" :data-source="blockChainInfo.LatestTx">
+            <BasicTable :pagination="false" :scroll="{ y: 400 }" :columns="columnsTransaction"
+              :data-source="blockChainInfo.LatestTx">
+              <template #txHash="{ record }">
+                <a-typography-paragraph copyable>
+                  {{ record.txHash }}
+                </a-typography-paragraph>
+              </template>
+              <template #blockHash="{ record }">
+                <a-typography-paragraph copyable>
+                  {{ record.blockHash }}
+                </a-typography-paragraph>
+              </template>
             </BasicTable>
             <!-- <BasicTable @register="transactionTable"></BasicTable> -->
           </div>
@@ -331,17 +349,25 @@ onMounted(async () => {
 // 最新纪元配置
 const columnsEpoch = [
   { title: '纪元编号', dataIndex: 'EpochID', key: 'EpochID', },
-  { title: '提交单元数', dataIndex: 'NbCommit', key: 'NbCommit', },
-  { title: '确认单元数', dataIndex: 'NbFinalized', key: 'nbFinalized', },
-  { title: '异常单元数', dataIndex: 'NbInvalid', key: 'nbInvalid' },
-  { title: '交易哈希', dataIndex: 'TxHash', key: 'TxHash' },
+  {
+    title: '交易哈希', dataIndex: 'TxHash', key: 'TxHash', slots: {
+      customRender: 'txHash',
+    },
+  },
+  { title: '提交单元数', dataIndex: 'NbCommit', key: 'NbCommit', width: '100px' },
+  { title: '确认单元数', dataIndex: 'NbFinalized', key: 'nbFinalized', width: '100px' },
+  { title: '异常单元数', dataIndex: 'NbInvalid', key: 'nbInvalid', width: '100px' },
 ]
 
 // 最新交易表单配置
 const columnsTransaction = [
-  { title: "交易哈希", dataIndex: 'txHash', key: 'hash' },
+  {
+    title: "交易哈希", dataIndex: 'txHash', key: 'hash', slots: {
+      customRender: 'txHash',
+    }
+  },
   { title: "交易数据类型", dataIndex: 'txType', key: 'txType' },
-  { title: "区块哈希", dataIndex: 'blockHash', key: 'blockHash' },
+  { title: "区块哈希", dataIndex: 'blockHash', key: 'blockHash', slots: { customRender: 'blockHash' } },
   { title: "合约地址", dataIndex: 'contract', key: 'contractAddress' },
   { title: "交易上链时间", dataIndex: 'upchainTime', key: 'upchainTime' },
 ];

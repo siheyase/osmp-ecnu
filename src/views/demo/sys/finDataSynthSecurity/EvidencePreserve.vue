@@ -1,6 +1,9 @@
 <!-- 页面2.2 存证溯源 -->
 <template>
   <a-card title="存证溯源">
+    <div v-if="route.query.taskId != null">
+      <a-button type="primary" @click="()=>router.back()">< 返回合成任务列表</a-button>
+    </div>
     <a-tabs v-model:activeKey="activeKey1">
       <a-tab-pane key="1">
         <template #tab>
@@ -58,7 +61,7 @@
           </a-space>
         </a-form>
       </a-tab-pane>
-      <a-tab-pane key="2">
+      <a-tab-pane v-if="route.query.taskId == null" key="2">
         <template #tab>
           <span>
             <android-outlined />
@@ -169,7 +172,7 @@
                   <a-col :span="12">
                     <strong>合成总量:</strong>
                     <a-tag color="pink" class="break-tag">{{ calculateDataSize(TaskItem.total, TaskItem.model, 'AUTO')
-                      }}</a-tag>
+                    }}</a-tag>
                   </a-col>
                   <a-col :span="12">
                     <strong>数据集:</strong>
@@ -190,7 +193,7 @@
                   <a-col :span="8">
                     <strong>已合成:</strong>
                     <a-tag color="red" class="break-tag">{{ calculateDataSize(TaskItem.process, TaskItem.model, 'AUTO')
-                      }}
+                    }}
                     </a-tag>
                   </a-col>
                 </a-row>
@@ -394,7 +397,7 @@
                         <strong>调度总量:</strong>
                         <a-tag color="pink">{{ calculateDataSize(schedule.total, TaskItem.model,
                           'AUTO')
-                          }}</a-tag>
+                        }}</a-tag>
                       </a-col>
                       <a-col :span="8">
                         <strong>已完成数据:</strong>
@@ -570,6 +573,7 @@ import { message } from 'ant-design-vue';
 import { calculateDataSize, calculateDataMapSize } from '/@/utils/value/calDataSize';
 import { useRoute } from 'vue-router';
 import * as echarts from 'echarts'
+import { router } from '/@/router';
 
 
 const route = useRoute();
@@ -1147,55 +1151,6 @@ const screenWidth = ref(window.innerWidth);
 const updateScreenSize = () => {
   screenWidth.value = window.innerWidth;
 };
-
-
-// 生成完整 Merkle Tree 结构
-function generateHash() {
-  const hash = Array.from({ length: 64 }, () =>
-    Math.floor(Math.random() * 16).toString(16)
-  ).join('');
-  return `0x${hash}`;
-}
-
-function buildMerkleTreeWithProof(targetLeafName = 'L2') {
-  const leafNodes = [
-    { name: `${generateHash()}`, value: generateHash(), isLeaf: true },
-    { name: 'L2', value: generateHash(), isLeaf: true, proof: true },
-    { name: 'R1', value: generateHash(), isLeaf: true },
-    { name: 'R2', value: generateHash(), isLeaf: true }
-  ];
-
-  const leftParent = {
-    name: 'Left',
-    value: generateHash(),
-    children: [leafNodes[0], leafNodes[1]],
-    proof: targetLeafName === 'L2'
-  };
-
-  const rightParent = {
-    name: 'Right',
-    value: generateHash(),
-    children: [leafNodes[2], leafNodes[3]]
-  };
-
-  const root = {
-    name: 'Root',
-    value: generateHash(),
-    children: [
-      { ...leftParent },
-      rightParent
-    ],
-    proof: true
-  };
-
-  if (targetLeafName === 'L2') {
-    root.children[0].proof = true;
-  }
-
-  return root;
-}
-
-const merkleTreeData = buildMerkleTreeWithProof('L2');
 
 onMounted(() => {
   window.addEventListener("resize", updateScreenSize);

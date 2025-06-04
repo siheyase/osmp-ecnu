@@ -1,7 +1,7 @@
 const dataRates = {
     FINKAN: 160,
     BAED: 113,
-    ABM: 7624000,
+    ABM: 953,
 };
 
 const units = [
