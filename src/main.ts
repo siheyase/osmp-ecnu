@@ -3,63 +3,83 @@ import '/@/design/index.less';
 import 'ant-design-vue/dist/reset.css';
 // 注册图标
 import 'virtual:svg-icons-register';
-
 import App from './App.vue';
-import { createApp } from 'vue';
+import { createApp, type App as VueApp } from 'vue';
 import { initAppConfigStore } from '/@/logics/initAppConfig';
 import { setupErrorHandle } from '/@/logics/error-handle';
-import { router, setupRouter } from '/@/router';
+import { router, setupRouter } from '/@/router'; // 保持 router 导入
 import { setupRouterGuard } from '/@/router/guard';
 import { setupStore } from '/@/store';
 import { setupGlobDirectives } from '/@/directives';
 import { setupI18n } from '/@/locales/setupI18n';
 import { registerGlobComp } from '/@/components/registerGlobComp';
+import { renderWithQiankun, qiankunWindow } from 'vite-plugin-qiankun/dist/helper';
+import { useUserStore } from '/@/store/modules/user';
 
-async function bootstrap() {
-  // 创建应用实例
-  const app = createApp(App);
-  // 【QQYUN-6329】
-  window.appRootInstance = app;
-  // 多语言配置,异步情况:语言文件可以从服务器端获得
-  await setupI18n(app);
+let app: VueApp;
 
-  // 配置存储
-  setupStore(app);
-
-  // 初始化内部系统配置
-  initAppConfigStore();
-
-  // 注册外部模块路由(注册online模块lib)
-  // registerPackages(app);
-
-  // 注册全局组件
-  registerGlobComp(app);
-
-  //CAS单点登录
-  // await useSso().ssoLogin();
-
-  // 配置路由
-  setupRouter(app);
-
-  // 路由保护
-  setupRouterGuard(router);
-
-  // 注册全局指令
-  setupGlobDirectives(app);
-
-  // 配置全局错误处理
-  setupErrorHandle(app);
-
-  // // 注册第三方组件
-  // await registerThirdComp(app);
-
-  // 当路由准备好时再执行挂载( https://next.router.vuejs.org/api/#isready)
-  await router.isReady();
-
-  // 挂载应用
-  app.mount('#app', true);
-
-  console.log(' vue3 app 加载完成！');
+function render(props: any) {
+  try {
+    const { container, data } = props || {};
+    // 兼容 qiankun 和主应用场景
+    const targetContainer = container ? container.querySelector('#app') || container : document.querySelector('#app') || '#app';
+    if (!targetContainer) {
+      throw new Error('未找到应用挂载容器 #app');
+    }
+    app = createApp(App);
+    setupStore(app);
+    initAppConfigStore();
+    registerGlobComp(app);
+    setupRouter(app);
+    setupRouterGuard(router);
+    setupGlobDirectives(app);
+    setupI18n(app)
+      .then(() => {
+        app.mount(targetContainer);
+      })
+      .catch((err) => {
+        // 国际化初始化失败
+        console.error('i18n 初始化失败:', err);
+      });
+    setupErrorHandle(app);
+    // 存储用户信息
+    const userStore = useUserStore();
+    userStore.setUserInfo(data?.userInfo || {});
+  } catch (error) {
+    console.error('应用渲染异常:', error);
+    const fallback = document.createElement('div');
+    fallback.style.color = 'red';
+    fallback.innerText = '应用加载失败，请刷新页面或联系开发人员。';
+    const root = document.querySelector('#app');
+    if (root) {
+      root.innerHTML = '';
+      root.appendChild(fallback);
+    }
+  }
 }
 
-bootstrap();
+function unmount() {
+  app?.unmount();
+}
+
+renderWithQiankun({
+  mount(props) {
+    console.log('osmp_ecnu mounted', props);
+    render(props);
+  },
+  bootstrap() {
+    console.log('osmp_ecnu bootstraped');
+  },
+  unmount() {
+    console.log('osmp_ecnu unmounted');
+    unmount();
+  },
+  update(props: any) {
+    console.log('osmp_ecnu updated', props);
+    console.log(props);
+  },
+});
+
+if (!qiankunWindow.__POWERED_BY_QIANKUN__) {
+  render({});
+}

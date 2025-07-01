@@ -1,9 +1,8 @@
 import type { AppRouteRecordRaw, AppRouteModule } from '/@/router/types';
 
 import { PAGE_NOT_FOUND_ROUTE } from '/@/router/routes/basic';
-import { DemoRoute } from './demo';
-import { DataSynthMonitorRoute, DataSynthTaskRoute, BlockChainMonitorRoute, EvidencePreserveRoute} from './dataOnChain';
-
+// import { DataSynthMonitorRoute, DataSynthTaskRoute, BlockChainMonitorRoute, EvidencePreserveRoute } from './dataOnChain';
+import { EcnuQianKunRoute } from './ecnuQianKun';
 import { PageEnum } from '/@/enums/pageEnum';
 
 const modules = import.meta.glob('./modules/**/*.ts', { eager: true });
@@ -22,10 +21,18 @@ export const asyncRoutes = [PAGE_NOT_FOUND_ROUTE, ...routeModuleList];
 export const RootRoute: AppRouteRecordRaw = {
   path: '/',
   name: 'Root',
-  redirect: PageEnum.DEMO_INDEX,
+  redirect: PageEnum.BASE_HOME,
   meta: {
     title: 'Root',
   },
 };
 
-export const basicRoutes = [RootRoute, PAGE_NOT_FOUND_ROUTE, DemoRoute, DataSynthMonitorRoute, DataSynthTaskRoute, BlockChainMonitorRoute, EvidencePreserveRoute];
+export const basicRoutes = [
+  RootRoute,
+  PAGE_NOT_FOUND_ROUTE,
+  // DataSynthMonitorRoute,
+  // DataSynthTaskRoute,
+  // BlockChainMonitorRoute,
+  // EvidencePreserveRoute,
+  EcnuQianKunRoute,
+];

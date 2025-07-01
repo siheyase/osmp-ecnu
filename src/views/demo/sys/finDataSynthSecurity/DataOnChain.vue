@@ -1,10 +1,10 @@
 <!--
- * @Author: lyt
+ * @Author: ecnu
  * @Date: 2024-12-12 10:32:41
  * @LastEditTime: 2024-12-13 17:33:27
- * @LastEditors: lyt
- * @Description: 数据合成安全
- * @FilePath: /osmp-demo/src/views/demo/sys/finDataSynthSecurity/DataOnChain.vue
+ * @LastEditors: ecnu
+ * @Description: 数据合成安全-数据合成监控
+ * @FilePath: osmp-demo\src\views\demo\sys\finDataSynthSecurity\DataSynthMonitor.vue
  *  
 -->
 <template>
@@ -100,31 +100,33 @@
     }
   }
 
-  /deep/
-    :where(.css-dev-only-do-not-override-1oyve5v).ant-table-wrapper
-    .ant-table.ant-table-bordered
-    > .ant-table-container
-    > .ant-table-header
-    > table
-    > thead
-    > tr
-    > th {
+  :deep(
+      :where(.css-dev-only-do-not-override-1oyve5v).ant-table-wrapper
+        .ant-table.ant-table-bordered
+        > .ant-table-container
+        > .ant-table-header
+        > table
+        > thead
+        > tr
+        > th
+    ) {
     border-inline-end: none;
   }
 
-  /deep/
-    :where(.css-dev-only-do-not-override-1oyve5v).ant-table-wrapper
-    .ant-table.ant-table-bordered
-    > .ant-table-container
-    > .ant-table-body
-    > table
-    > tbody
-    > tr
-    > td {
+  :deep(
+      :where(.css-dev-only-do-not-override-1oyve5v).ant-table-wrapper
+        .ant-table.ant-table-bordered
+        > .ant-table-container
+        > .ant-table-body
+        > table
+        > tbody
+        > tr
+        > td
+    ) {
     border-inline-end: none;
   }
 
-  /deep/ .items-center {
+  :deep(.items-center) {
     margin-bottom: 10px;
   }
 </style>

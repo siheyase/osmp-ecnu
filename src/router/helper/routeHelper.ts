@@ -25,7 +25,21 @@ let dynamicViewsModules: Record<string, () => Promise<Recordable>>;
 // Dynamic introduction
 function asyncImportRoute(routes: AppRouteRecordRaw[] | undefined) {
   if (!dynamicViewsModules) {
-    dynamicViewsModules = import.meta.glob('../../views/**/*.{vue,tsx}');
+    // 优化动态导入配置
+    dynamicViewsModules = import.meta.glob(
+      [
+        // 基础页面
+        '../../views/**/index.vue',
+        // 其他页面
+        '../../views/**/*.vue',
+        // tsx 页面
+        '../../views/**/*.tsx',
+      ],
+      {
+        eager: false,
+        import: 'default',
+      }
+    );
     //合并online lib路由
     dynamicViewsModules = Object.assign({}, dynamicViewsModules, packageViews);
   }
@@ -58,34 +72,15 @@ function asyncImportRoute(routes: AppRouteRecordRaw[] | undefined) {
     const tenantId = getTenantId();
     // URL支持{{ window.xxx }}占位符变量
     //update-begin---author:wangshuai ---date:20220711  for：[VUEN-1638]菜单tenantId需要动态生成------------
-    item.component = (item.component || '')
-      .replace(/{{([^}}]+)?}}/g, (s1, s2) => _eval(s2))
-      .replace('${token}', token)
-      .replace('${tenantId}', tenantId);
+    const { name, children } = item;
+    let component = item.component;
+    if (component) {
+      component = (component || '')
+        .replace(/{{([^}}]+)?}}/g, (s1, s2) => _eval(s2))
+        .replace('${token}', token)
+        .replace('${tenantId}', tenantId);
+    }
     //update-end---author:wangshuai ---date:20220711  for：[VUEN-1638]菜单tenantId需要动态生成------------
-    // 适配 iframe
-    if (/^\/?http(s)?/.test(item.component as string)) {
-      item.component = item.component.substring(1, item.component.length);
-    }
-    if (/^http(s)?/.test(item.component as string)) {
-      if (item.meta?.internalOrExternal) {
-        // @ts-ignore 外部打开
-        item.path = item.component;
-        // update-begin--author:sunjianlei---date:20220408---for: 【VUEN-656】配置外部网址打不开，原因是带了#号，需要替换一下
-        item.path = item.path.replace('#', URL_HASH_TAB);
-        // update-end--author:sunjianlei---date:20220408---for: 【VUEN-656】配置外部网址打不开，原因是带了#号，需要替换一下
-      } else {
-        // @ts-ignore 内部打开
-        item.meta.frameSrc = item.component;
-      }
-      delete item.component;
-    }
-    // update-end--author:sunjianlei---date:20210918---for:适配旧版路由选项 --------
-    if (!item.component && item.meta?.frameSrc) {
-      item.component = 'IFRAME';
-    }
-    let { component, name } = item;
-    const { children } = item;
     if (component) {
       const layoutFound = LayoutMap.get(component.toUpperCase());
       if (layoutFound) {
@@ -108,6 +103,7 @@ function asyncImportRoute(routes: AppRouteRecordRaw[] | undefined) {
   });
 }
 
+// 优化动态导入函数
 function dynamicImport(dynamicViewsModules: Record<string, () => Promise<Recordable>>, component: string) {
   const keys = Object.keys(dynamicViewsModules);
   const matchKeys = keys.filter((key) => {
@@ -118,9 +114,22 @@ function dynamicImport(dynamicViewsModules: Record<string, () => Promise<Recorda
     const lastIndex = endFlag ? k.length : k.lastIndexOf('.');
     return k.substring(startIndex, lastIndex) === component;
   });
+
   if (matchKeys?.length === 1) {
     const matchKey = matchKeys[0];
-    return dynamicViewsModules[matchKey];
+    // 添加预加载提示
+    const component = dynamicViewsModules[matchKey];
+    return () => {
+      // 预加载提示
+      const loading = document.createElement('div');
+      loading.className = 'route-loading';
+      loading.innerHTML = '加载中...';
+      document.body.appendChild(loading);
+
+      return component().finally(() => {
+        document.body.removeChild(loading);
+      });
+    };
   } else if (matchKeys?.length > 1) {
     warn(
       'Please do not create `.vue` and `.TSX` files with the same file name in the same hierarchical directory under the views folder. This will cause dynamic introduction failure'
@@ -130,7 +139,7 @@ function dynamicImport(dynamicViewsModules: Record<string, () => Promise<Recorda
 }
 
 // Turn background objects into routing objects
-export function transformObjToRoute<T = AppRouteModule>(routeList: AppRouteModule[]): T[] {
+export function transformObjToRoute(routeList: AppRouteModule[]): AppRouteModule[] {
   routeList.forEach((route) => {
     const component = route.component as string;
     if (component) {
@@ -151,7 +160,7 @@ export function transformObjToRoute<T = AppRouteModule>(routeList: AppRouteModul
     }
     route.children && asyncImportRoute(route.children);
   });
-  return routeList as unknown as T[];
+  return routeList;
 }
 
 /**

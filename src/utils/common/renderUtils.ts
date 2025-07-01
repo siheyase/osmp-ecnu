@@ -1,7 +1,6 @@
 import { h } from 'vue';
 import { Avatar, Tag, Tooltip, Image, progress } from 'ant-design-vue';
 import { getFileAccessHttpUrl } from '/@/utils/common/compUtils';
-import { Tinymce } from '/@/components/Tinymce';
 import Icon from '/@/components/Icon';
 import { getDictItemsByCode } from '/@/utils/dict/index';
 import { filterMultiDictText } from '/@/utils/dict/JDictSelectUtil.js';
@@ -131,19 +130,6 @@ const render = {
       color = obj[0].color;
     }
     return isEmpty(text) || !renderTag ? h('span', text) : h(Tag, { color }, () => text);
-  },
-  /**
-   * 渲染富文本
-   */
-  renderTinymce: ({ model, field }) => {
-    return h(Tinymce, {
-      showImageUpload: false,
-      height: 300,
-      value: model[field],
-      onChange: (value: string) => {
-        model[field] = value;
-      },
-    });
   },
 
   renderSwitch: (text, arr) => {

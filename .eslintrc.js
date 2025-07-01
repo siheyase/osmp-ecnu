@@ -74,5 +74,7 @@ module.exports = defineConfig({
         math: 'always',
       },
     ],
+    'sort-imports': 'off',
+    'import/order': 'off',
   },
 });
