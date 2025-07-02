@@ -1,10 +1,10 @@
 <!--
  * @Author: lyt
  * @Date: 2024-12-02 13:19:01
- * @LastEditTime: 2024-12-12 10:29:08
+ * @LastEditTime: 2025-06-05 10:01:14
  * @LastEditors: lyt
  * @Description: lyt
- * @FilePath: /osmp-demo/jeecgboot-vue3/src/views/demo/table/components/SearchTable.vue
+ * @FilePath: /osmp-ecnu/src/views/demo/table/components/SearchTable.vue
  *  
 -->
 <template>
@@ -55,31 +55,33 @@
     }
   }
 
-  /deep/
-    :where(.css-dev-only-do-not-override-1oyve5v).ant-table-wrapper
-    .ant-table.ant-table-bordered
-    > .ant-table-container
-    > .ant-table-header
-    > table
-    > thead
-    > tr
-    > th {
+  :deep(
+      :where(.css-dev-only-do-not-override-1oyve5v).ant-table-wrapper
+        .ant-table.ant-table-bordered
+        > .ant-table-container
+        > .ant-table-header
+        > table
+        > thead
+        > tr
+        > th
+    ) {
     border-inline-end: none;
   }
 
-  /deep/
-    :where(.css-dev-only-do-not-override-1oyve5v).ant-table-wrapper
-    .ant-table.ant-table-bordered
-    > .ant-table-container
-    > .ant-table-body
-    > table
-    > tbody
-    > tr
-    > td {
+  :deep(
+      :where(.css-dev-only-do-not-override-1oyve5v).ant-table-wrapper
+        .ant-table.ant-table-bordered
+        > .ant-table-container
+        > .ant-table-body
+        > table
+        > tbody
+        > tr
+        > td
+    ) {
     border-inline-end: none;
   }
 
-  /deep/ .items-center {
+  :deep(.items-center) {
     margin-bottom: 10px;
   }
 </style>

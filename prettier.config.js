@@ -17,4 +17,7 @@ module.exports = {
   htmlWhitespaceSensitivity: 'strict',
   endOfLine: 'auto',
   rangeStart: 0,
+  importOrder: [],
+  importOrderSeparation: false,
+  importOrderSortAlphabetically: false,
 };

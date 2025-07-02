@@ -4,10 +4,8 @@ import vueJsx from '@vitejs/plugin-vue-jsx';
 import purgeIcons from 'vite-plugin-purge-icons';
 import UnoCSS from 'unocss/vite';
 import { presetTypography, presetUno } from 'unocss';
-
-// 本地调试https配置方法
+import qiankun from 'vite-plugin-qiankun';
 import VitePluginCertificate from 'vite-plugin-mkcert';
-//[issues/555]开发环境，vscode断点调试，文件或行数对不上
 import vueSetupExtend from 'vite-plugin-vue-setup-extend-plus';
 import { configHtmlPlugin } from './html';
 import { configMockPlugin } from './mock';
@@ -15,18 +13,23 @@ import { configCompressPlugin } from './compress';
 import { configVisualizerConfig } from './visualizer';
 import { configThemePlugin } from './theme';
 import { configSvgIconsPlugin } from './svgSprite';
-// //预编译加载插件(不支持vite3作废)
-// import OptimizationPersist from 'vite-plugin-optimize-persist';
-// import PkgConfig from 'vite-plugin-package-config';
 
 export function createVitePlugins(viteEnv: ViteEnv, isBuild: boolean) {
   const { VITE_USE_MOCK, VITE_BUILD_COMPRESS, VITE_BUILD_COMPRESS_DELETE_ORIGIN_FILE } = viteEnv;
 
+  // 从 package.json 获取应用名称，如果主应用注册时用了其他名称，请确保这里也用那个名称
+  const appName = 'osmp_ecnu';
   const vitePlugins: (PluginOption | PluginOption[])[] = [
-    // have to
     vue(),
-    // have to
     vueJsx(),
+
+    // 添加 qiankun 插件
+    // 第一个参数是子应用的名称，必须与主应用注册时的名称一致
+    // 第二个参数的 useDevMode: true 会在开发模式下共享 Vite dev server，而不是每个子应用都单独构建
+    qiankun(appName, {
+      useDevMode: !isBuild,
+    }),
+
     // support name
     vueSetupExtend(),
     // @ts-ignore
@@ -57,10 +60,8 @@ export function createVitePlugins(viteEnv: ViteEnv, isBuild: boolean) {
 
   // The following plugins only work in the production environment
   if (isBuild) {
-    
     // rollup-plugin-gzip
     vitePlugins.push(configCompressPlugin(VITE_BUILD_COMPRESS, VITE_BUILD_COMPRESS_DELETE_ORIGIN_FILE));
-
   }
 
   // //vite-plugin-theme【预编译加载插件，解决vite首次打开界面加载慢问题】

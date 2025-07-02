@@ -420,31 +420,29 @@
     margin-top: 5px;
   }
 
-  /deep/
-    :where(.css-dev-only-do-not-override-1oyve5v).ant-table-wrapper
-    .ant-table.ant-table-bordered
-    > .ant-table-container
-    > .ant-table-header
-    > table
-    > thead
-    > tr
-    > th {
+  :deep(
+      :where(.css-dev-only-do-not-override-1oyve5v).ant-table-wrapper
+        .ant-table.ant-table-bordered
+        > .ant-table-container
+        > .ant-table-header
+        > table
+        > thead
+        > tr
+        > th
+    ) {
     border-inline-end: none;
   }
 
-  /deep/
-    :where(.css-dev-only-do-not-override-1oyve5v).ant-table-wrapper
-    .ant-table.ant-table-bordered
-    > .ant-table-container
-    > .ant-table-body
-    > table
-    > tbody
-    > tr
-    > td {
+  :deep(
+      :where(.css-dev-only-do-not-override-1oyve5v).ant-table-wrapper
+        .ant-table.ant-table-bordered
+        > .ant-table-container
+        > .ant-table-body
+        > table
+        > tbody
+        > tr
+        > td
+    ) {
     border-inline-end: none;
-  }
-
-  /deep/ .items-center {
-    margin-bottom: 10px;
   }
 </style>

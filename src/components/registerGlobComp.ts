@@ -15,7 +15,7 @@ import {
   // DatePicker,
   // TimePicker,
   // Calendar,
-  // Radio,
+  Radio,
   Switch,
   Card,
   List,
@@ -61,12 +61,11 @@ import {
 } from 'ant-design-vue';
 const compList = [AntButton.Group, Icon, AIcon, JUploadButton];
 
-
 export function registerGlobComp(app: App) {
   compList.forEach((comp) => {
     app.component(comp.name || comp.displayName, comp);
   });
-  
+
   //仪表盘依赖Tinymce，需要提前加载（没办法按需加载了）
   // app.component(Editor.name, Editor);
   // update-begin--author:liaozhiyang---date:20240308---for：【QQYUN-8241】Tinymce异步加载
@@ -77,7 +76,9 @@ export function registerGlobComp(app: App) {
   //   })
   // );
   // update-end--author:liaozhiyang---date:20240308---for：【QQYUN-8241】Tinymce异步加载
-  app.use(Select).use(Typography)
+  app
+    .use(Select)
+    .use(Typography)
     .use(Alert)
     .use(Button)
     // .use(Breadcrumb)
@@ -85,7 +86,7 @@ export function registerGlobComp(app: App) {
     // .use(DatePicker)
     // .use(TimePicker)
     // .use(Calendar)
-    // .use(Radio)
+    .use(Radio)
     .use(Switch)
     .use(Card)
     .use(List)
@@ -127,5 +128,4 @@ export function registerGlobComp(app: App) {
     // .use(Rate)
     .use(Progress)
     .use(Timeline);
-    console.log("---初始化---， 全局注册Antd、仪表盘、流程设计器、online、流程等组件--------------")
 }

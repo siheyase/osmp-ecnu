@@ -68,6 +68,10 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
       port: VITE_PORT,
       // Load proxy configuration from .env
       proxy: createProxy(VITE_PROXY),
+      cors: true,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+      },
     },
     build: {
       minify: 'esbuild',
@@ -80,15 +84,6 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
         output: {
           chunkFileNames: 'js/[name]-[hash].js', // 引入文件名的名称
           entryFileNames: 'js/[name]-[hash].js', // 包的入口文件名称
-          // manualChunks配置 (依赖包从大到小排列)
-          manualChunks: {
-            // vue vue-router合并打包
-            'vue-vendor': ['vue', 'vue-router'],
-            'antd-vue-vendor': ['ant-design-vue','@ant-design/icons-vue','@ant-design/colors'],
-            'vxe-table-vendor': ['vxe-table','vxe-table-plugin-antd','xe-utils'],
-            'emoji-mart-vue-fast': ['emoji-mart-vue-fast'],
-            'china-area-data-vendor': ['china-area-data']
-          },
         },
       },
       // 关闭brotliSize显示可以稍微减少打包时间
