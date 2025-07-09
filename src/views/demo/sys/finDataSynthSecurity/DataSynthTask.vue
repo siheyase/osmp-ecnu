@@ -99,6 +99,7 @@
               <a-button type="link" @click="showSynthModal(record)">合成详情</a-button>
               <a-button type="link" :disabled="record.status !== 0" @click="handleDownloadStream(record)">下载数据</a-button>
               <a-button type="link" @click="evidencePage(record.taskID)">查看凭证</a-button>
+              <a-button type="link" :disabled="record.status !== 0" @click="handleUploadTaskStream(record)">上传数据</a-button>
               <!-- <a-button type="link" danger @click="deleteClick(record)">删除</a-button> -->
             </template>
             <template #txHash="{ record }">
@@ -152,6 +153,51 @@
         </template>
       </BasicTable>
     </a-modal>
+    <!-- 上传数据弹窗 -->
+    <a-modal 
+      v-model:open="uploadModalVisible" 
+      title="上传任务数据" 
+      :style="{ width: '800px' }" 
+      :maskStyle="{ backgroundColor: 'rgba(0, 0, 0, 0.1)', boxShadow: 'none' }"
+      centered
+      :closable="true"
+      :maskClosable="false"
+      @ok="handleUploadConfirm"
+      @cancel="handleUploadCancel"
+    >
+
+      <template #footer>
+        <a-button key="cancel" @click="handleUploadCancel">取消</a-button>
+        <a-button key="submit" type="primary" :loading="uploading" @click="handleUploadConfirm">上传</a-button>
+      </template>
+
+      <div style="padding: 20px 25px;">
+        <div style="margin-bottom: 20px; font-size: 16px; color: #333;">
+          <strong>合成任务ID：</strong>{{ uploadForm.taskID }}
+          <span style="margin-left: 20px;">
+            <strong>任务名称：</strong>{{ uploadForm.taskName }}
+          </span>
+        </div>
+
+        <a-form :model="uploadForm" layout="vertical">
+          <a-form-item label="用途">
+            <a-input v-model:value="uploadForm.purpose" placeholder="请输入用途（可选）" />
+          </a-form-item>
+
+          <a-form-item label="描述">
+            <a-textarea
+              v-model:value="uploadForm.description"
+              placeholder="请输入描述（可选）"
+              :rows="3"
+            />
+          </a-form-item>
+
+          <a-form-item label="创建人">
+            <a-input v-model:value="uploadForm.createBy" placeholder="请输入创建人（可选）" />
+          </a-form-item>
+        </a-form>
+      </div>
+    </a-modal>
   </div>
 </template>
 
@@ -159,7 +205,7 @@
   import { ref, computed, onMounted } from 'vue';
   import { BasicTable } from '/@/components/Table';
   import { useSearchTable } from '../../table/components/useSearchTable';
-  import { createTaskApi, downLoadCollectApi, getSynthDataApi } from '/@/api/demo/finDataSynthSecurityApi';
+  import { createTaskApi, downLoadCollectApi, getSynthDataApi, uploadTaskApi } from '/@/api/demo/finDataSynthSecurityApi';
   import { message } from 'ant-design-vue';
   import { useRouter } from 'vue-router';
   import { calculateDataSize } from '/@/utils/value/calDataSize';
@@ -354,6 +400,73 @@
       taskID: task.taskID,
       size: task.total,
     });
+  };
+
+  // 上传数据弹窗
+  const uploadModalVisible = ref<boolean>(false);
+  const uploading = ref<boolean>(false);
+  const uploadForm = ref({
+    taskID: '',
+    taskName: '',
+    purpose: '',
+    description: '',
+    createBy: ''
+  });
+
+  const handleUploadTaskStream = async (task) => {
+    uploadForm.value = {
+      taskID: task.taskID,
+      taskName: task.taskName || 'default',
+      purpose: '',
+      description: '',
+      createBy: ''
+    };
+    uploadModalVisible.value = true;
+  };
+  // 确认上传
+  const handleUploadConfirm = async () => {
+    try {
+      uploading.value = true;
+
+      const res = await uploadTaskApi({
+        query: 'UploadTaskQuery',
+        taskID: uploadForm.value.taskID,
+        purpose: uploadForm.value.purpose,
+        description: uploadForm.value.description,
+        createBy: uploadForm.value.createBy
+      });
+
+      if (res.status === 'OK') {
+        message.success('上传成功！');
+        uploadModalVisible.value = false;
+        // 重置表单
+        uploadForm.value = {
+          taskID: '',
+          taskName: '',
+          purpose: '',
+          description: '',
+          createBy: ''
+        };
+      } else {
+        message.error('上传失败：' + (res.message || '未知错误'));
+      }
+    } catch (error) {
+      console.error('上传失败:', error);
+      message.error('上传失败：' + error.message);
+    } finally {
+      uploading.value = false;
+    }
+  };
+
+  const handleUploadCancel = () => {
+    uploadModalVisible.value = false;
+    uploadForm.value = {
+      taskID: '',
+      taskName: '',
+      purpose: '',
+      description: '',
+      createBy: ''
+    };
   };
 
   // 过滤任务

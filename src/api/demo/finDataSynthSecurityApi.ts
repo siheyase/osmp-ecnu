@@ -42,7 +42,8 @@ enum Api {
   FINDATASYNTHSECURITY_DATA_QUERY = '/dataSynth',
   FINDATASYNTHSECURITY_CREATE_TASK = '/create',
   FINDATASYNTHSECURITY_BLOCKCHAIN_INFO = '/blockchain',
-  FINDATASYNTHSECURITY_COLLECT = '/collect'
+  FINDATASYNTHSECURITY_COLLECT = '/collect',
+  FINDATASYNTHSECURITY_UPLOAD_TASK = '/upload'
 }
 
 export const getFDSynthNodeSynDataApi = async () => {
@@ -241,6 +242,15 @@ export const downLoadCollectApi = async (queryData: any) => {
   window.open(url)
 };
 
+//数据合成安全 - 上传任务数据接口
+export const uploadTaskApi = async (queryData) => {
+  const res = await defHttp.get<any>({
+    url: Api.FINDATASYNTHSECURITY_UPLOAD_TASK,
+    params: queryData
+  })
+  console.log('数据合成安全-上传任务数据-接口返回数据', res);
+  return res;
+}
 
 //==============这些用于Table查询的API=================
 // 数据合成安全 - 节点查询接口
