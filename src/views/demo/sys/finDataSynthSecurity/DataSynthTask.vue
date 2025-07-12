@@ -15,7 +15,8 @@
           </a-col>
           <a-col :span="6">
             <a-form-item label="选择模型">
-              <a-select v-model:value="newTask.model" placeholder="请选择模型" :disabled="!newTask.dataType" @change="updateDatasets">
+              <a-select v-model:value="newTask.model" placeholder="请选择模型" :disabled="!newTask.dataType"
+                @change="updateDatasets">
                 <a-select-option v-for="model in availableModels" :key="model.value" :value="model.value">
                   {{ model.label }}
                 </a-select-option>
@@ -97,9 +98,11 @@
             </template> -->
             <template #action="{ record }">
               <a-button type="link" @click="showSynthModal(record)">合成详情</a-button>
-              <a-button type="link" :disabled="record.status !== 0" @click="handleDownloadStream(record)">下载数据</a-button>
+              <a-button type="link" :disabled="record.status !== 0"
+                @click="handleDownloadStream(record)">下载数据</a-button>
               <a-button type="link" @click="evidencePage(record.taskID)">查看凭证</a-button>
-              <a-button type="link" :disabled="record.status !== 0" @click="handleUploadTaskStream(record)">上传数据</a-button>
+              <a-button type="link" :disabled="record.status !== 0"
+                @click="handleUploadTaskStream(record)">上传数据</a-button>
               <!-- <a-button type="link" danger @click="deleteClick(record)">删除</a-button> -->
             </template>
             <template #txHash="{ record }">
@@ -117,7 +120,8 @@
       </a-tabs>
     </div>
 
-    <a-modal v-model:open="nodeModalVisable" title="并行合成详情" :style="{ width: '800px' }" centered @ok="nodeModalVisable = false">
+    <a-modal v-model:open="nodeModalVisable" title="并行合成详情" :style="{ width: '800px' }" centered
+      @ok="nodeModalVisable = false">
       <template #footer>
         <a-button key="back" @click="nodeModalVisable = false">返回</a-button>
       </template>
@@ -144,7 +148,8 @@
           </div>
         </a-list-item>
       </a-list> -->
-      <BasicTable :data-source="dataItem.nodes" :columns="nodeInfoColumn" bordered size="small" row-key="index" :pagination="false">
+      <BasicTable :data-source="dataItem.nodes" :columns="nodeInfoColumn" bordered size="small" row-key="index"
+        :pagination="false">
         <template #nodeId="{ record }">
           <div>
             <img :src="ECNU_ICON" :style="{ width: '50px', height: '50px' }" />
@@ -154,17 +159,9 @@
       </BasicTable>
     </a-modal>
     <!-- 上传数据弹窗 -->
-    <a-modal 
-      v-model:open="uploadModalVisible" 
-      title="上传任务数据" 
-      :style="{ width: '800px' }" 
-      :maskStyle="{ backgroundColor: 'rgba(0, 0, 0, 0.1)', boxShadow: 'none' }"
-      centered
-      :closable="true"
-      :maskClosable="false"
-      @ok="handleUploadConfirm"
-      @cancel="handleUploadCancel"
-    >
+    <a-modal v-model:open="uploadModalVisible" title="上传任务数据" :style="{ width: '800px' }"
+      :maskStyle="{ backgroundColor: 'rgba(0, 0, 0, 0.1)', boxShadow: 'none' }" centered :closable="true"
+      :maskClosable="false" @ok="handleUploadConfirm" @cancel="handleUploadCancel">
 
       <template #footer>
         <a-button key="cancel" @click="handleUploadCancel">取消</a-button>
@@ -185,11 +182,7 @@
           </a-form-item>
 
           <a-form-item label="描述">
-            <a-textarea
-              v-model:value="uploadForm.description"
-              placeholder="请输入描述（可选）"
-              :rows="3"
-            />
+            <a-textarea v-model:value="uploadForm.description" placeholder="请输入描述（可选）" :rows="3" />
           </a-form-item>
 
           <a-form-item label="创建人">
@@ -202,293 +195,302 @@
 </template>
 
 <script lang="ts" setup>
-  import { ref, computed, onMounted } from 'vue';
-  import { BasicTable } from '/@/components/Table';
-  import { useSearchTable } from '../../table/components/useSearchTable';
-  import { createTaskApi, downLoadCollectApi, getSynthDataApi, uploadTaskApi } from '/@/api/demo/finDataSynthSecurityApi';
-  import { message } from 'ant-design-vue';
-  import { useRouter } from 'vue-router';
-  import { calculateDataSize } from '/@/utils/value/calDataSize';
-  import ECNU_ICON from '/@/assets/ecnu.png';
+import { ref, computed, onMounted } from 'vue';
+import { BasicTable } from '/@/components/Table';
+import { useSearchTable } from '../../table/components/useSearchTable';
+import { createTaskApi, downLoadCollectApi, getSynthDataApi, uploadTaskApi } from '/@/api/demo/finDataSynthSecurityApi';
+import { message } from 'ant-design-vue';
+import { useRouter } from 'vue-router';
+import { calculateDataSize } from '/@/utils/value/calDataSize';
+import ECNU_ICON from '/@/assets/ecnu.png';
 
-  const router = useRouter();
+const router = useRouter();
 
-  // 跳转并传参（query 方式）
-  const evidencePage = (taskId) => {
-    router.push({
-      path: '/finDataSynthSecurity/evidencePreserve',
-      query: { taskId: taskId },
-    });
-  };
-
-  const { histCompTasksTable, viewProofClick, reload } = useSearchTable();
-
-  // 任务搜索条件
-  const filters = ref({
-    taskId: '',
-    txHash: '',
-    status: null,
+// 跳转并传参（query 方式）
+const evidencePage = (taskId) => {
+  router.push({
+    path: '/finDataSynthSecurity/evidencePreserve',
+    query: { taskId: taskId },
   });
+};
 
-  // 选中的 tab
-  const activeTab = ref('history');
+const { histCompTasksTable, viewProofClick, reload } = useSearchTable();
 
-  // 合成详情
-  const nodeModalVisable = ref<boolean>(false);
+// 任务搜索条件
+const filters = ref({
+  taskId: '',
+  txHash: '',
+  status: null,
+});
 
-  // 新建任务表单数据
-  const newTask = ref({
-    taskName: 'default',
-    dataType: '', // 数据类型
-    model: '', // 选择的模型
-    dataset: '', // 选择的数据集
-    synthesisAmount: 1, // 合成数量（条）
-    trustedProof: false,
-  });
+// 选中的 tab
+const activeTab = ref('history');
 
-  // 可用模型映射
-  const modelMapping = {
-    time_series: [{ label: 'ABM', value: 'ABM' }],
-    graph: [{ label: 'BAED', value: 'BAED' }],
-    table: [{ label: 'FINKAN', value: 'FINKAN' }],
-  };
+// 合成详情
+const nodeModalVisable = ref<boolean>(false);
 
-  // 可用数据集映射
-  const datasetMapping = {
-    ABM: [{ label: 'ABM_SHL2', value: 'SHL2 TA0_600519_202401-202402_defreg' }],
-    BAED: [{ label: 'elliptic', value: 'elliptic' }],
-    FINKAN: [{ label: 'FINKAN_default', value: 'default of credit card clients' }],
-  };
+// 新建任务表单数据
+const newTask = ref({
+  taskName: 'default',
+  dataType: '', // 数据类型
+  model: '', // 选择的模型
+  dataset: '', // 选择的数据集
+  synthesisAmount: 1, // 合成数量（条）
+  trustedProof: false,
+});
 
-  // 计算可用模型
-  const availableModels = computed(() => {
-    return newTask.value.dataType ? modelMapping[newTask.value.dataType] : [];
-  });
+// 可用模型映射
+const modelMapping = {
+  time_series: [{ label: 'ABM', value: 'ABM' }],
+  graph: [{ label: 'BAED', value: 'BAED' }, { label: 'TRADINGNET', value: 'TRADINGNET' }],
+  table: [{ label: 'FINKAN', value: 'FINKAN' }, { label: 'TRADINGACCOUT', value: 'TRADINGACCOUT' }],
+};
 
-  // 计算可用数据集
-  const availableDatasets = computed(() => {
-    return newTask.value.model ? datasetMapping[newTask.value.model] : [];
-  });
+// 可用数据集映射
+const datasetMapping = {
+  ABM: [{ label: 'ABM_SHL2', value: 'SHL2 TA0_600519_202401-202402_defreg' }],
+  BAED: [{ label: 'elliptic', value: 'elliptic' }],
+  FINKAN: [{ label: 'credit_card_default', value: 'default of credit card clients' }, { label: 'FINKAN_OutSample', value: 'FINKAN_OutSample' }],
+  TRADINGNET: [{ label: 'TRADINGNET_SampleAccounts', value: 'TRADINGNET_SampleAccounts' }],
+  TRADINGACCOUT: [{ label: 'TRADINGACCOUT_DARASET', value: 'TRADINGACCOUT_DATASET' }],
+};
 
-  // 当选择数据类型时，更新可选模型
-  const updateModels = () => {
-    newTask.value.model = '';
-    newTask.value.dataset = '';
-  };
+// 计算可用模型
+const availableModels = computed(() => {
+  return newTask.value.dataType ? modelMapping[newTask.value.dataType] : [];
+});
 
-  // 当选择模型时，更新可选数据集
-  const updateDatasets = () => {
-    newTask.value.dataset = '';
-  };
+// 计算可用数据集
+const availableDatasets = computed(() => {
+  return newTask.value.model ? datasetMapping[newTask.value.model] : [];
+});
 
-  // 提交任务
-  const createTask = async () => {
-    console.log('创建任务:', newTask.value);
-    if (newTask.value.trustedProof == true) {
-      message.info('可信证明，该功能未实现');
-      return;
-    }
-    const res = await createTaskApi({
-      name: newTask.value.taskName,
-      model: newTask.value.model,
-      params: {
-        dataset: newTask.value.dataset,
-      },
-      size: newTask.value.synthesisAmount,
-      isReliable: !newTask.value.trustedProof,
-    });
-    if (res.status == 'OK') {
-      message.success('创建成功');
-      newTask.value = {
-        dataType: '', // 数据类型
-        model: '', // 选择的模型
-        dataset: '', // 选择的数据集
-        synthesisAmount: 1, // 合成数量（条）
-        trustedProof: false,
-      };
-      setTimeout(() => reload(), 5000);
-    } else {
-      message.error('创建失败');
-    }
-  };
+// 当选择数据类型时，更新可选模型
+const updateModels = () => {
+  newTask.value.model = '';
+  newTask.value.dataset = '';
+};
 
-  onMounted(() => {
-    setInterval(function () {
-      reload();
-    }, 10000);
-  });
+// 当选择模型时，更新可选数据集
+const updateDatasets = () => {
+  newTask.value.dataset = '';
+};
 
-  let dataItem = ref({
-    model: 'default',
-    nodes: [],
-  });
-
-  const nodeInfoColumn = [
-    {
-      title: '节点ID',
-      dataIndex: 'nodeId',
-      key: 'nodeId',
-      slots: {
-        customRender: 'nodeId',
-      },
+// 提交任务
+const createTask = async () => {
+  console.log('创建任务:', newTask.value);
+  if (newTask.value.trustedProof == true) {
+    message.info('可信证明，该功能未实现');
+    return;
+  }
+  let my_model=newTask.value.model;
+  // 临时替换
+  if (newTask.value.model == 'TRADINGACCOUT') {
+    my_model = 'FINKAN';
+  } else if (newTask.value.model == 'TRADINGNET') {
+    my_model = 'BAED';
+  }
+  const res = await createTaskApi({
+    name: newTask.value.taskName,
+    model: my_model,
+    params: {
+      dataset: newTask.value.dataset,
     },
-    { title: '合成数据量', dataIndex: 'data', key: 'data' },
-  ];
-
-  //查询合成详情
-  const showSynthModal = async (task) => {
-    // 1. 调用接口获取数据（假设已通过其他方式获取到接口返回的data）
-    const res = await getSynthDataApi({
-      query: 'TaskOnNodesQuery',
-      taskID: task.taskID,
-    });
-    dataItem.value = {
-      model: task.model,
-      nodes: Object.entries(res.data.nodeInfo).map(([nodeId, data]) => ({
-        nodeId: `ECNU-合成节点-${nodeId}`,
-        data: calculateDataSize(data, task.model, 'AUTO'),
-      })),
+    size: newTask.value.synthesisAmount,
+    isReliable: !newTask.value.trustedProof,
+  });
+  if (res.status == 'OK') {
+    message.success('创建成功');
+    newTask.value = {
+      dataType: '', // 数据类型
+      model: '', // 选择的模型
+      dataset: '', // 选择的数据集
+      synthesisAmount: 1, // 合成数量（条）
+      trustedProof: false,
     };
-    nodeModalVisable.value = true;
+    setTimeout(() => reload(), 5000);
+  } else {
+    message.error('创建失败');
+  }
+};
+
+onMounted(() => {
+  setInterval(function () {
+    reload();
+  }, 10000);
+});
+
+let dataItem = ref({
+  model: 'default',
+  nodes: [],
+});
+
+const nodeInfoColumn = [
+  {
+    title: '节点ID',
+    dataIndex: 'nodeId',
+    key: 'nodeId',
+    slots: {
+      customRender: 'nodeId',
+    },
+  },
+  { title: '合成数据量', dataIndex: 'data', key: 'data' },
+];
+
+//查询合成详情
+const showSynthModal = async (task) => {
+  // 1. 调用接口获取数据（假设已通过其他方式获取到接口返回的data）
+  const res = await getSynthDataApi({
+    query: 'TaskOnNodesQuery',
+    taskID: task.taskID,
+  });
+  dataItem.value = {
+    model: task.model,
+    nodes: Object.entries(res.data.nodeInfo).map(([nodeId, data]) => ({
+      nodeId: `ECNU-合成节点-${nodeId}`,
+      data: calculateDataSize(data, task.model, 'AUTO'),
+    })),
   };
+  nodeModalVisable.value = true;
+};
 
-  // const handleDownload = async (task) => {
-  //   try {
-  //     // 1. 调用接口获取数据（假设已通过其他方式获取到接口返回的data）
-  //     const response = await getCollectApi({
-  //       query: "CollectTaskQuery",
-  //       taskID: task.taskID,
-  //       size: task.total
-  //     })
-  //     const { file, filename } = response.data
+// const handleDownload = async (task) => {
+//   try {
+//     // 1. 调用接口获取数据（假设已通过其他方式获取到接口返回的data）
+//     const response = await getCollectApi({
+//       query: "CollectTaskQuery",
+//       taskID: task.taskID,
+//       size: task.total
+//     })
+//     const { file, filename } = response.data
 
-  //     // 2. Base64转Blob
-  //     const byteCharacters = atob(file)
-  //     const byteNumbers = new Uint8Array(byteCharacters.length)
-  //     for (let i = 0; i < byteCharacters.length; i++) {
-  //       byteNumbers[i] = byteCharacters.charCodeAt(i)
-  //     }
-  //     const byteArray = new Uint8Array(byteNumbers)
-  //     const blob = new Blob([byteArray])
+//     // 2. Base64转Blob
+//     const byteCharacters = atob(file)
+//     const byteNumbers = new Uint8Array(byteCharacters.length)
+//     for (let i = 0; i < byteCharacters.length; i++) {
+//       byteNumbers[i] = byteCharacters.charCodeAt(i)
+//     }
+//     const byteArray = new Uint8Array(byteNumbers)
+//     const blob = new Blob([byteArray])
 
-  //     // 3. 创建下载链接
-  //     const link = document.createElement('a')
-  //     link.href = URL.createObjectURL(blob)
-  //     // 根据数据类型决定文件扩展名: 图数据类型返回json文件，其他返回csv文件
-  //     const fileExtension = task.model === 'BAED' ? '.json' : '.csv'
-  //     link.download = filename + fileExtension // 使用接口返回的文件名
-  //     link.style.display = 'none'
+//     // 3. 创建下载链接
+//     const link = document.createElement('a')
+//     link.href = URL.createObjectURL(blob)
+//     // 根据数据类型决定文件扩展名: 图数据类型返回json文件，其他返回csv文件
+//     const fileExtension = task.model === 'BAED' ? '.json' : '.csv'
+//     link.download = filename + fileExtension // 使用接口返回的文件名
+//     link.style.display = 'none'
 
-  //     // 4. 触发下载
-  //     document.body.appendChild(link)
-  //     link.click()
-  //     document.body.removeChild(link)
-  //     URL.revokeObjectURL(link.href)
+//     // 4. 触发下载
+//     document.body.appendChild(link)
+//     link.click()
+//     document.body.removeChild(link)
+//     URL.revokeObjectURL(link.href)
 
-  //     // 5. 可选：显示成功提示
-  //     message.success('文件下载成功')
-  //   } catch (error) {
-  //     console.error('下载失败:', error)
-  //     message.error('文件下载失败')
-  //   }
-  // }
+//     // 5. 可选：显示成功提示
+//     message.success('文件下载成功')
+//   } catch (error) {
+//     console.error('下载失败:', error)
+//     message.error('文件下载失败')
+//   }
+// }
 
-  const handleDownloadStream = async (task) => {
-    // 1. 调用接口获取数据（假设已通过其他方式获取到接口返回的data）
-    downLoadCollectApi({
-      query: 'CollectTaskQuery',
-      taskID: task.taskID,
-      size: task.total,
+const handleDownloadStream = async (task) => {
+  // 1. 调用接口获取数据（假设已通过其他方式获取到接口返回的data）
+  downLoadCollectApi({
+    query: 'CollectTaskQuery',
+    taskID: task.taskID,
+    size: task.total,
+  });
+};
+
+// 上传数据弹窗
+const uploadModalVisible = ref<boolean>(false);
+const uploading = ref<boolean>(false);
+const uploadForm = ref({
+  taskID: '',
+  taskName: '',
+  purpose: '',
+  description: '',
+  createBy: ''
+});
+
+const handleUploadTaskStream = async (task) => {
+  uploadForm.value = {
+    taskID: task.taskID,
+    taskName: task.taskName || 'default',
+    purpose: '',
+    description: '',
+    createBy: ''
+  };
+  uploadModalVisible.value = true;
+};
+// 确认上传
+const handleUploadConfirm = async () => {
+  try {
+    uploading.value = true;
+
+    const res = await uploadTaskApi({
+      query: 'UploadTaskQuery',
+      taskID: uploadForm.value.taskID,
+      purpose: uploadForm.value.purpose,
+      description: uploadForm.value.description,
+      createBy: uploadForm.value.createBy
     });
-  };
 
-  // 上传数据弹窗
-  const uploadModalVisible = ref<boolean>(false);
-  const uploading = ref<boolean>(false);
-  const uploadForm = ref({
+    if (res.status === 'OK') {
+      message.success('上传成功！');
+      uploadModalVisible.value = false;
+      // 重置表单
+      uploadForm.value = {
+        taskID: '',
+        taskName: '',
+        purpose: '',
+        description: '',
+        createBy: ''
+      };
+    } else {
+      message.error('上传失败：' + (res.message || '未知错误'));
+    }
+  } catch (error) {
+    console.error('上传失败:', error);
+    message.error('上传失败：' + error.message);
+  } finally {
+    uploading.value = false;
+  }
+};
+
+const handleUploadCancel = () => {
+  uploadModalVisible.value = false;
+  uploadForm.value = {
     taskID: '',
     taskName: '',
     purpose: '',
     description: '',
     createBy: ''
-  });
-
-  const handleUploadTaskStream = async (task) => {
-    uploadForm.value = {
-      taskID: task.taskID,
-      taskName: task.taskName || 'default',
-      purpose: '',
-      description: '',
-      createBy: ''
-    };
-    uploadModalVisible.value = true;
   };
-  // 确认上传
-  const handleUploadConfirm = async () => {
-    try {
-      uploading.value = true;
+};
 
-      const res = await uploadTaskApi({
-        query: 'UploadTaskQuery',
-        taskID: uploadForm.value.taskID,
-        purpose: uploadForm.value.purpose,
-        description: uploadForm.value.description,
-        createBy: uploadForm.value.createBy
-      });
+// 过滤任务
+const applyFilters = async () => {
+  console.log('搜索任务:', filters.value);
+};
 
-      if (res.status === 'OK') {
-        message.success('上传成功！');
-        uploadModalVisible.value = false;
-        // 重置表单
-        uploadForm.value = {
-          taskID: '',
-          taskName: '',
-          purpose: '',
-          description: '',
-          createBy: ''
-        };
-      } else {
-        message.error('上传失败：' + (res.message || '未知错误'));
-      }
-    } catch (error) {
-      console.error('上传失败:', error);
-      message.error('上传失败：' + error.message);
-    } finally {
-      uploading.value = false;
-    }
-  };
-
-  const handleUploadCancel = () => {
-    uploadModalVisible.value = false;
-    uploadForm.value = {
-      taskID: '',
-      taskName: '',
-      purpose: '',
-      description: '',
-      createBy: ''
-    };
-  };
-
-  // 过滤任务
-  const applyFilters = async () => {
-    console.log('搜索任务:', filters.value);
-  };
-
-  // 重置搜索
-  const resetFilters = () => {
-    filters.value = { taskId: '', txHash: '', status: null };
-  };
+// 重置搜索
+const resetFilters = () => {
+  filters.value = { taskId: '', txHash: '', status: null };
+};
 </script>
 
 <style scoped lang="less">
-  .formSlot {
-    width: 100%;
-    display: flex;
-    flex-direction: row;
-    column-gap: 10px;
-  }
+.formSlot {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  column-gap: 10px;
+}
 
-  .date-select-btn {
-    margin-left: 10px;
-  }
+.date-select-btn {
+  margin-left: 10px;
+}
 </style>
