@@ -15,6 +15,8 @@ export function modelToShow(modelName) {
   switch (modelName) {
     case 'FINKAN':
       return '关系表格数据';
+    case 'CTGAN':
+      return '关系表格数据';
     case 'ABM':
       return '时序数据';
     case 'BAED':

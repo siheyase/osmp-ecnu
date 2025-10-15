@@ -367,6 +367,7 @@
       { name: 'elliptic', value: res2.data.datasetDistribution['elliptic'] },
       { name: 'FINKAN_default', value: res2.data.datasetDistribution['default of credit card clients'] },
       { name: 'ABM_SHL2', value: res2.data.datasetDistribution['SHL2 TA0_600519_202401-202402_defreg'] },
+      { name: 'CTGAN_default', value: res2.data.datasetDistribution['default of credit card clients'] },
     ];
   });
 

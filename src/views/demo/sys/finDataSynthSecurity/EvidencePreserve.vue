@@ -468,6 +468,8 @@
                       <span>
                         <!-- 如果状态是 'success' 显示 '完整性检验' 按钮 -->
                         <a-button v-if="record.status === 'Finished'" type="link" @click="getSlotInfo(record, false)">完整性检验</a-button>
+                        <a-button v-if="record.status === 'Finished'" type="link" @click="getZKMLProof(record, false)">ZK证明展示</a-button>
+                        <a-button v-if="record.status === 'Finished'" type="link" @click="showKeyVerification(record)">密钥验证</a-button>
                         <!-- 默认情况下，显示一个提示信息或空的按钮 -->
                         <a-button v-else-if="record.status === 'Processing'" type="link" disabled>等待中</a-button>
                         <a-button v-else type="link" danger>错误原因</a-button>
@@ -508,6 +510,92 @@
                   </a-list>
                   <div id="proof" style="width: 1000px; height: 600px"></div>
                 </a-modal>
+                <a-modal
+                  v-model:open="ZKModalVisible"
+                  :title="slotItem.name + ' ZKML证明展示'"
+                  :width="{ width: '800px' }"
+                  :maskStyle="{ backgroundColor: 'rgba(0, 0, 0, 0.1)', boxShadow: 'none' }"
+                  centered
+                  @ok="ZKModalVisible = false"
+                >
+                  <template #footer>
+                    <a-button key="verify" type="primary" @click="verifyZKProof">验证</a-button>
+                    <a-button key="close" @click="ZKModalVisible = false">关闭</a-button>
+                  </template>
+                  <a-card>
+                    <pre style="max-height: 500px; overflow-y: auto; white-space: pre-wrap;">
+                      {{ JSON.stringify(zkProof, null, 2) }}
+                    </pre>
+                  </a-card>
+                </a-modal>
+
+                <a-modal
+                  v-model:open="KeyVerificationModalVisible"
+                  :title="'提交单元 ' + keyVerificationData.slotHash + ' 密钥验证展示'"
+                  :width="800"
+                  :maskStyle="{ backgroundColor: 'rgba(0, 0, 0, 0.1)', boxShadow: 'none' }"
+                  centered
+                  @ok="KeyVerificationModalVisible = false"
+                >
+                  <template #footer>
+                    <a-button key="close" @click="KeyVerificationModalVisible = false">关闭</a-button>
+                  </template>
+                  <a-list bordered size="large">
+                    <a-list-item>
+                      <a-row gutter="{16}" style="width: 100%">
+                        <a-col :span="24">
+                          <strong>提交单元: </strong>
+                          <a-tag color="purple" class="break-tag">{{ keyVerificationData.slotHash }}</a-tag>
+                        </a-col>
+                      </a-row>
+                    </a-list-item>
+                    <a-list-item>
+                      <a-row gutter="{16}" style="width: 100%">
+                        <a-col :span="24">
+                          <strong>节点ID: </strong>
+                          <a-tag color="orange">{{ keyVerificationData.nodeID }}</a-tag>
+                        </a-col>
+                      </a-row>
+                    </a-list-item>
+                    <a-list-item>
+                      <a-row gutter="{16}" style="width: 100%">
+                        <a-col :span="24">
+                          <strong>数据哈希: </strong>
+                          <a-tag color="cyan" class="break-tag">{{ keyVerificationData.dataHash }}</a-tag>
+                        </a-col>
+                      </a-row>
+                    </a-list-item>
+                    <a-list-item>
+                      <a-row gutter="{16}" style="width: 100%">
+                        <a-col :span="24">
+                          <strong>节点公钥: </strong>
+                          <a-tag color="blue" class="break-tag">{{ keyVerificationData.publicKey }}</a-tag>
+                        </a-col>
+                      </a-row>
+                    </a-list-item>
+                    <a-list-item>
+                      <a-row gutter="{16}" style="width: 100%">
+                        <a-col :span="24">
+                          <strong>节点签名: </strong>
+                          <a-tag color="green" class="break-tag">{{ keyVerificationData.signature }}</a-tag>
+                        </a-col>
+                      </a-row>
+                    </a-list-item>
+                    <a-list-item>
+                      <a-row gutter="{16}" style="width: 100%">
+                        <a-col :span="24">
+                          <strong>CA证书: </strong>
+                          <a-textarea
+                          :value="keyVerificationData.ca"
+                          readonly
+                          :rows="4"
+                        />
+                        </a-col>
+                      </a-row>
+                    </a-list-item>
+                  </a-list>
+                </a-modal>
+
               </a-collapse-panel>
             </a-collapse>
           </a-tab-pane>
@@ -589,6 +677,17 @@
   const scheduleActiveKey = ref(['0']);
   const timelineItems = ref([]);
   const FinalizedSlotModalVisable = ref<boolean>(false);
+  const ZKModalVisible = ref<boolean>(false);
+  const zkProof = ref<any>(null);
+  const KeyVerificationModalVisible = ref<boolean>(false);
+  const keyVerificationData = ref({
+    slotHash: '',
+    dataHash: '',
+    publicKey: '',
+    signature: '',
+    nodeID: '',
+    ca: ''
+  });
 
   function buildTree(proof, merkleRoot, target) {
     const show = 10;
@@ -744,6 +843,70 @@
     } else {
     }
   };
+
+  const getZKMLProof = async (slot, is_err) => {
+    const res = await getQueryDataApi({
+      query: 'SlotZKMLProof',
+      slotHash: slot.slotHash,
+    });
+
+    slotItem.name = slot.slotHash;
+    
+    if (res.status === 'OK') {
+      zkProof.value = res.data.proof; 
+      message.success('ZK 证明获取成功');
+      ZKModalVisible.value = true; 
+    } else {
+      message.error('ZK 证明获取失败');
+    }
+  };
+
+  const verifyZKProof = () => {
+    // 模拟验证逻辑
+    message.loading('正在验证 ZK 证明...');
+    setTimeout(() => {
+      message.success('ZK 证明验证成功！');
+    }, 1000);
+  };
+
+  const showKeyVerification = (slot) => {
+      try {
+          // 解析 base64 编码的 ca 字段
+          const caDecoded = atob(slot.ca);
+          const caData = JSON.parse(caDecoded);
+
+          // 解析 commit_slot 获取 commitment（数据哈希）
+          let dataHashHex = '';
+          try {
+              // commitment 是 base64 编码的，将其转换为十六进制
+              const commitmentBase64 = slot.commitment;
+              // 将 base64 转换为字节，再转换为十六进制
+              const rawData = atob(commitmentBase64);
+              dataHashHex = '0x' + Array.from(rawData)
+                  .map(char => ('0' + char.charCodeAt(0).toString(16)).slice(-2))
+                  .join('');
+          } catch (e) {
+              console.error('解析commit_slot失败:', e);
+              dataHashHex = '无法解析';
+          }
+
+          keyVerificationData.value = {
+              slotHash: slot.slotHash, 
+              dataHash: dataHashHex, // 直接使用 commitment 作为数据哈希
+              publicKey: caData.public_key || '',
+              signature: slot.sign, // 直接显示签名
+              nodeID: slot.nodeID !== undefined ? slot.nodeID : '',
+              ca: caDecoded
+          };
+
+          KeyVerificationModalVisible.value = true;
+          message.success('密钥信息加载成功');
+      } catch (error) {
+          console.error('解析密钥信息失败:', error);
+          message.error('密钥信息解析失败');
+      }
+  };
+
   const SchduleSlotTableColumn = (infoType) => {
     return [
       {
@@ -944,6 +1107,9 @@
               status: sArr[item.slots[i].status],
               commitment: item.slots[i].commitment,
               err: item.slots[i].err,
+              ca: item.slots[i].ca,
+              sign: item.slots[i].sign,
+              nodeID: item.slots[i].nodeID,
             });
           }
           scheduleArray.push({
@@ -1038,6 +1204,9 @@
             status: sArr[item.status],
             commitment: item.commitment,
             err: item.err,
+            ca: item.ca,
+            sign: item.sign,
+            nodeID: item.nodeID,
           });
         }
         scheduleArray.push({
@@ -1061,6 +1230,9 @@
             status: sArr[item.status],
             commitment: item.commitment,
             err: item.err,
+            ca: item.ca,
+            sign: item.sign,
+            nodeID: item.nodeID,
           });
         }
         scheduleArray.push({

@@ -1,4 +1,5 @@
 const dataRates = {
+  CTGAN: 160,
   FINKAN: 160,
   BAED: 113,
   ABM: 953,
@@ -40,8 +41,9 @@ export function calculateDataMapSize(dataGroup, type, isStr = true) {
   const ABM_size = dataGroup['ABM'] ? dataGroup['ABM'] * dataRates['ABM'] : 0;
   const FINKA_size = dataGroup['FINKAN'] ? dataGroup['FINKAN'] * dataRates['FINKAN'] : 0;
   const BAED_size = dataGroup['BAED'] ? dataGroup['BAED'] * dataRates['BAED'] : 0;
+  const CTGAN_size = dataGroup['CTGAN'] ? dataGroup['CTGAN'] * dataRates['CTGAN'] : 0;
 
-  const totalBytes = ABM_size + FINKA_size + BAED_size;
+  const totalBytes = CTGAN_size + ABM_size + FINKA_size + BAED_size;
   console.log(totalBytes);
   let selectedUnit: any;
 

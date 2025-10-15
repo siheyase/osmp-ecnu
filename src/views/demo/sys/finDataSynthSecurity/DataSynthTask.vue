@@ -243,7 +243,7 @@ const newTask = ref({
 const modelMapping = {
   time_series: [{ label: 'ABM', value: 'ABM' }],
   graph: [{ label: 'BAED', value: 'BAED' }, { label: 'TRADINGNET', value: 'TRADINGNET' }],
-  table: [{ label: 'FINKAN', value: 'FINKAN' }, { label: 'TRADINGACCOUT', value: 'TRADINGACCOUT' }],
+  table: [{ label: 'FINKAN', value: 'FINKAN' }, { label: 'TRADINGACCOUT', value: 'TRADINGACCOUT' }, { label: 'CTGAN', value: 'CTGAN' }],
 };
 
 // 可用数据集映射
@@ -253,6 +253,7 @@ const datasetMapping = {
   FINKAN: [{ label: 'credit_card_default', value: 'default of credit card clients' }, { label: 'FINKAN_OutSample', value: 'FINKAN_OutSample' }],
   TRADINGNET: [{ label: 'TRADINGNET_SampleAccounts', value: 'TRADINGNET_SampleAccounts' }],
   TRADINGACCOUT: [{ label: 'TRADINGACCOUT_DARASET', value: 'TRADINGACCOUT_DATASET' }],
+  CTGAN: [{ label: 'credit_card_default', value: 'default of credit card clients' }],
 };
 
 // 计算可用模型
