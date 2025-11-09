@@ -469,7 +469,7 @@
                         <!-- 如果状态是 'success' 显示 '完整性检验' 按钮 -->
                         <a-button v-if="record.status === 'Finished'" type="link" @click="getSlotInfo(record, false)">完整性检验</a-button>
                         <!-- <a-button v-if="record.status === 'Finished'" type="link" @click="getZKMLProof(record, false)">ZK证明展示</a-button> -->
-                        <a-button v-if="record.status === 'Finished'" type="link" @click="showKeyVerification(record)">密钥验证</a-button>
+                        <a-button v-if="record.status === 'Finished'" type="link" @click="showKeyVerification(record)">合成证书</a-button>
                         <!-- 默认情况下，显示一个提示信息或空的按钮 -->
                         <a-button v-else-if="record.status === 'Processing'" type="link" disabled>等待中</a-button>
                         <a-button v-else type="link" danger>错误原因</a-button>
@@ -531,7 +531,7 @@
 
                 <a-modal
                   v-model:open="KeyVerificationModalVisible"
-                  :title="'提交单元 ' + keyVerificationData.slotHash + ' 密钥验证展示'"
+                  :title="'提交单元 ' + keyVerificationData.slotHash + ' 合成证书'"
                   :width="800"
                   :maskStyle="{ backgroundColor: 'rgba(0, 0, 0, 0.1)', boxShadow: 'none' }"
                   centered
